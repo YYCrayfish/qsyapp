@@ -127,6 +127,13 @@ public class FFmpegUtil {
      * @param srcFile    源文件
      * @param waterMark  水印文件路径
      * @param targetFile 目标文件
+     *
+
+        原始视频文件路径：Wildlife.wmv
+        水印图片路径：panda.png
+        水印位置：（x,y)=(10,10)<=(left,top)距离左侧、顶部各10像素；
+        输出文件路径：Marked.wmv
+
      * @return 添加水印后的文件
      */
     public static String[] addWaterMark(String srcFile, String waterMark, String overlay, String targetFile) {

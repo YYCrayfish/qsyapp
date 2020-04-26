@@ -13,6 +13,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
@@ -178,7 +179,11 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
         DisplayMetrics dm = getResources().getDisplayMetrics();
         screenWidth = dm.widthPixels;
         screenHeight = dm.heightPixels;
-        outPath = getBaseContext().getCacheDir().getAbsolutePath() + File.separator;
+        // 不能指定路径为data下，不然会无法读取到视频
+        outPath = Environment.getExternalStorageDirectory().getPath()+"/qsymy"+File.separator;//getBaseContext().getCacheDir().getAbsolutePath() + File.separator;
+        File temp = new File(outPath);
+        if(!temp.exists())
+            temp.mkdirs();
         moveIv = findViewById(R.id.move_iv);
         moveIv.setOnTouchListener(movingEventListener);
         moveTv.setOnTouchListener(movingEventListener);
@@ -369,42 +374,53 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
 
     private void addWater(String path) {
         if (type == 1) {
+
+            // 这里把Text文本转为了图片 因为添加水印时，需要传一个水印地图地址的参数
             tvToImg();
+
             imagePath = outPath + "qsy_aw_tv.png";//文字转图片暂存路径
             overlay = "overlay=" + 0 + ":" + 0;
         }
         outPath = outPath + "aw_" + UriToPathUtil.getFileNameByPath(path);
-
+        Log.e("xushiyong","地址:"+path+","+imagePath+","+overlay+","+outPath);
+        ///storage/emulated/0/tencent/MicroMsg/WeiXin/wx_camera_1587654132226.mp4,
+        // //data/user/0/com.manyu.videoshare/cache/qsy_aw_tv.png,
+        // overlay=0:0,
+        // /data/user/0/com.manyu.videoshare/cache/aw_wx_camera_1587654132226.mp4
         String[] commands = FFmpegUtil.addWaterMark(path, imagePath, overlay, outPath);
 
-        RxFFmpegInvoke.getInstance().runCommandRxJava(commands).subscribe(new RxFFmpegSubscriber() {
-            @Override
-            public void onFinish() {
+        try {
+            RxFFmpegInvoke.getInstance().runCommandRxJava(commands).subscribe(new RxFFmpegSubscriber() {
+                @Override
+                public void onFinish() {
 
-                PreviewActivity.start(AddWaterActivity.this, outPath);
-                UriToPathUtil.deleteSingleFile(imagePath);
-                imagePath = "";
-                outPath = getCacheDir().getAbsolutePath() + File.separator;
-                proessEnd();
-                Log.e("ffmpeg_result", "成功");
-            }
+                    PreviewActivity.start(AddWaterActivity.this, outPath);
+                    UriToPathUtil.deleteSingleFile(imagePath);
+                    imagePath = "";
+                    outPath = getCacheDir().getAbsolutePath() + File.separator;
+                    proessEnd();
+                    Log.e("ffmpeg_result", "成功");
+                }
 
-            @Override
-            public void onProgress(int progress, long progressTime) {
-                setProess(progress);
-                Log.e("ffmpeg_result", progress + "");
-            }
+                @Override
+                public void onProgress(int progress, long progressTime) {
+                    setProess(progress);
+                    Log.e("ffmpeg_result", progress + "");
+                }
 
-            @Override
-            public void onCancel() {
-                Log.e("ffmpeg_result", "取消");
-            }
+                @Override
+                public void onCancel() {
+                    Log.e("ffmpeg_result", "取消");
+                }
 
-            @Override
-            public void onError(String message) {
-                Log.e("ffmpeg_result", "失败");
-            }
-        });
+                @Override
+                public void onError(String message) {
+                    Log.e("ffmpeg_result", "失败");
+                }
+            });
+        }catch (Exception e){
+            Log.e("xushiyong","抛出异常~~"+e.toString());
+        }
     }
 
     private void tvToImg() {

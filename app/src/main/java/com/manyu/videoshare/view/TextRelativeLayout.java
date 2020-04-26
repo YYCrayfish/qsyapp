@@ -182,13 +182,11 @@ public class TextRelativeLayout extends RelativeLayout {
                 });
                 imageView.setImageDrawable(getResources().getDrawable(R.mipmap.ic_puase));
                 imageView.setLayoutParams(new LayoutParams(60, 60));
-                imageView.setX((int) textView.getX() + textView.getMeasuredWidth());
-                imageView.setY((int) textView.getY() + textView.getMeasuredHeight());
+                universallySetImageXY();
                 addView(imageView);
             } else {
 //                if (isClickTv) {
-                imageView.setX((int) textView.getX() + textView.getMeasuredWidth());
-                imageView.setY((int) textView.getY() + textView.getMeasuredHeight());
+                universallySetImageXY();
 //                }
                 imageView.setVisibility(VISIBLE);
 
@@ -199,6 +197,14 @@ public class TextRelativeLayout extends RelativeLayout {
                 imageView.setVisibility(GONE);
             }
         }
+    }
+
+    private void universallySetImageXY(){
+        Log.e("xushiyong"," 左上右下:"+textView.getLeft()+","+textView.getTop()+","+textView.getRight()+","+textView.getBottom()+"   x-y:"+textView.getX()+"-"+textView.getY());
+        imageView.setX((int) textView.getX() + textView.getMeasuredWidth() - 20);
+        imageView.setY((int) textView.getY() + textView.getMeasuredHeight() - 20);
+//        imageView.setX((int) textView.getRight() - 20);
+//        imageView.setY((int) textView.getBottom() - 20);
     }
 
     @Override
@@ -238,6 +244,9 @@ public class TextRelativeLayout extends RelativeLayout {
                             //平移操作
                             textView.setX(event.getX() - mTv_width);
                             textView.setY(event.getY() - mTv_height);
+
+                            //universallySetImageXY();
+
                             invalidate();
                         }
 
