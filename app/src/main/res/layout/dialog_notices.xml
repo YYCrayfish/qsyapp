@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:background="@color/dialog_clip"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_marginLeft="41dp"
+        android:layout_marginRight="41dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/dialo_white_8"
+        android:orientation="vertical">
+        <TextView
+            android:layout_marginTop="35dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_gravity="center_horizontal"
+            android:text="剩余解析次数用尽"
+            android:textColor="@color/user_title_back"/>
+        <Button
+            android:layout_marginLeft="71dp"
+            android:layout_marginRight="71dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/btn_blue_10"
+            android:textColor="@color/user_title_back"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginTop="25dp"
+            android:id="@+id/dialog_notices_buy"
+            android:text="购买VIP"/>
+        <Button
+            android:layout_marginLeft="71dp"
+            android:layout_marginRight="71dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/btn_white_white_10"
+            android:textColor="@color/user_title_back"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginTop="17dp"
+            android:id="@+id/dialog_notices_gets"
+            android:text="免费获取"/>
+        <Button
+            android:layout_marginLeft="71dp"
+            android:layout_marginRight="71dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/btn_white_white_10"
+            android:textColor="@color/user_title_back"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="35dp"
+            android:id="@+id/dialog_notices_cancle"
+            android:text="返回"/>
+    </LinearLayout>
+
+
+</LinearLayout>

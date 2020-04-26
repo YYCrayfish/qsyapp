@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="recharge_money">26dp</dimen>
+    <dimen name="edit_size">16sp</dimen>
+    <dimen name="padding_top">30dp</dimen>
+    <dimen name="grid_expected_size">150dp</dimen>
+</resources>

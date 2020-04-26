@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".ui.account.SettingActivity">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <include layout="@layout/include_app_title"/>
+        <LinearLayout
+            android:id="@+id/setting_btn_version"
+            android:padding="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_weight="1"
+                android:textSize="14dp"
+                android:textColor="@color/main_text_support"
+                android:text="检查更新"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/icon_right"/>
+        </LinearLayout>
+        <include layout="@layout/include_line_a"/>
+        <LinearLayout
+            android:padding="16dp"
+            android:id="@+id/setting_privacy_policy"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_weight="1"
+                android:textSize="14dp"
+                android:textColor="@color/main_text_support"
+                android:text="隐私政策"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/icon_right"/>
+        </LinearLayout>
+        <include layout="@layout/include_line_a"/>
+        <LinearLayout
+            android:padding="16dp"
+            android:id="@+id/setting_btn_about"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_weight="1"
+                android:textSize="14dp"
+                android:textColor="@color/main_text_support"
+                android:text="关于我们"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/icon_right"/>
+        </LinearLayout>
+        <include layout="@layout/include_line_a"/>
+    </LinearLayout>
+    <Button
+        android:id="@+id/setting_btn_exit"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="16dp"
+        android:layout_width="match_parent"
+        android:text="退出"
+        android:textSize="18sp"
+        android:textColor="@color/login_blue"
+        android:layout_height="wrap_content"
+        android:background="@drawable/btn_white"/>
+</RelativeLayout>

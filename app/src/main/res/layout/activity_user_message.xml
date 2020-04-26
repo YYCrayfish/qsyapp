@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/white"
+    tools:context=".ui.user.UserMessageActivity">
+    <include layout="@layout/include_app_title"/>
+    <LinearLayout
+        android:id="@+id/message_btn_changeheand"
+        android:layout_marginTop="25dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        android:orientation="vertical">
+        <ImageView
+            android:id="@+id/message_img_head"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:src="@drawable/user_head_default"
+            android:layout_gravity="center_horizontal"/>
+        <TextView
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="点击更换头像"
+            android:textColor="@color/main_text_support"
+            android:textSize="14sp"
+            android:layout_marginTop="10dp"/>
+    </LinearLayout>
+    <include layout="@layout/include_line_a"/>
+    <LinearLayout
+        android:id="@+id/message_btn_name"
+        android:padding="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+
+            android:textSize="14dp"
+            android:textColor="@color/main_text_support"
+            android:text="昵称"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/message_text_name"
+            android:layout_marginLeft="35dp"
+            android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="18812224444"/>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/icon_right"/>
+    </LinearLayout>
+    <include layout="@layout/include_line_a"/>
+    <LinearLayout
+        android:id="@+id/message_btn_birthday"
+        android:padding="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+
+            android:textSize="14dp"
+            android:textColor="@color/main_text_support"
+            android:text="生日"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/message_text_birthday"
+            android:layout_marginLeft="35dp"
+            android:layout_weight="1"
+            android:textSize="14dp"
+            android:textColor="@color/main_text_support"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="请编辑生日"/>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/icon_right"/>
+    </LinearLayout>
+    <include layout="@layout/include_line_a"/>
+    <LinearLayout
+        android:id="@+id/message_btn_signature"
+        android:padding="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+
+            android:textSize="14dp"
+            android:textColor="@color/main_text_support"
+            android:text="签名"
+            android:layout_gravity="center_vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:textSize="14dp"
+            android:id="@+id/message_text_signature"
+            android:layout_marginLeft="35dp"
+            android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="请编辑签名"/>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/icon_right"/>
+    </LinearLayout>
+    <include layout="@layout/include_line_a"/>
+    <LinearLayout
+        android:id="@+id/message_btn_sex"
+        android:padding="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+
+            android:textSize="14dp"
+            android:textColor="@color/main_text_support"
+            android:text="性别"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/message_text_sex"
+            android:layout_marginLeft="35dp"
+            android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="保密"/>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/icon_right"/>
+    </LinearLayout>
+    <include layout="@layout/include_line_a"/>
+</LinearLayout>

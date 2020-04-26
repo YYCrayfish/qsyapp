@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+
+    <RelativeLayout
+
+        android:layout_width="match_parent"
+        android:layout_height="38dp"
+        android:layout_gravity="center_vertical"
+        android:gravity="center_vertical">
+
+
+        <ImageView
+            android:layout_centerVertical="true"
+            android:id="@+id/title_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/title_invite_back"
+            android:paddingRight="16dp"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
+            android:paddingLeft="16dp"/>
+
+
+        <TextView
+            android:layout_centerVertical="true"
+            android:id="@+id/title_tv"
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:textColor="#FFFFFFFF"
+            android:textSize="18sp" />
+        <TextView
+            android:visibility="gone"
+            android:id="@+id/title_right"
+            android:paddingRight="16dp"
+            android:textSize="14sp"
+            android:textColor="@color/main_text_support"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="完成"/>
+    </RelativeLayout>
+
+
+
+</LinearLayout>

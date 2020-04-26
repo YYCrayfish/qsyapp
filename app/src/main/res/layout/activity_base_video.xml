@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#232323"
+    android:orientation="vertical"
+    tools:context=".base.BaseVideoActivity">
+
+    <LinearLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <include layout="@layout/include_app_title" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/cl_progress"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#80000000"
+        android:gravity="center"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.manyu.videoshare.view.Progressbar
+            android:id="@+id/progressbar"
+            android:layout_width="match_parent"
+            android:layout_height="15dp"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp" />
+    </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>

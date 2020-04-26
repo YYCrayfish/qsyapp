@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:background="@color/white"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="18dp"
+    android:id="@+id/layout_paytype_title"
+    android:orientation="horizontal">
+    <ImageView
+        android:layout_width="21dp"
+        android:layout_gravity="center_vertical"
+        android:layout_height="21dp"
+        android:id="@+id/layout_paytype_icon"
+        android:src="@drawable/recharge_icon_weixin"/>
+    <TextView
+        android:id="@+id/layout_paytype_text"
+        android:layout_weight="1"
+        android:layout_marginLeft="11dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:layout_gravity="center_vertical"
+        android:textColor="@color/main_text_support"
+        android:text="微信支付"/>
+    <RadioButton
+        android:clickable="false"
+        android:id="@+id/layout_paytype_selection"
+        style="@style/recharge_select"
+        android:layout_gravity="center_vertical"
+        android:drawableTop="@drawable/recharge_select" />
+</LinearLayout>

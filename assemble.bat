@@ -1,0 +1,1 @@
+gradlew.bat assembleReleaseChannels -PchannelList=test

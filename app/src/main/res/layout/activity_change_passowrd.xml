@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:background="@color/white"
+    android:layout_height="match_parent">
+    <include layout="@layout/include_app_title" />
+    <LinearLayout
+        android:layout_marginTop="57dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:lines="1"
+            android:textSize="@dimen/edit_size"
+            android:inputType="textPassword"
+            android:id="@+id/change_edit_oldps"
+            android:layout_marginBottom="5dp"
+            android:background="@drawable/edit_null"
+            android:textColorHint="@color/hint_color"
+            android:hint="@string/edit_phone_oldpassword"
+            />
+        <include layout="@layout/include_line_a"/>
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:lines="1"
+            android:textSize="@dimen/edit_size"
+            android:layout_marginTop="20dp"
+            android:id="@+id/change_edit_password"
+            android:layout_marginBottom="5dp"
+            android:background="@drawable/edit_null"
+            android:textColorHint="@color/hint_color"
+            android:hint="请输入新密码"
+            android:inputType="textPassword"
+            />
+        <include layout="@layout/include_line_a"/>
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:lines="1"
+            android:textSize="@dimen/edit_size"
+            android:inputType="textPassword"
+            android:layout_marginTop="20dp"
+            android:id="@+id/change_edit_repassword"
+            android:layout_marginBottom="5dp"
+            android:background="@drawable/edit_null"
+            android:textColorHint="@color/hint_color"
+            android:hint="请再次输入新密码"
+            />
+        <include layout="@layout/include_line_a"/>
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/btn_blue"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:layout_marginTop="32dp"
+            android:id="@+id/change_btn_confirm"
+            android:text="@string/forget_btn_confirm"/>
+    </LinearLayout>
+</LinearLayout>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/main_text_support"
+    tools:context=".ui.FullVideoActivity">
+    <com.manyu.videoshare.base.MyVideoView
+
+        android:layout_centerInParent="true"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/full_videview"
+        />
+    <LinearLayout
+        android:id="@+id/full_up"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <include layout="@layout/layout_popupwindow" />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/full_screen"
+        android:layout_above="@id/full_up"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/main_video_back"
+            android:visibility="gone"
+            android:layout_height="match_parent" />
+        <ImageView
+            android:visibility="gone"
+            android:id="@+id/main_surface_start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/main_video_play"
+            android:layout_centerInParent="true"/>
+    </RelativeLayout>
+    <ImageView
+        android:id="@+id/full_img_back"
+        android:layout_width="wrap_content"
+        android:paddingTop="45dp"
+        android:paddingLeft="20dp"
+        android:paddingBottom="16dp"
+        android:paddingRight="16dp"
+        android:layout_height="wrap_content"
+        android:src="@drawable/title_back"/>
+</RelativeLayout>

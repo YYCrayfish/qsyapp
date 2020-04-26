@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#008577</color>
+    <color name="colorPrimaryDark">#00574B</color>
+    <color name="colorAccent">#D81B60</color>
+    <color name="home_item_un">#dcdcdc</color>
+    <color name="lightcoral">#f08080</color>
+    <color name="white">#ffffff</color>
+    <color name="hint_color">#FF999999</color>
+    <color name="login_foget">#FF00C8FD</color>
+    <color name="login_blue">#FF00C8FD</color>
+    <color name="check_box_text">#FF343434</color>
+    <color name="main_text_support">#FF1F1F1F</color>
+    <color name="main_text_ask_answer">#FFFF0F97</color>
+    <color name="main_text_ask_answerword">#FF000000</color>
+    <color name="black">#80000000</color>
+    <color name="dialog_clip">#88000000</color>
+    <color name="main_text_explain">#FF999999</color>
+    <color name="recharge_line">#FFF4B85A</color>
+    <color name="recharge_back">#FFF4F4F4</color>
+    <color name="tran">#00000000</color>
+    <color name="about_name">#FF393E4C</color>
+    <color name="about_version">#FFD1D3DE</color>
+    <color name="start_jump">#FFCCCCCC</color>
+    <color name="start_bar">#FFFFD200</color>
+    <color name="user_title_back">#FF1F1F1F</color>
+    <color name="paylist_color">#FFFF0707</color>
+    <color name="share_heand_color">#FF181818</color>
+    <color name="share_invite_text">#FF343434</color>
+    <color name="dialog_share_back">#FFF4F4F4</color>
+    <color name="shareimg_back_up">#FF537AFF</color>
+    <color name="shareimg_back_down">#FF00C3FD</color>
+    <string name="colorThemeString" translatable="false">#FF00C8FD</string>
+    <string name="colorThemeLightString" translatable="false">#FFBBFFFF</string>
+    <color name="colorThemeLight">#FFBBFFFF</color>
+</resources>

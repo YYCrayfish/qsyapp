@@ -1,0 +1,152 @@
+apply plugin: 'com.android.application'
+apply plugin: 'walle'
+
+def pass = '37333733'
+def key_file = 'sqss.jks'
+def daoV = "27.1.0"
+android {
+
+    signingConfigs {
+        keyAlias {
+            keyAlias project.hasProperty("alias") ? project.getProperty("alias") : "sqss_qushuiyin"
+            keyPassword "$pass"
+            storeFile file("$key_file")
+            storePassword "$pass"
+            v1SigningEnabled true
+            v2SigningEnabled true
+        }
+    }
+    /*compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    aaptOptions {
+        cruncherEnabled = false
+        useNewCruncher = false
+
+    }*/
+    compileSdkVersion 27
+    defaultConfig {
+        applicationId project.hasProperty("applicationIds") ? project.getProperty("applicationIds") : "com.manyu.videoshare"
+        flavorDimensions "versionCode"
+        minSdkVersion 20
+        targetSdkVersion 27
+        versionCode 2
+        versionName "1.0.2"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        ndk {
+            abiFilters "armeabi-v7a", "arm64-v8a"
+        }
+    }
+    buildTypes {
+        release {
+            signingConfig signingConfigs.keyAlias
+
+
+            def isHx = project.hasProperty("isHx") ? project.getProperty("isHx") : "0"
+            matchingFallbacks = ['release', 'debug']
+            //开启断点调试
+            buildConfigField "boolean", "LOG_DEBUG", "$isHx" != '0' ? "false" : "true"
+            debuggable "$isHx" == '0'
+            signingConfig signingConfigs.keyAlias
+            //混淆
+            minifyEnabled "$isHx" != '0'
+            //Zipalign优化
+            zipAlignEnabled "$isHx" != '0'
+            // 移除无用的resource文件
+            shrinkResources "$isHx" != '0'
+
+            //前一部分代表系统默认的android程序的混淆文件，该文件已经包含了基本的混淆声明，后一个文件是自己的定义混淆文件
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        app2.initWith(release)
+        App3.initWith(release)
+    }
+    /*productFlavors {
+        ceshi {
+            manifestPlaceholders = [UMENG_CHANNEL_VALUE: "ceshi"]
+        }
+        yingyongbao {
+            manifestPlaceholders = [UMENG_CHANNEL_VALUE: "yingyongbao"]
+        }
+        wandoujia {
+            manifestPlaceholders = [UMENG_CHANNEL_VALUE: "wandoujia"]
+        }
+        xiaomi {
+            manifestPlaceholders = [UMENG_CHANNEL_VALUE: "xiaomi"]
+        }
+    }*/
+    packagingOptions {//加上这写代码
+        pickFirst 'META-INF/*'
+    }
+    project.configurations.all {
+        resolutionStrategy.eachDependency { details ->
+            if (details.requested.group == 'com.android.support'
+                    && !details.requested.name.contains('multidex')) {
+                details.useVersion "27.1.0"
+            }
+        }
+    }
+    allprojects {
+        repositories {
+            maven { url 'https://www.jitpack.io' }
+        }
+    }
+}
+configurations.all {
+    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+        def requested = details.requested
+        if (requested.group == 'com.android.support') {
+            if (!requested.name.startsWith("multidex")) {
+                details.useVersion "$daoV"
+            }
+        }
+    }
+    resolutionStrategy {
+        force "com.android.support:support-v4:$daoV"
+    }
+}
+
+walle {
+    apkOutputFolder = new File("${project.buildDir}/outputs/channels")
+    apkFileNameFormat = '${buildType}_${channel}.apk'
+    //configFile与channelFile两者必须存在一个，否则无法生成渠道包。两者都存在时优先执行configFile
+    channelFile = new File("${project.getProjectDir()}/channel")
+    //configFile = new File("${project.getProjectDir()}/config.json")
+}
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+    api 'com.zhihu.android:matisse:0.5.2-beta4'
+    //noinspection GradleCompatible
+    implementation 'com.android.support:appcompat-v7:27.1.0'
+    implementation 'com.android.support:support-v4:27.1.0'
+    implementation 'com.android.support:recyclerview-v7:27.1.0'
+    implementation 'com.jaeger.statusbarutil:library:1.5.1'
+    implementation "com.android.support:cardview-v7:$daoV"
+    testImplementation 'junit:junit:4.12'
+    implementation 'com.jude:rollviewpager:1.4.6'
+    implementation 'com.zhy:okhttputils:2.6.2'
+    implementation 'com.alibaba:fastjson:1.2.31'
+    implementation 'com.zhy:base-rvadapter:3.0.3'
+    implementation 'jp.wasabeef:glide-transformations:2.0.2'
+    implementation files('libs/gson-2.2.4.jar')
+    implementation 'com.github.ybq:Android-SpinKit:1.2.0'
+    implementation 'com.github.bumptech.glide:glide:4.9.0'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
+    implementation 'io.reactivex.rxjava2:rxjava:2.0.5'
+    implementation 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.3@aar'
+    implementation 'com.tencent.mm.opensdk:wechat-sdk-android-with-mta:+'
+    implementation 'com.umeng.sdk:common:latest.integration'
+    implementation 'com.umeng.sdk:analytics:latest.integration'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    implementation 'com.meituan.android.walle:library:1.1.6'
+    implementation 'com.squareup.okhttp3:okhttp:3.3.1'
+    implementation 'com.github.microshow:RxFFmpeg:2.2.0'
+    implementation project(":takephoto_library")
+    api(name: 'alipaySdk-15.6.2-20190416165100-noUtdid', ext: 'aar')
+    api 'com.google.zxing:android-core:3.3.0'
+    api 'com.google.zxing:core:3.3.2'
+}

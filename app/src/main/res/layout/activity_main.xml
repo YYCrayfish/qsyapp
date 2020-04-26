@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical"
+    tools:context=".ui.MainActivity">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:id="@+id/main_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+        </FrameLayout>
+
+
+        <include layout="@layout/include_line_a"/>
+
+
+        <RadioGroup
+            android:id="@+id/main_radiogroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingTop="5dp">
+
+            <RadioButton
+                android:id="@+id/main_radio_a"
+                style="@style/radiobutton_style"
+                android:checked="true"
+                android:drawableTop="@drawable/main_icon_main"
+                android:text="主页" />
+
+            <RadioButton
+                android:id="@+id/main_radio_b"
+                style="@style/radiobutton_style"
+                android:drawableTop="@drawable/main_icon_mine"
+                android:text="我的" />
+
+
+        </RadioGroup>
+    </LinearLayout>
+
+
+</LinearLayout>

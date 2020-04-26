@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#000"
+    android:padding="10dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/color"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="颜色"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:includeFontPadding="false"
+                android:textSize="15sp"
+                android:textColor="@color/white"/>
+            <RelativeLayout
+                android:id="@+id/rl_color_bar"
+                app:layout_constraintTop_toTopOf="@+id/color"
+                app:layout_constraintLeft_toRightOf="@id/color"
+                app:layout_constraintBottom_toBottomOf="@id/color"
+                app:layout_constraintRight_toRightOf="parent"
+                android:layout_marginLeft="10dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:id="@+id/ll_color_progress"
+                        android:layout_width="match_parent"
+                        android:layout_height="12dp">
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="@drawable/shape_red_green_01" />
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="@drawable/shape_red_green_02" />
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="@drawable/shape_green_blue_01" />
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="@drawable/shape_green_blue_02" />
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="@drawable/shape_blue_red_01" />
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="@drawable/shape_blue_red_02" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <View
+                    android:id="@+id/view_color_bar"
+                    android:layout_width="6dp"
+                    android:layout_height="16dp"
+                    android:layout_centerVertical="true"
+                    android:background="@drawable/shape_color_pick_bar" />
+
+            </RelativeLayout>
+            <TextView
+                android:id="@+id/tran"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="透明"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/color"
+                android:layout_marginTop="8dp"
+                android:includeFontPadding="false"
+                android:textSize="15sp"
+                android:textColor="@color/white"/>
+            <RelativeLayout
+                android:id="@+id/rl_trans_bar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/tran"
+                app:layout_constraintLeft_toRightOf="@+id/tran">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="12dp"
+                    android:layout_centerVertical="true"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/bg_trans_01" />
+
+                <ImageView
+                    android:id="@+id/view_trans_preview"
+                    android:layout_width="match_parent"
+                    android:layout_height="12dp"
+                    android:layout_centerVertical="true" />
+
+                <View
+                    android:id="@+id/view_trans_bar"
+                    android:layout_width="6dp"
+                    android:layout_height="16dp"
+                    android:layout_centerVertical="true"
+                    android:background="@drawable/shape_color_pick_bar" />
+
+            </RelativeLayout>
+
+        </android.support.constraint.ConstraintLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="明暗"
+            android:includeFontPadding="false"
+            android:textSize="15sp"
+            android:textColor="@color/white"/>
+        <RelativeLayout
+            android:id="@+id/fl_color"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="10dp"
+            android:background="#ffff0000">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/shape_white_gradually_trans" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/shape_black_gradually_trans" />
+
+            <View
+                android:id="@+id/view_location"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:background="@drawable/shape_stroke_dot" />
+
+        </RelativeLayout>
+    </LinearLayout>
+</LinearLayout>
