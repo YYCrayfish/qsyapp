@@ -12,8 +12,10 @@ import com.manyu.videoshare.R;
 
 public class WaterMark extends RelativeLayout {
 
-    TextView text;
-    ImageView button;
+    private TextView text;
+    private ImageView btnControl;
+    private ImageView btnDelete;
+    long waterMarkId;
 
     public WaterMark(Context context){
         super(context);
@@ -22,7 +24,8 @@ public class WaterMark extends RelativeLayout {
         addView(view);
 
         text = findViewById(R.id.waterText);
-        button = findViewById(R.id.waterButton);
+        btnControl = findViewById(R.id.waterButtonControl);
+        btnDelete = findViewById(R.id.waterButtonDelete);
     }
 
     public void setText(String content){
@@ -30,9 +33,11 @@ public class WaterMark extends RelativeLayout {
             text.setText(content);
     }
 
-    public ImageView getButton(){
-        return button;
+    public ImageView getBtnControl(){
+        return btnControl;
     }
+
+    public ImageView getBtnDelete(){return btnDelete;}
 
     public void setTextSize(float textSize){
         if(text != null)
@@ -43,23 +48,19 @@ public class WaterMark extends RelativeLayout {
         return text!=null ? text.getTextSize():0;
     }
 
-    public String getTextString(){
-        return text!=null ? text.getText().toString():"";
+    // 隐藏按钮 在生成视频前需要先隐藏掉，不然视频上的水印图片会带有这两个小控制按钮
+    public void hideButton(){
+        if(btnControl != null)
+            btnControl.setVisibility(View.GONE);
+        if(btnDelete != null)
+            btnDelete.setVisibility(View.GONE);
     }
 
-    public float getXX(){
-        return getX();
+    public void setWaterMarkId(long id){
+        waterMarkId = id;
     }
 
-    public float getYY(){
-        return getY();
+    public long getWaterMarkId(){
+        return waterMarkId;
     }
-
-
-
-//    public void setScale(float scale){
-//        if(text != null)
-//            text.setSca(textSize);
-//
-//    }
 }

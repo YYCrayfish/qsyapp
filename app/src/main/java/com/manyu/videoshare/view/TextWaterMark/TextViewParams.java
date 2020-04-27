@@ -7,6 +7,7 @@ package com.manyu.videoshare.view.TextWaterMark;
 public class TextViewParams {
     int width;
     int height;
+    long tag;
 
     public int getWidth() {
         return width;
@@ -22,5 +23,13 @@ public class TextViewParams {
 
     public void setHeight(int height) {
         this.height = height;
+    }
+
+    public long getTag() {
+        return tag;
+    }
+
+    public void setTag(long tag) {
+        this.tag = tag;
     }
 }

@@ -1,7 +1,6 @@
 package com.manyu.videoshare.view;
 
 import android.content.Context;
-import android.graphics.Point;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -23,7 +22,7 @@ public class WaterMarkLayout extends RelativeLayout {
     // 水印组件列表
     private List<WaterMark> waterMarkList = new ArrayList<>();
     // 所有水印组件的属性列表
-    private List<TextViewParams> listTvParams = new ArrayList<>();
+//    private List<TextViewParams> listTvParams = new ArrayList<>();
 
     // 当前的水印
     private WaterMark currentWaterMark;
@@ -38,6 +37,9 @@ public class WaterMarkLayout extends RelativeLayout {
     private float currentAngle = 0;
     private float lastAngle = 0;
     private float scale = 0;
+    // 缩放限制
+    private float maxScan = 60;
+    private float minScan = 8;
 
     // 记录当前水印的宽高
     private int waterMakeWidth;
@@ -63,17 +65,19 @@ public class WaterMarkLayout extends RelativeLayout {
         // 重置X Y数据
         waterMark.setX(x);
         waterMark.setY(y);
+        // 设置一个唯一ID 后面删除时需要用到 PS:只有触摸生效时才能获得真正的currentWaterMark，直接点击删除按钮可能删除的是最后一次触摸的其他水印
+        waterMark.setWaterMarkId(System.currentTimeMillis());
 
         // 存入容器
         waterMarkList.add(waterMark);
 
         // 设置水印的拖拉按钮的触摸事件监听
         waterMark.setOnTouchListener(onTouchListener);
-        waterMark.getButton().setOnTouchListener(onTouchWaterButtonListener);
+        waterMark.getBtnControl().setOnTouchListener(onTouchWaterButtonListener);
+        waterMark.getBtnDelete().setOnClickListener(new OnClickDelete(waterMark.getWaterMarkId()));
 
         // 添加本布局中
         addView(waterMark);
-//        saveTextViewparams();
     }
 
     public void addWaterMark(WaterMark waterMark){
@@ -92,12 +96,9 @@ public class WaterMarkLayout extends RelativeLayout {
                     touchDown = true;
                     touchX = ((int) motionEvent.getX());
                     touchY = ((int) motionEvent.getY());
-//                    firstTouchX = motionEvent.getX();
-//                    firstTouchY = motionEvent.getY();
                     break;
                 case MotionEvent.ACTION_UP:
                     touchDown = false;
-//                    lastAngle = currentAngle;
                     break;
             }
             return false;
@@ -112,28 +113,30 @@ public class WaterMarkLayout extends RelativeLayout {
             currentWaterMark = (WaterMark) view;
             switch (motionEvent.getAction() & MotionEvent.ACTION_MASK){
                 case MotionEvent.ACTION_DOWN:
-//                    firstTouchX = motionEvent.getX();
-//                    firstTouchY = motionEvent.getY();
                     break;
                 case MotionEvent.ACTION_UP:
                     touchDown = false;
-//                    lastAngle = currentAngle;
-//                    updateTextViewParams(( TextView )view , currentAngle, scale);
                     break;
-//                case MotionEvent.ACTION_MOVE:
-////                    if(touchDown){
-////                        view.setX(motionEvent.getX());
-////                        view.setY(motionEvent.getY());
-////                        touchX = (int) motionEvent.getX();
-////                        touchY = (int) motionEvent.getY();
-//                    currentWaterMark.setX(motionEvent.getX() - touchX);
-//                    currentWaterMark.setY(motionEvent.getY() - touchY);
-////                    }
-//                    break;
             }
             return false;
         }
     };
+
+    // 点击删除水印的自定义事件 PS:为了接收一个水印ID，便于删除对应的水印
+    private class OnClickDelete implements OnClickListener{
+
+        long waterMarkId;
+
+        public OnClickDelete(long waterMarkId){
+            this.waterMarkId = waterMarkId;
+        }
+
+        @Override
+        public void onClick(View view) {
+            // 删除水印
+            deleteWaterMark(waterMarkId);
+        }
+    }
 
     private void showLog(String tex){
         Log.e("xushiyong",tex);
@@ -141,7 +144,6 @@ public class WaterMarkLayout extends RelativeLayout {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-//        Log.e("xushiyong","触摸页面"+event.getAction());
         switch (event.getAction() & MotionEvent.ACTION_MASK){
             case MotionEvent.ACTION_MOVE:
                 boolean isAbleMove = CalcUtil.spacing(firstTouchX, firstTouchY, event.getX(), event.getY()) > 20;
@@ -151,19 +153,7 @@ public class WaterMarkLayout extends RelativeLayout {
                     if(touchDown){
                         currentWaterMark.measure(0, 0);
 
-//                        showLog("当前角度："+newDist+"  距离："+oldDist+"  缩放："+scale);
-
-//                        showLog("进行设置缩放：缩放->"+scale+"  新的距离->"+newDist+"  旧的距离->"+oldDist);
-
                         currentAngle = CalcUtil.angleBetweenLines(currentWaterMark.getX() + currentWaterMark.getMeasuredWidth() / 2, currentWaterMark.getY() + currentWaterMark.getMeasuredWidth() / 2, firstTouchX - touchX, firstTouchY - touchY, currentWaterMark.getX() + currentWaterMark.getMeasuredWidth() / 2, currentWaterMark.getY() + currentWaterMark.getMeasuredWidth() / 2, event.getX() - touchX, event.getY() - touchY) + lastAngle;
-//                        showLog("当前角度："+currentAngle+"  距离："+newDist+"  缩放："+scale);
-//                        if(currentAngle - lastAngle < 10){
-//                            showLog("这是想缩放");
-//                        }
-//                        else{
-//                            showLog("这是想拖动");
-//                        }
-//                        lastAngle = currentAngle;
                         currentWaterMark.setRotation(currentAngle);
 
                         // 水印中心点 和 当前压按点的距离
@@ -172,22 +162,38 @@ public class WaterMarkLayout extends RelativeLayout {
                             scale = newDist / oldDist;
                         }
 
-                        if ( newDist > oldDist + 1 ) {
+//                        缩放值：2.6468241(newDist:221.5906 -- oldDist:83.71943)
+//                        缩放值：0.41843542(newDist:92.72136 -- oldDist:221.5906)
+//                        缩放值：2.3968143(newDist:222.23589 -- oldDist:92.72136)
+//                        缩放值：0.35420856(newDist:78.71785 -- oldDist:222.23589)
+//                        缩放值：2.9475708(newDist:232.02643 -- oldDist:78.71785)
+//                        缩放值：0.48130453(newDist:111.67537 -- oldDist:232.02643)
+//                        缩放值：1.9769487(newDist:220.77647 -- oldDist:111.67537)
+//                        缩放值：0.37807494(newDist:83.470055 -- oldDist:220.77647)
+//                        缩放值：2.7917287(newDist:233.02576 -- oldDist:83.470055)
+//                        缩放值：0.4274602(newDist:99.60924 -- oldDist:233.02576)
+//                        缩放值：2.3150952(newDist:230.60487 -- oldDist:99.60924)
+//                        缩放值：0.33751738(newDist:77.83315 -- oldDist:230.60487)
+                        //showLog("当前距离："+newDist+"  距离："+oldDist+"  缩放："+scale);
+
+                        if ( newDist > oldDist + 1) {
                             zoom(scale);
                             oldDist = newDist;
                         }
-                        if ( newDist < oldDist - 1 ) {
+                        if ( newDist < oldDist - 1) {
                             zoom(scale);
                             oldDist = newDist;
                         }
-
-                        showLog("缩放值："+scale+"(newDist:"+newDist+" -- oldDist:"+oldDist+")"+"  角度:"+currentAngle);
-
                     }
                     else{
                         // 因为手机屏幕是第二区间，所以这里减扣掉控件的宽高这样就可以在拖动时可以看完完整的文字内容
-                        currentWaterMark.setX(event.getX() - currentWaterMark.getWidth());
-                        currentWaterMark.setY(event.getY() - currentWaterMark.getHeight());
+                        float tempX = event.getX() - currentWaterMark.getWidth();
+                        float tempY = event.getY() - currentWaterMark.getHeight();
+                        // 避免出屏幕界区
+                        //if((event.getX() > 10 && event.getY() > 10 )){
+                            currentWaterMark.setX(tempX);
+                            currentWaterMark.setY(tempY);
+                        //}
                     }
                 }
                 break;
@@ -210,83 +216,30 @@ public class WaterMarkLayout extends RelativeLayout {
 
     //缩放实现
     private void zoom(float f) {
-//        RelativeLayout.LayoutParams rl = new RelativeLayout.LayoutParams(380,400);
-//        currentWaterMark.setLayoutParams(rl);
-//        f = f > 1.5f ? 1.5f:f;
-//        float temp = textSize * f;
-//        temp = temp > 40 ? 40 : temp;
-//        showLog("缩放至："+f);
-        currentWaterMark.setTextSize(textSize * f);
-//        if (!currentWaterMark.isOpenStroke() && shadowColor != 0) {
-//            currentWaterMark.setShadowLayer((textSize / 6) * scale, (textSize / 6) * scale, (textSize / 6) * scale, shadowColor);
-//        }
+        // 避免出现缩放的范围过大或过小
+        float tempTextSize = textSize * (f);
+        if(tempTextSize > maxScan)
+            tempTextSize = maxScan;
+        else if( tempTextSize < minScan)
+            tempTextSize = minScan;
+
+        currentWaterMark.setTextSize(tempTextSize);
+        textSize = tempTextSize;
     }
 
-//    /**
-//     * 对控件进行参数的更新操作
-//     *
-//     * @param tv
-//     */
-//    private void updateTextViewParams(TextView tv, float rotation, float scale) {
-//        for ( int i = 0; i < listTvParams.size(); i++ ) {
-//            TextViewParams param = new TextViewParams();
-//            if ( tv.getTag().toString().equals(listTvParams.get(i).getTag()) ) {
-//                param.setRotation(rotation);
-//                param.setTextSize(( float ) (tv.getTextSize() / scaleTimes));
-//                param.setMidPoint(CalcUtil.getViewMidPoint(tv));
-//                param.setScale(scale);
-//                textSize = tv.getTextSize() / 2;
-//                param.setWidth(tv.getWidth());
-//                param.setHeight(tv.getHeight());
-//                param.setX(tv.getX());
-//                param.setY(tv.getY());
-//                param.setTag(listTvParams.get(i).getTag());
-//                param.setContent(tv.getText().toString());
-//                param.setTextColor(tv.getCurrentTextColor());
-//                listTvParams.set(i, param);
-//                return;
-//            }
-//        }
-//    }
-//
-//    /**
-//     * //对状态进行保存操作
-//     *
-//     * @param textView
-//     * @return
-//     */
-//    private void saveTextViewparams(WaterMark textView) {
-//        if ( textView != null ) {
-//            TextViewParams tvParams = new TextViewParams();
-//            tvParams.setRotation(0);
-//            tvParams.setTextSize(( float ) (textView.getTextSize() / scaleTimes));
-//            tvParams.setX(textView.getX());
-//            tvParams.setY(textView.getY());
-//            tvParams.setWidth(textView.getWidth());
-//            tvParams.setHeight(textView.getHeight());
-//            tvParams.setContent(textView.getTextString());
-//            tvParams.setMidPoint(CalcUtil.getViewMidPoint(textView));
-//            tvParams.setScale(1);
-//            tvParams.setTag(String.valueOf(( long ) textView.getTag()));
-//            tvParams.setRotation(currentAngle);
-////            tvParams.setTextColor(textView.getCurrentTextColor());
-//            listTvParams.add(tvParams);
-//        }
-//    }
-
-//    /**
-//     * 根据TextView获取到该TextView的配置文件
-//     *
-//     * @param tv
-//     * @return
-//     */
-//    private TextViewParams getTextViewParams(TextView tv) {
-//        for ( int i = 0; i < listTvParams.size(); i++ ) {
-//            if ( listTvParams.get(i).getTag().equals(String.valueOf(( long ) tv.getTag())) ) {
-//                return listTvParams.get(i);
-//            }
-//        }
-//        return null;
-//    }
-
+    /**
+     * 删除水印
+     * @param waterMarkID
+     * @return
+     */
+    private void deleteWaterMark(long waterMarkID) {
+        for ( int i = 0; i < waterMarkList.size(); i++ ) {
+            WaterMark wm = waterMarkList.get(i);
+            if ( wm.getWaterMarkId() == waterMarkID ) {
+                waterMarkList.remove(i);
+                removeView(wm);
+                break;
+            }
+        }
+    }
 }

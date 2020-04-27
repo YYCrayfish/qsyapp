@@ -1,24 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
 
+    <!--水印文字-->
     <TextView
         android:id="@+id/waterText"
         android:padding="4dp"
         android:textSize="15sp"
+        android:text="都会死的还是就看"
         android:textColor="@color/white"
+        android:layout_marginTop="12dp"
+        android:layout_marginLeft="12dp"
         android:background="@drawable/shape_water_border"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
+    <!--删除-->
     <ImageView
-        android:id="@+id/waterButton"
+        android:id="@+id/waterButtonDelete"
         android:background="@mipmap/ic_puase"
-        android:layout_marginTop="-12dp"
-        android:layout_marginLeft="-12dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_width="24dp"
+        android:layout_height="24dp" />
+
+    <!--拖动和缩放-->
+    <ImageView
+        android:id="@+id/waterButtonControl"
+        android:background="@mipmap/ic_puase"
         android:layout_below="@id/waterText"
         android:layout_toRightOf="@id/waterText"
+        android:layout_marginTop="-12dp"
+        android:layout_marginLeft="-12dp"
         android:layout_width="24dp"
         android:layout_height="24dp" />
 
