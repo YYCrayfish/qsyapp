@@ -50,6 +50,8 @@ import com.manyu.videoshare.util.VideoViewTool;
 import com.manyu.videoshare.view.MyViewPager;
 import com.manyu.videoshare.view.StrokeText;
 import com.manyu.videoshare.view.TextRelativeLayout;
+import com.manyu.videoshare.view.WaterMark;
+import com.manyu.videoshare.view.WaterMarkLayout;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -78,6 +80,8 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
     private MyViewPager viewPager;
     private TabLayout tabLayout;
 
+    private WaterMarkLayout layoutWaterMark;
+
     private ImageView iv_close;
     private ImageView iv_edit;
     private ImageView iv_color;
@@ -85,7 +89,7 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
     private ImageView iv_ok;
     private RecyclerView recycler;
 
-    private TextRelativeLayout tvRl;
+//    private TextRelativeLayout tvRl;
 
     private int screenWidth;
     private int screenHeight;
@@ -144,8 +148,8 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
         tvWater = findViewById(R.id.text);
         rlImg = findViewById(R.id.rl_image);
         rltv = findViewById(R.id.rl_text);
-
-        tvRl = findViewById(R.id.tvRl);
+        layoutWaterMark = findViewById(R.id.layoutWaterMark);
+//        tvRl = findViewById(R.id.tvRl);
         color_tool = findViewById(R.id.color_tool);
         recycler = findViewById(R.id.recycler);
 
@@ -207,13 +211,13 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
                 @Override
                 public void onSelectItem(String value) {
                     tranStr = Integer.toHexString((int) (255 * (Double.parseDouble(value) / 100)));
-                    tvRl.addTextView(videoW / 2, videoH / 2, "", viewPager.getCurrentItem(), tranStr + tvColorStr);
+//                    tvRl.addTextView(videoW / 2, videoH / 2, "", viewPager.getCurrentItem(), tranStr + tvColorStr);
                 }
 
                 @Override
                 public void onSelect(String colorStr) {
                     tvColorStr = colorStr;
-                    tvRl.addTextView(videoW / 2, videoH / 2, "", viewPager.getCurrentItem(), tranStr + tvColorStr);
+//                    tvRl.addTextView(videoW / 2, videoH / 2, "", viewPager.getCurrentItem(), tranStr + tvColorStr);
                 }
             });
         }
@@ -382,7 +386,6 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
             overlay = "overlay=" + 0 + ":" + 0;
         }
         outPath = outPath + "aw_" + UriToPathUtil.getFileNameByPath(path);
-        Log.e("xushiyong","地址:"+path+","+imagePath+","+overlay+","+outPath);
         ///storage/emulated/0/tencent/MicroMsg/WeiXin/wx_camera_1587654132226.mp4,
         // //data/user/0/com.manyu.videoshare/cache/qsy_aw_tv.png,
         // overlay=0:0,
@@ -424,7 +427,8 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
     }
 
     private void tvToImg() {
-        Bitmap b = ImageUtil.getBitmap(tvRl);
+//        Bitmap b = ImageUtil.getBitmap(tvRl);
+        Bitmap b = ImageUtil.getBitmap(layoutWaterMark);
         FileOutputStream outputStream = null;
         try {
             outputStream = new FileOutputStream(outPath + "qsy_aw_tv.png");
@@ -595,8 +599,12 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
                     if (!TextUtils.isEmpty(content)) {
                         type = 1;
                         tvToolbar.setVisibility(View.VISIBLE);
-                        tvRl.setVisibility(View.VISIBLE);
-                        tvRl.addTextView(videoW / 2, videoH / 2, content, 0, tvColorStr);
+//                        tvRl.setVisibility(View.VISIBLE);
+//                        tvRl.addTextView(videoW / 2, videoH / 2, content, 0, tvColorStr);
+                        layoutWaterMark.setVisibility(View.VISIBLE);
+                        WaterMark waterMark = new WaterMark(AddWaterActivity.this);
+                        waterMark.setText(content);
+                        layoutWaterMark.addWaterMark(waterMark);
                     }
                 }
             });

@@ -262,9 +262,15 @@ public class TextRelativeLayout extends RelativeLayout {
                             if (oldDist != 0) {
                                 scale = newDist / oldDist;
                             }
-                            zoom(scale);
-                            oldDist = newDist;
 
+                            if ( newDist > oldDist + 1 ) {
+                                zoom(scale);
+                                oldDist = newDist;
+                            }
+                            if ( newDist < oldDist - 1 ) {
+                                zoom(scale);
+                                oldDist = newDist;
+                            }
 
                             mAngle = angleBetweenLines(textView.getX() + textView.getMeasuredWidth() / 2, textView.getY() + textView.getMeasuredWidth() / 2, currentX - mIv_width, currentY - mIv_height, textView.getX() + textView.getMeasuredWidth() / 2, textView.getY() + textView.getMeasuredWidth() / 2, event.getX() - mIv_width, event.getY() - mIv_height) + defaultAngle;
                             textView.setRotation(mAngle);

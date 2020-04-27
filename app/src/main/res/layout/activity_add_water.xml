@@ -46,8 +46,17 @@
                     android:layout_centerVertical="true" />
             </RelativeLayout>
 
-            <com.manyu.videoshare.view.TextRelativeLayout
-                android:id="@+id/tvRl"
+            <!--<com.manyu.videoshare.view.TextRelativeLayout-->
+                <!--android:id="@+id/tvRl"-->
+                <!--android:layout_width="0dp"-->
+                <!--android:layout_height="0dp"-->
+                <!--android:visibility="gone"-->
+                <!--app:layout_constraintBottom_toBottomOf="@id/vv"-->
+                <!--app:layout_constraintLeft_toLeftOf="@id/vv"-->
+                <!--app:layout_constraintRight_toRightOf="@id/vv"-->
+                <!--app:layout_constraintTop_toTopOf="@id/vv"/>-->
+            <com.manyu.videoshare.view.WaterMarkLayout
+                android:id="@+id/layoutWaterMark"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:visibility="gone"
