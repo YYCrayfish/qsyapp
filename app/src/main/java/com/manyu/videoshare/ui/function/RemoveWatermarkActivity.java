@@ -13,8 +13,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.MediaController;
-import android.widget.TextView;
-import android.widget.VideoView;
 
 import com.manyu.videoshare.R;
 import com.manyu.videoshare.base.BaseVideoActivity;
@@ -157,7 +155,7 @@ public class RemoveWatermarkActivity extends BaseVideoActivity implements View.O
         RxFFmpegInvoke.getInstance().runCommandRxJava(commands).subscribe(new RxFFmpegSubscriber() {
             @Override
             public void onFinish() {
-                proessEnd();
+                progressEnd();
                 Log.e("ffmpeg_result", "成功");
                 PreviewActivity.start(RemoveWatermarkActivity.this, newPath);
                 list.clear();
@@ -166,7 +164,7 @@ public class RemoveWatermarkActivity extends BaseVideoActivity implements View.O
 
             @Override
             public void onProgress(int progress, long progressTime) {
-                setProess(progress);
+                setProgressBarValue(progress);
                 Log.e("ffmpeg_result", progress + "");
             }
 

@@ -33,4 +33,7 @@
     <string name="colorThemeString" translatable="false">#FF00C8FD</string>
     <string name="colorThemeLightString" translatable="false">#FFBBFFFF</string>
     <color name="colorThemeLight">#FFBBFFFF</color>
+
+    <color name="colorGray">#696969</color>
+    <color name="colorGrayLight">#CCCCCC</color>
 </resources>

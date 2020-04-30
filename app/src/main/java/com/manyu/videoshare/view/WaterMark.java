@@ -1,6 +1,8 @@
 package com.manyu.videoshare.view;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +18,10 @@ public class WaterMark extends RelativeLayout {
     private ImageView btnControl;
     private ImageView btnDelete;
     long waterMarkId;
+    // 当前水印颜色 默认白色
+    String currentColor = "ffffff";
+    // 当前透明度 默认不透明
+    int currentAlpha = 255;
 
     public WaterMark(Context context){
         super(context);
@@ -31,6 +37,43 @@ public class WaterMark extends RelativeLayout {
     public void setText(String content){
         if(!(text == null))
             text.setText(content);
+    }
+
+    /**
+     * 设置水印文字颜色
+     * @param colorStr  格式例如：ffffff 白色  前面不带#号
+     */
+    public void setWaterMarkTextColor(String colorStr){
+        currentColor = colorStr;
+        setTextColorWithAlpha();
+    }
+
+    /**
+     * 设置水印透明度
+     * @param alpha
+     */
+    public void setWaterMarkTextAlpha(int alpha){
+        currentAlpha = alpha;
+
+        // 设置背景透明
+        View view = findViewById(R.id.waterText);
+        if(view != null)
+            view.getBackground().setAlpha(alpha);
+
+        // 设置文字透明
+        setTextColorWithAlpha();
+    }
+
+    /**
+     *   设置文字颜色和透明度
+    */
+    private void setTextColorWithAlpha(){
+        if(text != null){
+            // 解析拼接出一个带透明度的颜色值 PS:因为Color.argb似乎没有效果，只能替换这种方式来更变文字透明度
+            String hex = Integer.toHexString(currentAlpha);
+            int tempColor = Color.parseColor("#"+hex+currentColor);
+            text.setTextColor(tempColor);
+        }
     }
 
     public ImageView getBtnControl(){

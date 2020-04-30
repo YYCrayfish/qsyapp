@@ -103,7 +103,7 @@ public class SpeedActivity extends BaseVideoActivity implements View.OnClickList
         RxFFmpegInvoke.getInstance().runCommandRxJava(commands).subscribe(new RxFFmpegSubscriber() {
             @Override
             public void onFinish() {
-                proessEnd();
+                progressEnd();
                 Log.e("ffmpeg_result", "成功");
                 PreviewActivity.start(SpeedActivity.this, newPath);
                 newPath = getBaseContext().getCacheDir().getAbsolutePath() + File.separator;
@@ -111,11 +111,11 @@ public class SpeedActivity extends BaseVideoActivity implements View.OnClickList
 
             @Override
             public void onProgress(int progress, long progressTime) {
-                setProess(progress);
+                setProgressBarValue(progress);
                 if (speed <= 1) {
-                    setProess((int) (progress / (1 / speed)));
+                    setProgressBarValue((int) (progress / (1 / speed)));
                 } else {
-                    setProess((int) (progress * speed));
+                    setProgressBarValue((int) (progress * speed));
                 }
                 Log.e("ffmpeg_result", progress + "");
             }

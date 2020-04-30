@@ -1,6 +1,7 @@
 package com.manyu.videoshare.view;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -21,8 +22,6 @@ public class WaterMarkLayout extends RelativeLayout {
 
     // 水印组件列表
     private List<WaterMark> waterMarkList = new ArrayList<>();
-    // 所有水印组件的属性列表
-//    private List<TextViewParams> listTvParams = new ArrayList<>();
 
     // 当前的水印
     private WaterMark currentWaterMark;
@@ -40,13 +39,6 @@ public class WaterMarkLayout extends RelativeLayout {
     // 缩放限制
     private float maxScan = 60;
     private float minScan = 8;
-
-    // 记录当前水印的宽高
-    private int waterMakeWidth;
-    private int waterMakeHeight;
-
-    //记录当前设备的缩放倍数
-    private double scaleTimes = 1;
 
     // 第一次触摸按下
     private float firstTouchX = 0;
@@ -86,6 +78,19 @@ public class WaterMarkLayout extends RelativeLayout {
 
         // 重载
         addWaterMark(waterMark,x,y);
+    }
+
+    // 设置字体颜色
+    public void setWaterMarkTextColor(String colorStr){
+        if(currentWaterMark != null){
+            currentWaterMark.setWaterMarkTextColor(colorStr);
+        }
+    }
+
+    // 设置透明度
+    public void setWaterMarkTextAlpha(int alpha){
+        if(currentWaterMark != null)
+            currentWaterMark.setWaterMarkTextAlpha(alpha);
     }
 
     OnTouchListener onTouchWaterButtonListener = new OnTouchListener() {
@@ -214,7 +219,7 @@ public class WaterMarkLayout extends RelativeLayout {
     }
 
 
-    //缩放实现
+    // 缩放的重新定义实现
     private void zoom(float f) {
         // 避免出现缩放的范围过大或过小
         float tempTextSize = textSize * (f);
@@ -224,6 +229,7 @@ public class WaterMarkLayout extends RelativeLayout {
             tempTextSize = minScan;
 
         currentWaterMark.setTextSize(tempTextSize);
+        // 这里很关键
         textSize = tempTextSize;
     }
 

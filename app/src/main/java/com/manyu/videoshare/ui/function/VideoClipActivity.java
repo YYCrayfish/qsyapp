@@ -12,9 +12,7 @@ import android.support.constraint.ConstraintLayout;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.widget.MediaController;
 import android.widget.TextView;
-import android.widget.VideoView;
 
 import com.manyu.videoshare.R;
 import com.manyu.videoshare.base.BaseVideoActivity;
@@ -168,7 +166,7 @@ public class VideoClipActivity extends BaseVideoActivity implements View.OnClick
         RxFFmpegInvoke.getInstance().runCommandRxJava(commands).subscribe(new RxFFmpegSubscriber() {
             @Override
             public void onFinish() {
-                proessEnd();
+                progressEnd();
                 Log.e("ffmpeg_result", "成功");
                 PreviewActivity.start(VideoClipActivity.this, newPath);
                 newPath = getBaseContext().getCacheDir().getAbsolutePath() + File.separator;
@@ -176,7 +174,7 @@ public class VideoClipActivity extends BaseVideoActivity implements View.OnClick
 
             @Override
             public void onProgress(int progress, long progressTime) {
-                setProess(progress);
+                setProgressBarValue(progress);
                 Log.e("ffmpeg_result", progress + "");
             }
 

@@ -47,6 +47,7 @@ import com.manyu.videoshare.ui.MainActivity;
 import com.manyu.videoshare.ui.function.AddWaterActivity;
 import com.manyu.videoshare.ui.function.CompressVideoActivity;
 import com.manyu.videoshare.ui.function.ModifyCoverActivity;
+import com.manyu.videoshare.ui.function.ModifyMD5Activity;
 import com.manyu.videoshare.ui.function.RemoveWatermarkActivity;
 import com.manyu.videoshare.ui.function.SpeedActivity;
 import com.manyu.videoshare.ui.function.TimeCutActivity;
@@ -222,7 +223,7 @@ public class MainFragment1 extends BaseFragment implements View.OnClickListener 
 
                     //修改MD5
                     case 7:
-
+                        startActivity(new Intent(getContext(), ModifyMD5Activity.class));
                         break;
                 }
             }

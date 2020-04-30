@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
@@ -49,7 +48,6 @@ import com.manyu.videoshare.util.UriToPathUtil;
 import com.manyu.videoshare.util.VideoViewTool;
 import com.manyu.videoshare.view.MyViewPager;
 import com.manyu.videoshare.view.StrokeText;
-import com.manyu.videoshare.view.TextRelativeLayout;
 import com.manyu.videoshare.view.WaterMark;
 import com.manyu.videoshare.view.WaterMarkLayout;
 
@@ -176,10 +174,10 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
 
     @Override
     public void initData() {
-        List<String> list = new ArrayList<>();
-        for (int i = 10; i <= 100; i++) {
-            list.add("" + i);
-        }
+//        List<String> list = new ArrayList<>();
+//        for (int i = 10; i <= 100; i++) {
+//            list.add("" + i);
+//        }
         DisplayMetrics dm = getResources().getDisplayMetrics();
         screenWidth = dm.widthPixels;
         screenHeight = dm.heightPixels;
@@ -207,24 +205,28 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
         listFragment.add(OperateFragment.newInstance("阴影", 1));
 
         for (int i = 0; i < listFragment.size(); i++) {
-            ((OperateFragment) listFragment.get(i)).setOnSelectListener(new OperateFragment.onSelectListener() {
-                @Override
-                public void onSelectItem(String value) {
-                    tranStr = Integer.toHexString((int) (255 * (Double.parseDouble(value) / 100)));
-//                    tvRl.addTextView(videoW / 2, videoH / 2, "", viewPager.getCurrentItem(), tranStr + tvColorStr);
-                }
-
-                @Override
-                public void onSelect(String colorStr) {
-                    tvColorStr = colorStr;
-//                    tvRl.addTextView(videoW / 2, videoH / 2, "", viewPager.getCurrentItem(), tranStr + tvColorStr);
-                }
-            });
+            ((OperateFragment) listFragment.get(i)).setOnSelectListener(new FragmentDataReceive());
         }
+
         PagerAdapter adapter = new PagerAdapter(getSupportFragmentManager(), listFragment);
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
         viewPager.setCurrentItem(0);
+    }
+
+    // Fragment页面的数据回调汇总处理
+    private class FragmentDataReceive implements OperateFragment.onSelectListener{
+
+        @Override
+        public void onSelectItem(String value) {
+            int alpha = (int) (255 * (Integer.parseInt(value) / 100.0f));
+            layoutWaterMark.setWaterMarkTextAlpha(alpha);
+        }
+
+        @Override
+        public void onSelect(String colorStr) {
+            layoutWaterMark.setWaterMarkTextColor(colorStr);
+        }
     }
 
     private View.OnTouchListener movingEventListener = new View.OnTouchListener() {
@@ -401,13 +403,13 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
                     UriToPathUtil.deleteSingleFile(imagePath);
                     imagePath = "";
                     outPath = getCacheDir().getAbsolutePath() + File.separator;
-                    proessEnd();
+                    progressEnd();
                     Log.e("ffmpeg_result", "成功");
                 }
 
                 @Override
                 public void onProgress(int progress, long progressTime) {
-                    setProess(progress);
+                    setProgressBarValue(progress);
                     Log.e("ffmpeg_result", progress + "");
                 }
 

@@ -2,6 +2,7 @@ package com.manyu.videoshare.ui.fragment;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import android.widget.TextView;
 
 import com.manyu.videoshare.R;
 import com.manyu.videoshare.base.BaseFragment;
+import com.manyu.videoshare.intefaces.UDataCallBack;
 import com.manyu.videoshare.view.SelectColorView;
 import com.manyu.videoshare.view.SelectView;
 
@@ -25,6 +27,7 @@ public class OperateFragment extends BaseFragment {
     public static OperateFragment newInstance(String title, int type) {
         Bundle args = new Bundle();
         args.putInt("type", type);
+
         OperateFragment fragment = new OperateFragment();
         fragment.setmFragmentTitle(title);
         fragment.setArguments(args);
@@ -40,35 +43,42 @@ public class OperateFragment extends BaseFragment {
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_operate, container, false);
         initView();
-        initData();
         return view;
     }
 
     private void initView() {
+        // 生成刻度值
         List<String> list = new ArrayList<>();
         for (int i = 10; i <= 100; i++) {
             list.add("" + i);
         }
+
         degree = view.findViewById(R.id.tv_degree);
         selectView = view.findViewById(R.id.selectView);
         selectColorView = view.findViewById(R.id.selectColorView);
-        selectColorView.setOnSelectListener(new SelectColorView.onSelectListener() {
-            @Override
-            public void onSelect(String colorStr) {
-                onSelectListener.onSelect(colorStr);
-            }
-        });
-        selectView.showValue(list, new SelectView.onSelect() {
-            @Override
-            public void onSelectItem(String value) {
-                onSelectListener.onSelectItem(value);
-                degree.setText(value + "%");
-            }
-        });
+
+        // 设置事件处理
+        selectColorView.setOnSelectListener(new FragmentCallBack(1));
+        selectView.showValue(list, new FragmentCallBack(2));
     }
 
-    private void initData() {
+    private class FragmentCallBack implements UDataCallBack{
 
+        private int dataType;// 1|颜色  2|透明度
+
+        public FragmentCallBack(int type){
+            this.dataType = type;
+        }
+
+        @Override
+        public void onDataReceive(String data) {
+            if(dataType == 1){
+                onSelectListener.onSelect(data);
+            }else{
+                onSelectListener.onSelectItem(data);
+                degree.setText(data + "%");
+            }
+        }
     }
 
     private onSelectListener onSelectListener;

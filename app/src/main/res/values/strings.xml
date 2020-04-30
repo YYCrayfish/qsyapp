@@ -37,4 +37,7 @@
     <string name="error_gif">长宽不小于 %1$dpx，且大小不超过 %2$sM。</string>
     <string name="text_view_limit_int_idcard">1234567890Xx</string>
 
+    <string name="mod_tip01">拖拉下方白色分割线选择封面</string>
+    <string name="mod_tip02">没有合适的?</string>
+    <string name="mod_tip03">从相册中选择</string>
 </resources>

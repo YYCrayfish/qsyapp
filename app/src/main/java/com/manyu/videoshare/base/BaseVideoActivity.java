@@ -21,6 +21,8 @@ import com.manyu.videoshare.R;
 import com.manyu.videoshare.view.Progressbar;
 import com.umeng.analytics.MobclickAgent;
 
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import io.microshow.rxffmpeg.RxFFmpegInvoke;
 
 
@@ -47,7 +49,6 @@ public abstract class BaseVideoActivity extends FragmentActivity implements View
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         super.onCreate(savedInstanceState, persistentState);
     }
-
 
     @Override
     public void setContentView(@LayoutRes int layoutResID) {
@@ -90,15 +91,16 @@ public abstract class BaseVideoActivity extends FragmentActivity implements View
         StatusBarUtil.setColor(this, getResources().getColor(R.color.white));
     }
 
-    protected void setProess(int proess){
+    protected void setProgressBarValue(int proess){
         if (clProgress.getVisibility() == View.GONE) {
             clProgress.setVisibility(View.VISIBLE);
         }
         tvRight.setEnabled(false);
-        mProgress.setProgress(proess);
+        // 最多只能到99，不允许到100
+        mProgress.setProgress(proess > 99 ? 99:proess);
     }
 
-    protected void proessEnd(){
+    protected void progressEnd(){
         tvRight.setEnabled(true);
         clProgress.setVisibility(View.GONE);
     }

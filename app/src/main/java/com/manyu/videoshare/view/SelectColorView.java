@@ -9,6 +9,8 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.manyu.videoshare.intefaces.UDataCallBack;
+
 public class SelectColorView extends View {
 
     private float areaW = 65;
@@ -113,7 +115,7 @@ public class SelectColorView extends View {
                 if (nowX < 0) {
                     select = 0;
                 }
-                onSelectListener.onSelect(mColors[select]);
+                dataCallBack.onDataReceive(mColors[select]);
                 invalidate();
                 break;
             //手指抬起
@@ -125,13 +127,20 @@ public class SelectColorView extends View {
         return true;
     }
 
-    private onSelectListener onSelectListener;
+    private UDataCallBack dataCallBack;
 
-    public void setOnSelectListener(SelectColorView.onSelectListener onSelectListener) {
-        this.onSelectListener = onSelectListener;
+    public void setOnSelectListener(UDataCallBack onSelectListener) {
+        this.dataCallBack = onSelectListener;
     }
 
-    public interface onSelectListener {
-        void onSelect(String colorStr);
-    }
+
+//    private onSelectListener onSelectListener;
+//
+//    public void setOnSelectListener(SelectColorView.onSelectListener onSelectListener) {
+//        this.onSelectListener = onSelectListener;
+//    }
+//
+//    public interface onSelectListener {
+//        void onSelect(String colorStr);
+//    }
 }

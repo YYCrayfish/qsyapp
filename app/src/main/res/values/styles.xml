@@ -56,7 +56,7 @@
         <item name="android:indeterminateOnly">false</item>
         <item name="android:progressDrawable">@drawable/seekbar_white</item>
         <item name="android:indeterminateDrawable">@android:drawable/progress_horizontal</item>
-        <item name="android:thumb"></item>
+<!--        <item name="android:thumb"></item>-->
         <item name="android:minHeight">7dip</item>
         <item name="android:maxHeight">7dip</item>
         <item name="android:thumbOffset">7dip</item>

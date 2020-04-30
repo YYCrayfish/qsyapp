@@ -14,7 +14,6 @@ import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.VideoView;
@@ -144,7 +143,7 @@ public class TimeCutActivity extends BaseVideoActivity implements View.OnClickLi
         RxFFmpegInvoke.getInstance().runCommandRxJava(commands).subscribe(new RxFFmpegSubscriber() {
             @Override
             public void onFinish() {
-                proessEnd();
+                progressEnd();
                 Log.e("ffmpeg_result", "成功");
                 doubleSeekBar.pause(0);
                 PreviewActivity.start(TimeCutActivity.this, newPath);
@@ -153,7 +152,7 @@ public class TimeCutActivity extends BaseVideoActivity implements View.OnClickLi
 
             @Override
             public void onProgress(int progress, long progressTime) {
-                setProess(progress);
+                setProgressBarValue(progress);
                 Log.e("ffmpeg_result", progress + "");
             }
 

@@ -18,6 +18,7 @@ import com.manyu.videoshare.base.BaseVideoActivity;
 import com.manyu.videoshare.util.ToastUtils;
 import com.manyu.videoshare.util.ToolUtils;
 import com.manyu.videoshare.util.UriToPathUtil;
+import com.manyu.videoshare.util.universally.LOG;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -75,6 +76,7 @@ public class PreviewActivity extends BaseVideoActivity implements View.OnClickLi
         path = getIntent().getStringExtra("path");
         type = getIntent().getIntExtra("type", 0);
         newPath = newPath + "qsy_" + UriToPathUtil.getFileNameByPath(path);
+        LOG.showE("播放预览路径："+path);
         videoView.setVideoPath(path);
         videoView.start();
     }

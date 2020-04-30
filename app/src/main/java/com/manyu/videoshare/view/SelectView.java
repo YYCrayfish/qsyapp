@@ -19,6 +19,7 @@ import android.widget.OverScroller;
 
 
 import com.manyu.videoshare.R;
+import com.manyu.videoshare.intefaces.UDataCallBack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,7 +75,7 @@ public class SelectView extends View {
         TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.SelectView);
         if (typedArray != null) {
             isCanvasLine = typedArray.getBoolean(R.styleable.SelectView_isCanvasLine, true);
-            mTextSize = typedArray.getDimension(R.styleable.SelectView_textSize, dip2px(12));
+            mTextSize = typedArray.getDimension(R.styleable.SelectView_svTextSize, dip2px(12));
             bgColor = typedArray.getColor(R.styleable.SelectView_bgColor, Color.rgb(228, 228, 228));
             textColor = typedArray.getColor(R.styleable.SelectView_textColor, Color.rgb(151, 151, 151));
             mUnit = typedArray.getDimension(R.styleable.SelectView_unitSize, 13.f);
@@ -129,7 +130,6 @@ public class SelectView extends View {
         for (int i = mMinValue; i <= mMaxValue; i++) {
             int space = mMiddleValue - i;
             float x = getMeasuredWidth() / 2 - space * mUnit + mPointX;
-            Log.e("aaaaaaa", x + "");
             if (x > mPadding && x < getMeasuredWidth() - mPadding) {//判断x轴在视图范围内
 
                 float y = getMeasuredHeight() / 3;
@@ -154,7 +154,6 @@ public class SelectView extends View {
 
     private boolean isActionUp = false;
     private float mLastX;
-//    private boolean startAnim = true;
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -289,21 +288,23 @@ public class SelectView extends View {
         mScrolleAnim = new ScrolleAnim((distance * mUnit), mPointX);
         mScrolleAnim.setDuration(time);
         startAnimation(mScrolleAnim);
-        if (mOnSelect != null)
+
+        if (dataCallBack != null){
             if (mMiddleValue - (int) (Math.rint(mPointX / mUnit)) - 1 < 0) {
-                mOnSelect.onSelectItem(listValue.get(0));
+                dataCallBack.onDataReceive(listValue.get(0));
             } else if (mMiddleValue - (int) (Math.rint(mPointX / mUnit)) - 1 > listValue.size() - 1) {
-                mOnSelect.onSelectItem(listValue.get(listValue.size() - 1));
+                dataCallBack.onDataReceive(listValue.get(listValue.size() - 1));
             } else {
-                mOnSelect.onSelectItem(listValue.get(mMiddleValue - (int) (Math.rint(mPointX / mUnit)) - 1));
+                dataCallBack.onDataReceive(listValue.get(mMiddleValue - (int) (Math.rint(mPointX / mUnit)) - 1));
             }
+        }
     }
 
     private List<String> listValue = new ArrayList<>();
-    private onSelect mOnSelect = null;
+    private UDataCallBack dataCallBack = null;
 
-    public void showValue(List<String> list, onSelect monSelect) {
-        mOnSelect = monSelect;
+    public void showValue(List<String> list, UDataCallBack monSelect) {
+        this.dataCallBack = monSelect;
         listValue.clear();
         listValue.addAll(list);
         mMaxValue = listValue.size();
@@ -312,7 +313,7 @@ public class SelectView extends View {
         mPointX = -((mMaxValue - mMinValue) * mUnit / 2);
     }
 
-    public interface onSelect {
-        void onSelectItem(String value);
-    }
+//    public interface onSelect {
+//        void onSelectItem(String value);
+//    }
 }

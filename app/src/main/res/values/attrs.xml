@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--  gradle升级到5.6.4后 更要求复用原则，编译时不允许出现一个属性多次重复出现使用，所以这里需要把同名复用的提取出来 start -->
+    <attr name="imagewidth" format="dimension"/>
+    <attr name="imageheight" format="dimension"/>
+    <attr name="textColor" format="color"/>
+    <attr name="textSize" format="dimension"/>
+    <!--  gradle升级到5.6.4后 更要求复用原则，编译时不允许出现一个属性多次重复出现使用，所以这里需要把同名复用的提取出来 end -->
+
     <declare-styleable name="downloadProgressBar">
         <attr name="dptextsize" format="dimension"/>
     </declare-styleable>
@@ -26,8 +33,8 @@
     </declare-styleable>
 
     <declare-styleable name="VideoSeekBar">
-        <attr name="imagewidth" />
-        <attr name="imageheight" />
+        <attr name="imagewidth"/>
+        <attr name="imageheight"/>
     </declare-styleable>
 
     <declare-styleable name="TimeCutBar">
@@ -37,25 +44,25 @@
     </declare-styleable>
 
     <declare-styleable name="DoubleSlideSeekBar">
-        <attr name="lineHeight" />
-        <attr name="textSize" />
-        <attr name="textColor" />
-        <attr name="inColor" />
-        <attr name="outColor" />
-        <attr name="imageLow"/>
-        <attr name="imageBig"/>
-        <attr name="imagewidth" />
-        <attr name="imageheight" />
-        <attr name="hasRule" />
-        <attr name="ruleColor" />
-        <attr name="ruleTextColor" />
-        <attr name="unit" />
-        <attr name="equal" />
-        <attr name="ruleUnit" />
-        <attr name="ruleTextSize" />
-        <attr name="ruleLineHeight" />
-        <attr name="bigValue" />
-        <attr name="smallValue" />
+        <attr name="lineHeight" format="dimension"/>
+        <attr name="textSize"/>
+        <attr name="textColor"/>
+        <attr name="inColor" format="color"/>
+        <attr name="outColor" format="color"/>
+        <attr name="imageLow" format="reference"/>
+        <attr name="imageBig" format="reference"/>
+        <attr name="imagewidth"/>
+        <attr name="imageheight"/>
+        <attr name="hasRule" format="boolean"/>
+        <attr name="ruleColor" format="color"/>
+        <attr name="ruleTextColor" format="color"/>
+        <attr name="unit" format="string"/>
+        <attr name="equal" format="integer"/>
+        <attr name="ruleUnit" format="string"/>
+        <attr name="ruleTextSize" format="dimension"/>
+        <attr name="ruleLineHeight" format="dimension"/>
+        <attr name="bigValue" format="integer"/>
+        <attr name="smallValue" format="integer"/>
     </declare-styleable>
 
     <declare-styleable name="RatioImageView">
@@ -74,10 +81,10 @@
 
     <declare-styleable name="SelectView">
         <attr name="isCanvasLine" format="boolean"/>
-        <attr name="textSize" format="dimension"/>
+        <attr name="svTextSize" format="dimension"/>
         <attr name="unitSize" format="dimension"/>
         <attr name="bgColor" format="color"/>
-        <attr name="textColor" format="color"/>
+        <attr name="textColor"/>
         <attr name="textSelectColor" format="color"/>
         <attr name="unitLongLine" format="integer"/>
     </declare-styleable>

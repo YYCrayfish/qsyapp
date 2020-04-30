@@ -3,16 +3,11 @@ package com.manyu.videoshare.ui.function;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.widget.MediaController;
-import android.widget.TextView;
-import android.widget.VideoView;
 
 import com.manyu.videoshare.R;
 import com.manyu.videoshare.base.BaseVideoActivity;
@@ -86,14 +81,14 @@ public class UpendActivity extends BaseVideoActivity implements View.OnClickList
         RxFFmpegInvoke.getInstance().runCommandRxJava(commands).subscribe(new RxFFmpegSubscriber() {
             @Override
             public void onFinish() {
-                proessEnd();
+                progressEnd();
                 Log.e("ffmpeg_result:", "成功");
                 videoViewTool.init(UpendActivity.this, null, UriToPathUtil.getUri(newPath));
             }
 
             @Override
             public void onProgress(int progress, long progressTime) {
-                setProess(progress);
+                setProgressBarValue(progress);
                 Log.e("ffmpeg_result", progress + "");
             }
 
