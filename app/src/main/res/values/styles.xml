@@ -22,7 +22,7 @@
     </style>
     <style name="startTheme" parent="AppTheme">
         <item name="android:windowFullscreen">true</item>
-        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowNoTitle">true</item>
     </style>
     <style name="radiobutton_style">
         <item name="android:textStyle">bold</item>

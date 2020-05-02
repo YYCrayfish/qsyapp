@@ -37,7 +37,10 @@
     <string name="error_gif">长宽不小于 %1$dpx，且大小不超过 %2$sM。</string>
     <string name="text_view_limit_int_idcard">1234567890Xx</string>
 
-    <string name="mod_tip01">拖拉下方白色分割线选择封面</string>
-    <string name="mod_tip02">没有合适的?</string>
-    <string name="mod_tip03">从相册中选择</string>
+    <!--  translatable|false 就是代表不管系统是什么语言，都直接显示标签内容 本项目为了去除报红而添加 start -->
+    <string name="mod_tip01" translatable="false">拖拉下方白色分割线选择封面</string>
+    <string name="mod_tip02" translatable="false">没有合适的?</string>
+    <string name="mod_tip03" translatable="false">从相册中选择</string>
+    <string name="mod_tip04" translatable="false">并没有进行操作更改</string>
+    <!--  translatable|false 就是代表不管系统是什么语言，都直接显示标签内容 本项目为了去除报红而添加 end -->
 </resources>

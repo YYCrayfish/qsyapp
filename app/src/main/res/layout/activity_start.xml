@@ -4,8 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/rootLayout"
     android:background="@color/white"
     tools:context="com.manyu.videoshare.ui.StartActivity">
+
     <LinearLayout
         android:id="@+id/start_icons"
         android:layout_marginTop="12dp"
@@ -15,11 +17,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
+
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:src="@drawable/logo_start"/>
+
         <LinearLayout
             android:layout_marginLeft="6dp"
             android:layout_width="wrap_content"
@@ -27,6 +31,7 @@
             android:layout_gravity="center_vertical"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -35,6 +40,7 @@
                 android:textColor="@color/about_name"
                 android:layout_gravity="center"
                 android:text="Biu去水印"/>
+
             <TextView
                 android:id="@+id/about_version"
                 android:layout_width="wrap_content"
@@ -43,20 +49,31 @@
                 android:layout_marginTop="8dp"
                 android:textColor="@color/about_version"
                 android:text="V1.0.404"/>
+
         </LinearLayout>
+
     </LinearLayout>
+
     <RelativeLayout
         android:background="@color/main_text_support"
         android:layout_above="@id/start_icons"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
+
+<!--        <ImageView-->
+<!--            android:scaleType="fitXY"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:src="@drawable/start"-->
+<!--            android:id="@+id/start_img"/>-->
         <ImageView
             android:scaleType="fitXY"
+            android:background="@color/white"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/start"
             android:id="@+id/start_img"/>
+
         <com.manyu.videoshare.base.RoundProgressBar
             android:id="@+id/start_progress"
             android:visibility="gone"
@@ -65,5 +82,7 @@
             android:layout_marginTop="45dp"
             android:layout_width="38dp"
             android:layout_height="38dp" />
+
     </RelativeLayout>
+
 </RelativeLayout>

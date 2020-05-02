@@ -1,0 +1,11 @@
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <!-- 填充的颜色 -->
+    <solid android:color="@color/login_blue" />
+
+    <corners
+        android:radius="100dp"
+        />
+
+</shape>

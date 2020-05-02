@@ -5,16 +5,17 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Message;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.manyu.videoshare.R;
-import com.manyu.videoshare.base.BaseActivity;
 import com.manyu.videoshare.base.BaseSharePerence;
 import com.manyu.videoshare.base.LoadingDialog;
 import com.manyu.videoshare.base.RoundProgressBar;
@@ -33,7 +34,7 @@ import java.io.File;
 
 import okhttp3.Call;
 
-public class StartActivity extends BaseActivity implements View.OnClickListener {
+public class StartActivity extends AppCompatActivity implements View.OnClickListener {
     private TextView version;
     private RoundProgressBar bar;
     private InitAppBean bean = null;
@@ -41,12 +42,33 @@ public class StartActivity extends BaseActivity implements View.OnClickListener 
     private boolean starts = true;
     private ImageView btnAd;
     private Context context;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+//        hideSystemBar();
+        this.requestWindowFeature(Window.FEATURE_NO_TITLE);//去掉标题栏
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
         ToolUtils.setBar(this);
+        initView();
+        initData();
     }
+
+    private void hideSystemBar(){
+        if (Build.VERSION.SDK_INT > 11 && Build.VERSION.SDK_INT < 19) {
+            View v = this.getWindow().getDecorView();
+            v.setSystemUiVisibility(View.GONE);
+        } else if (Build.VERSION.SDK_INT >= 19) {
+            View decorView = getWindow().getDecorView();
+            int uiOptions =
+                    View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                            | View.SYSTEM_UI_FLAG_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
+            decorView.setSystemUiVisibility(uiOptions);
+        }
+    }
+
     private void setActivity(){
         new Thread(new Runnable() {
             @Override
@@ -69,11 +91,11 @@ public class StartActivity extends BaseActivity implements View.OnClickListener 
         }
     }
 
-    @Override
     public void initView() {
         context = this;
-        View decor = this.getWindow().getDecorView();
-        decor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+//        View decor = this.getWindow().getDecorView();
+//        decor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+//        decor.setSystemUiVisibility(View.INVISIBLE);
         //setActivity();
         version = findViewById(R.id.about_version);
         bar = findViewById(R.id.start_progress);
@@ -148,7 +170,6 @@ public class StartActivity extends BaseActivity implements View.OnClickListener 
         }
     }
 
-    @Override
     public void initData() {
 
         bar.setCircleColor(getResources().getColor(R.color.hint_color));//设置圆环的颜色
@@ -157,6 +178,7 @@ public class StartActivity extends BaseActivity implements View.OnClickListener 
         bar.setRoundWidth(ToolUtils.dip2px(2));//设置圆环的宽度
         bar.setTextSize(ToolUtils.dip2px(12));
     }
+
     private void getAgreement(){
 
 

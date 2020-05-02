@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.UUID;
 
 /**
@@ -311,11 +312,10 @@ public class FileUtil {
             long maxSize = length / count;//文件切片后的长度
             long offSet = 0L;//初始化偏移量
 
-            LOG.showE("文件长度："+length+"  切片后的长度:"+maxSize);
-
             for (int i = 0; i < count - 1; i++) { //最后一片单独处理
                 long begin = offSet;
                 long end = (i + 1) * maxSize;
+
                 offSet = getWrite(targetFile.getAbsolutePath(), i, begin, end);
             }
             if (length - offSet > 0) {
@@ -323,9 +323,6 @@ public class FileUtil {
             }
 
         } catch (FileNotFoundException e) {
-//      System.out.println("没有找到文件");
-            LOG.showE("没有找到文件："+e.toString());
-
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
@@ -365,13 +362,14 @@ public class FileUtil {
         long endPointer = 0L;
 
         String a=file.split(suffixName(new File(file)))[0];
-
         try {
             //申明文件切割后的文件磁盘
             RandomAccessFile in = new RandomAccessFile(new File(file), "r");
             //定义一个可读，可写的文件并且后缀名为.tmp的二进制文件
             //读取切片文件
             File mFile = new File(a + "_" + index + ".tmp");
+            if(!mFile.exists())
+                mFile.createNewFile();
             //如果存在
             if (mFile.exists()) {
                 RandomAccessFile out = new RandomAccessFile(mFile, "rw");
@@ -418,12 +416,11 @@ public class FileUtil {
         RandomAccessFile raf = null;
         try {
             //申明随机读取文件RandomAccessFile
-            raf = new RandomAccessFile(new File(fileName+suffixName(targetFile)), "rw");
+            raf = new RandomAccessFile(new File(fileName), "rw");
             //开始合并文件，对应切片的二进制文件
             for (int i = 0; i < tempCount; i++) {
                 //读取切片文件
                 File mFile = new File(a + "_" + i + ".tmp");
-                //
                 RandomAccessFile reader = new RandomAccessFile(mFile, "r");
                 byte[] b = new byte[1024];
                 int n = 0;
@@ -431,11 +428,12 @@ public class FileUtil {
                 while ((n = reader.read(b)) != -1) {//读
                     raf.write(b, 0, n);//写
                 }
-//                //合并后删除文件
-//                isDeleteFile(mFile);
-//                //日志
-//                log(mFile.toString());
+
+                //80c99805f2f0002b42f3c00ad18f26ae
+                // 删除文件
+                mFile.delete();
             }
+            raf.write(new Random().nextInt(10));
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

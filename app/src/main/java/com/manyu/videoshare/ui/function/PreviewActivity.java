@@ -18,6 +18,7 @@ import com.manyu.videoshare.base.BaseVideoActivity;
 import com.manyu.videoshare.util.ToastUtils;
 import com.manyu.videoshare.util.ToolUtils;
 import com.manyu.videoshare.util.UriToPathUtil;
+import com.manyu.videoshare.util.universally.ConfigureParameter;
 import com.manyu.videoshare.util.universally.LOG;
 
 import java.io.File;
@@ -29,11 +30,12 @@ import java.io.FileOutputStream;
  */
 
 public class PreviewActivity extends BaseVideoActivity implements View.OnClickListener {
+
     private String path;
     private TextView save;
     private VideoView videoView;
     private int type;
-    private String newPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getPath() + "/Camera/";
+    private String newPath = ConfigureParameter.SYSTEM_CAMERA_PATH;
 
     public static void start(Context context, String path) {
         ((Activity) context).startActivityForResult(new Intent(context, PreviewActivity.class).putExtra("path", path), 100);
@@ -76,7 +78,6 @@ public class PreviewActivity extends BaseVideoActivity implements View.OnClickLi
         path = getIntent().getStringExtra("path");
         type = getIntent().getIntExtra("type", 0);
         newPath = newPath + "qsy_" + UriToPathUtil.getFileNameByPath(path);
-        LOG.showE("播放预览路径："+path);
         videoView.setVideoPath(path);
         videoView.start();
     }

@@ -15,14 +15,14 @@
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="0.65"
+            android:layout_weight="0.70"
             app:layout_constraintBottom_toTopOf="@id/bottom_toolbar"
             app:layout_constraintTop_toTopOf="parent">
 
             <VideoView
                 android:id="@+id/vv"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
@@ -37,78 +37,123 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <RelativeLayout
-                android:id="@+id/layoutView"
-                android:background="@drawable/shape_round_white"
+            <LinearLayout
                 android:paddingTop="6dp"
                 android:paddingBottom="6dp"
                 android:layout_marginBottom="6dp"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
+                android:weightSum="1"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <TextView
-                    android:background="@drawable/shape_sp_text_style02"
-                    android:layout_alignParentLeft="true"
-                    android:layout_marginLeft="5dp"
-                    android:gravity="center"
-                    android:text="新"
-                    android:textSize="9sp"
+                <RelativeLayout
+                    android:id="@+id/layoutView"
+                    android:background="@drawable/shape_round_white"
+                    android:layout_weight="0.99"
+                    android:minHeight="30dp"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:background="@drawable/shape_sp_text_style02"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginRight="6dp"
+                        android:gravity="center"
+                        android:text="新"
+                        android:textSize="9sp"
+                        android:layout_centerVertical="true"
+                        android:textColor="@color/white"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"/>
+
+                    <TextView
+                        android:id="@+id/txtNewMd5"
+                        android:gravity="center"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/black"
+                        android:textSize="12.5sp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:layout_weight="0.01"
+                    android:layout_width="30dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
-                    android:textColor="@color/white"
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"/>
+                    android:layout_height="wrap_content">
 
-                <TextView
-                    android:id="@+id/txtNewMd5"
-                    android:gravity="center"
-                    android:layout_centerInParent="true"
-                    android:textColor="@color/black"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    <ImageButton
+                        android:id="@+id/btnRefresh"
+                        android:background="@drawable/refresh_selector"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"/>
 
-            </RelativeLayout>
+                </LinearLayout>
 
+            </LinearLayout>
 
-            <RelativeLayout
-                android:background="@drawable/shape_round"
+            <LinearLayout
                 android:paddingTop="6dp"
                 android:paddingBottom="6dp"
                 android:layout_marginTop="5dp"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
+                android:weightSum="1"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <TextView
-                    android:background="@drawable/shape_sp_text_style01"
-                    android:layout_centerVertical="true"
-                    android:layout_alignParentLeft="true"
-                    android:layout_marginLeft="5dp"
-                    android:gravity="center"
-                    android:text="旧"
-                    android:textSize="9sp"
-                    android:textColor="@color/white"
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"/>
+                <RelativeLayout
+                    android:background="@drawable/shape_round"
+                    android:layout_weight="0.99"
+                    android:minHeight="30dp"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content">
 
-                <TextView
-                    android:id="@+id/txtOldMd5"
-                    android:gravity="center"
-                    android:layout_centerInParent="true"
-                    android:textColor="@color/white"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    <TextView
+                        android:background="@drawable/shape_sp_text_style01"
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginRight="6dp"
+                        android:gravity="center"
+                        android:text="旧"
+                        android:textSize="9sp"
+                        android:textColor="@color/white"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"/>
 
-            </RelativeLayout>
+                    <TextView
+                        android:id="@+id/txtOldMd5"
+                        android:gravity="center"
+                        android:textSize="12.5sp"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/white"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                </RelativeLayout>
+
+                <View
+                    android:layout_marginLeft="10dp"
+                    android:layout_weight="0.01"
+                    android:layout_width="30dp"
+                    android:layout_height="0dp"/>
+
+            </LinearLayout>
 
         </LinearLayout>
 
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="0.35"
+            android:layout_weight="0.30"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent">
 

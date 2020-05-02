@@ -38,6 +38,7 @@ import java.io.IOException;
 import io.microshow.rxffmpeg.RxFFmpegInvoke;
 import io.microshow.rxffmpeg.RxFFmpegSubscriber;
 
+/** add by xushiyong START on 2020/5/1 desc: 修改视频封面的页面 **/
 public class ModifyCoverActivity extends BaseVideoActivity implements View.OnClickListener,SingleSlideSeekBar.onRangeListener {
 
     private ImageView iv_cover;
@@ -254,7 +255,7 @@ public class ModifyCoverActivity extends BaseVideoActivity implements View.OnCli
         LOG.showE("合成封面文件替换完成");
     }
 
-    // 第四步：合成视频
+    // 第四步：合成视频  音频 + 图片序列
     private void modifyStep4(){
         String[] commands = FFmpegUtil.buildFullVideo(filePath+"pages"+File.separator,filePath+"copy.mp3",filePath+"xushiyong.mp4");
         RxFFmpegInvoke.getInstance().runCommandRxJava(commands).subscribe(new RxFFmpegSubscriber() {
@@ -285,14 +286,7 @@ public class ModifyCoverActivity extends BaseVideoActivity implements View.OnCli
 
     // 修改封面
     private void modifyCover() {
-
-        if(true){
-            modifyStep1();
-            if(true)
-                return;
-//            modifyStep4();
-            return;
-        }
+        modifyStep1();
     }
 
     Handler handler = new Handler() {

@@ -31,7 +31,7 @@
 
         <TextView
             android:textColor="@color/white"
-            android:text="正在处理中 ~ 请勿退出程序"
+            android:text="正在处理中 ~ 请勿退出程序或锁屏"
             android:layout_marginBottom="4dp"
             android:gravity="center"
             android:layout_width="match_parent"

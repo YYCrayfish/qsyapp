@@ -39,17 +39,18 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="15dp"
+                android:gravity="center"
+                android:layout_marginLeft="20dp"
                 android:layout_marginTop="11dp"
                 android:orientation="horizontal"
-                android:layout_marginRight="15dp">
+                android:layout_marginRight="20dp">
 
                 <android.support.v7.widget.CardView
                     android:id="@+id/video_extract"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginRight="10dp"
                     android:layout_weight="1"
-                    android:minWidth="100dp"
                     app:cardCornerRadius="2dp"
                     app:cardElevation="0dp">
 
@@ -59,14 +60,15 @@
                         android:src="@drawable/ic_video_extract"
                         android:scaleType="centerCrop"
                         app:ratio="2" />
+
                 </android.support.v7.widget.CardView>
+
                 <android.support.v7.widget.CardView
                     android:id="@+id/remove_watermark"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:minWidth="100dp"
-                    android:layout_marginLeft="4dp"
+                    android:layout_marginLeft="10dp"
                     app:cardCornerRadius="2dp"
                     app:cardElevation="0dp">
 
@@ -76,6 +78,7 @@
                         android:src="@drawable/ic_remove_watermark"
                         android:scaleType="centerCrop"
                         app:ratio="2"/>
+
                 </android.support.v7.widget.CardView>
             </LinearLayout>
 

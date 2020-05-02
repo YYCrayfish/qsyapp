@@ -170,23 +170,59 @@
                     android:textSize="12sp"
                     android:textStyle="bold" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
                     android:layout_marginTop="20dp"
-                    android:includeFontPadding="false"
-                    android:text=":保存后找不到视频？"
-                    android:textColor="#666666"
-                    android:textSize="12sp" />
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    <TextView
+                        android:background="@drawable/shape_sp_text_style01"
+                        android:text="Q"
+                        android:textColor="@color/white"
+                        android:textSize="11sp"
+                        android:gravity="center"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:includeFontPadding="false"
+                        android:text=": 保存后找不到视频？"
+                        android:textColor="#666666"
+                        android:textSize="13sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
                     android:layout_marginTop="10dp"
-                    android:includeFontPadding="false"
-                    android:text=":请使用文件管理器，到“Camera”目录中查看。"
-                    android:textColor="#999999"
-                    android:textSize="12sp" />
+                    android:gravity="center_vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:background="@drawable/shape_sp_text_style03"
+                        android:text="A"
+                        android:textColor="@color/white"
+                        android:textSize="11sp"
+                        android:gravity="center"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:includeFontPadding="false"
+                        android:text=": 请使用文件管理器，到“DCIM/Camera”中查看。"
+                        android:textColor="#999999"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
             </LinearLayout>
         </android.support.constraint.ConstraintLayout>
     </ScrollView>
