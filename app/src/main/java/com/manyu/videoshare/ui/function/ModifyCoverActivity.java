@@ -376,15 +376,15 @@ public class ModifyCoverActivity extends BaseVideoActivity implements View.OnCli
                 //解析出数字格式id
                 String id = docId.split(":")[1];
                 String selection = MediaStore.Images.Media._ID + "=" + id;
-                imagePath = getImagePath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, selection);
+                imagePath = FileUtil.getImagePath(this,MediaStore.Images.Media.EXTERNAL_CONTENT_URI, selection);
             } else if ("com.android.providers.downloads.documents".equals(uri.getAuthority())) {
                 Uri contentUri = ContentUris.withAppendedId(Uri.parse("" +
                         "content://downloads/public_downloads"), Long.valueOf(docId));
-                imagePath = getImagePath(contentUri, null);
+                imagePath = FileUtil.getImagePath(this,contentUri, null);
             }
         } else if ("content".equals(uri.getScheme())) {
             //如果不是document类型的uri，则使用普通的方式处理
-            imagePath = getImagePath(uri, null);
+            imagePath = FileUtil.getImagePath(this,uri, null);
         }
         displayImage(imagePath);
     }
@@ -396,40 +396,14 @@ public class ModifyCoverActivity extends BaseVideoActivity implements View.OnCli
      */
     private void handleImageBeforeKitKat(Intent data) {
         Uri uri = data.getData();
-        String imagePath = getImagePath(uri, null);
+        String imagePath = FileUtil.getImagePath(this,uri, null);
         this.imagePath = imagePath;
         displayImage(imagePath);
     }
 
-    /**
-     * 通过 uri seletion选择来获取图片的真实uri
-     *
-     * @param uri
-     * @param seletion
-     * @return
-     */
-    private String getImagePath(Uri uri, String seletion) {
-        String path = null;
-        Cursor cursor = getContentResolver().query(uri, null, seletion, null, null);
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
-            }
-            cursor.close();
-        }
-        return path;
-    }
-
-    private void displayImage(String imagPath) {
-        if (imagPath != null) {
-            bitmap = FileUtil.loadBitmap(imagPath,true);
-//            int tw = bitmap.getWidth();
-//            int th = bitmap.getHeight();
-//            float wr = tw * 1.0f / th;
-//            if(wr < 0.5 || wr > 4)
-//            {
-//                ToastUtils.showShort("图片尺寸不合规，建议不使用宽高差太大的图片");
-//            }
+    private void displayImage(String imagePath) {
+        if (imagePath != null) {
+            bitmap = FileUtil.loadBitmap(imagePath,true);
             iv_cover.setImageBitmap(bitmap);
         } else {
             Toast.makeText(this, "图片获取失败", Toast.LENGTH_SHORT).show();
@@ -438,7 +412,8 @@ public class ModifyCoverActivity extends BaseVideoActivity implements View.OnCli
 
     @Override
     public void onDestroy() {
-        metadataRetriever.release();
+        if(metadataRetriever != null)
+            metadataRetriever.release();
         super.onDestroy();
     }
 

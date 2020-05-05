@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.manyu.videoshare.R;
 import com.manyu.videoshare.base.BaseFragment;
 import com.manyu.videoshare.intefaces.UDataCallBack;
+import com.manyu.videoshare.util.universally.LOG;
 import com.manyu.videoshare.view.SelectColorView;
 import com.manyu.videoshare.view.SelectView;
 
@@ -23,6 +24,7 @@ public class OperateFragment extends BaseFragment {
     private TextView degree;
     private SelectView selectView;
     private SelectColorView selectColorView;
+    private int eventType;
 
     public static OperateFragment newInstance(String title, int type) {
         Bundle args = new Bundle();
@@ -57,6 +59,8 @@ public class OperateFragment extends BaseFragment {
         selectView = view.findViewById(R.id.selectView);
         selectColorView = view.findViewById(R.id.selectColorView);
 
+        eventType = getArguments().getInt("type");
+
         // 设置事件处理
         selectColorView.setOnSelectListener(new FragmentCallBack(1));
         selectView.showValue(list, new FragmentCallBack(2));
@@ -72,10 +76,11 @@ public class OperateFragment extends BaseFragment {
 
         @Override
         public void onDataReceive(String data) {
+            LOG.showE("事件类型："+eventType);
             if(dataType == 1){
-                onSelectListener.onSelect(data);
+                onSelectListener.onSelect(eventType,data);
             }else{
-                onSelectListener.onSelectItem(data);
+                onSelectListener.onSelectItem(eventType,data);
                 degree.setText(data + "%");
             }
         }
@@ -88,7 +93,7 @@ public class OperateFragment extends BaseFragment {
     }
 
     public interface onSelectListener {
-        void onSelectItem(String value);//透明度
-        void onSelect(String colorStr);//颜色
+        void onSelectItem(int eventType, String value);//透明度
+        void onSelect(int eventType, String colorStr);//颜色
     }
 }

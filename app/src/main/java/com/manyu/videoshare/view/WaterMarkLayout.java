@@ -10,6 +10,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.manyu.videoshare.util.CalcUtil;
+import com.manyu.videoshare.util.universally.LOG;
 import com.manyu.videoshare.view.TextWaterMark.TextViewParams;
 
 import java.util.ArrayList;
@@ -80,6 +81,26 @@ public class WaterMarkLayout extends RelativeLayout {
         addWaterMark(waterMark,x,y);
     }
 
+    public void setWaterMarkShadowColor(String colorStr){
+        if(currentWaterMark != null)
+            currentWaterMark.setWaterMarkShadowColor(colorStr);
+    }
+
+    public void setWaterMarkShadowAlpha(int alpha){
+        if(currentWaterMark != null)
+            currentWaterMark.setWaterMarkShadowAlpha(alpha);
+    }
+
+    public void setWaterMarkColor(String colorStr){
+        if(currentWaterMark != null)
+            currentWaterMark.setWaterMarkColor(colorStr);
+    }
+
+    public void setWaterMarkAlpha(int alpha){
+        if(currentWaterMark != null)
+            currentWaterMark.setWaterMarkAlpha(alpha);
+    }
+
     // 设置字体颜色
     public void setWaterMarkTextColor(String colorStr){
         if(currentWaterMark != null){
@@ -93,6 +114,20 @@ public class WaterMarkLayout extends RelativeLayout {
             currentWaterMark.setWaterMarkTextAlpha(alpha);
     }
 
+    // 设置边框字体颜色
+    public void setWaterMarkBorderColor(String colorStr){
+        if(currentWaterMark != null){
+            currentWaterMark.setWaterMarkBorderColor(colorStr);
+        }
+    }
+
+    // 设置边框透明度
+    public void setWaterMarkBorderAlpha(int alpha){
+        if(currentWaterMark != null)
+            currentWaterMark.setWaterMarkBorderAlpha(alpha);
+    }
+
+    // 处理点击水印按钮事件
     OnTouchListener onTouchWaterButtonListener = new OnTouchListener() {
         @Override
         public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -101,6 +136,7 @@ public class WaterMarkLayout extends RelativeLayout {
                     touchDown = true;
                     touchX = ((int) motionEvent.getX());
                     touchY = ((int) motionEvent.getY());
+                    LOG.showE("水印的按钮的点击");
                     break;
                 case MotionEvent.ACTION_UP:
                     touchDown = false;
@@ -118,6 +154,7 @@ public class WaterMarkLayout extends RelativeLayout {
             currentWaterMark = (WaterMark) view;
             switch (motionEvent.getAction() & MotionEvent.ACTION_MASK){
                 case MotionEvent.ACTION_DOWN:
+                    LOG.showE("水印的点击");
                     break;
                 case MotionEvent.ACTION_UP:
                     touchDown = false;
@@ -192,8 +229,8 @@ public class WaterMarkLayout extends RelativeLayout {
                     }
                     else{
                         // 因为手机屏幕是第二区间，所以这里减扣掉控件的宽高这样就可以在拖动时可以看完完整的文字内容
-                        float tempX = event.getX() - currentWaterMark.getWidth();
-                        float tempY = event.getY() - currentWaterMark.getHeight();
+                        float tempX = event.getX() - currentWaterMark.getWidth() / 2;
+                        float tempY = event.getY() - currentWaterMark.getHeight() / 2;
                         // 避免出屏幕界区
                         //if((event.getX() > 10 && event.getY() > 10 )){
                             currentWaterMark.setX(tempX);
@@ -203,6 +240,7 @@ public class WaterMarkLayout extends RelativeLayout {
                 }
                 break;
             case MotionEvent.ACTION_DOWN:
+                LOG.showE("普通的触摸的点击");
                 firstTouchX = event.getX();
                 firstTouchY = event.getY();
                 currentWaterMark.measure(0, 0);

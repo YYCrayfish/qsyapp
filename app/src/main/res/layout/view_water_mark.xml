@@ -4,7 +4,7 @@
     android:layout_height="wrap_content">
 
     <!--水印文字-->
-    <TextView
+    <com.manyu.videoshare.view.TextWaterMark.TextViewBorder
         android:id="@+id/waterText"
         android:padding="4dp"
         android:textSize="15sp"

@@ -19,6 +19,7 @@ import com.manyu.videoshare.util.ToastUtils;
 import com.manyu.videoshare.util.ToolUtils;
 import com.manyu.videoshare.util.UriToPathUtil;
 import com.manyu.videoshare.util.universally.ConfigureParameter;
+import com.manyu.videoshare.util.universally.FileUtil;
 import com.manyu.videoshare.util.universally.LOG;
 
 import java.io.File;
@@ -94,52 +95,10 @@ public class PreviewActivity extends BaseVideoActivity implements View.OnClickLi
                 finish();
                 break;
             case R.id.save:
-                if (copyFile(path, newPath)) {
+                if (FileUtil.copyFileOnly(path, newPath)) {
                     ToastUtils.showShort("视频已经成功保存到相册中");
                 }
                 break;
-        }
-    }
-
-    public boolean copyFile(String oldPath$Name, String newPath$Name) {
-        try {
-            File newFile = new File(newPath$Name);
-            if (newFile.exists()) {
-                ToastUtils.showShort("视频已经存在，无需再次保存。");
-                return false;
-            }
-            File file = new File(oldPath$Name);
-            if (!file.exists()) {
-                Log.e("--Method--", "copyFile:  oldFile not exist.");
-                return false;
-            } else if (!file.isFile()) {
-                Log.e("--Method--", "copyFile:  oldFile not file.");
-                return false;
-            } else if (!file.canRead()) {
-                Log.e("--Method--", "copyFile:  oldFile cannot read.");
-                return false;
-            }
-
-        /* 如果不需要打log，可以使用下面的语句
-        if (!oldFile.exists() || !oldFile.isFile() || !oldFile.canRead()) {
-            return false;
-        }
-        */
-
-            FileInputStream fileInputStream = new FileInputStream(oldPath$Name);    //读入原文件
-            FileOutputStream fileOutputStream = new FileOutputStream(newPath$Name);
-            byte[] buffer = new byte[1024];
-            int byteRead;
-            while ((byteRead = fileInputStream.read(buffer)) != -1) {
-                fileOutputStream.write(buffer, 0, byteRead);
-            }
-            fileInputStream.close();
-            fileOutputStream.flush();
-            fileOutputStream.close();
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
         }
     }
 

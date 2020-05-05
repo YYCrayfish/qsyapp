@@ -48,6 +48,7 @@ public class StrokeText extends android.support.v7.widget.AppCompatTextView {
     public void init(AttributeSet attrs) {
         TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.StrokeText);
         if (typedArray != null) {
+
             strokeColor = typedArray.getColor(R.styleable.StrokeText_strokeColor, getResources().getColor(R.color.tran));
             openStroke = typedArray.getBoolean(R.styleable.StrokeText_openStroke, false);
             typedArray.recycle();

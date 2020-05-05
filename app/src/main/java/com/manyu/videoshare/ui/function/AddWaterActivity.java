@@ -201,8 +201,8 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
         }
         listFragment.add(OperateFragment.newInstance("文字", 0));
         listFragment.add(OperateFragment.newInstance("边框", 1));
-        listFragment.add(OperateFragment.newInstance("底色", 1));
-        listFragment.add(OperateFragment.newInstance("阴影", 1));
+        listFragment.add(OperateFragment.newInstance("底色", 2));
+        listFragment.add(OperateFragment.newInstance("阴影", 3));
 
         for (int i = 0; i < listFragment.size(); i++) {
             ((OperateFragment) listFragment.get(i)).setOnSelectListener(new FragmentDataReceive());
@@ -218,14 +218,28 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
     private class FragmentDataReceive implements OperateFragment.onSelectListener{
 
         @Override
-        public void onSelectItem(String value) {
+        public void onSelectItem(int eventType, String value) {
             int alpha = (int) (255 * (Integer.parseInt(value) / 100.0f));
-            layoutWaterMark.setWaterMarkTextAlpha(alpha);
+            if(eventType == 0)
+                layoutWaterMark.setWaterMarkTextAlpha(alpha);
+            else if(eventType == 1)
+                layoutWaterMark.setWaterMarkBorderAlpha(alpha);
+            else if(eventType == 2)
+                layoutWaterMark.setWaterMarkAlpha(alpha);
+            else if(eventType == 3)
+                layoutWaterMark.setWaterMarkShadowAlpha(alpha);
         }
 
         @Override
-        public void onSelect(String colorStr) {
-            layoutWaterMark.setWaterMarkTextColor(colorStr);
+        public void onSelect(int eventType, String colorStr) {
+            if(eventType == 0)
+                layoutWaterMark.setWaterMarkTextColor(colorStr);
+            else if(eventType == 1)
+                layoutWaterMark.setWaterMarkBorderColor(colorStr);
+            else if(eventType == 2)
+                layoutWaterMark.setWaterMarkColor(colorStr);
+            else if(eventType == 3)
+                layoutWaterMark.setWaterMarkShadowColor(colorStr);
         }
     }
 
