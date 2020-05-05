@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 
 import com.manyu.videoshare.util.UriToPathUtil;
@@ -137,32 +138,131 @@ public class FileUtil {
      * @param newFilePath 要复制到的路径
      * @return 是否成功
      */
-    public static boolean fileCopy(String oldFilePath,String newFilePath) {
+    public static boolean fileCopy(String oldFilePath,String newFilePath,String videoImageFile) {
         try{
             //如果原文件不存在
             if(fileExists(oldFilePath) == false){
                 return false;
             }
 
-            File oldFile = new File(oldFilePath);
-            //获得原文件流
-            FileInputStream inputStream = new FileInputStream(oldFile);
-            byte[] data = new byte[1024];
-
-            File newFile = new File(newFilePath);
-            //输出流
-            FileOutputStream outputStream =new FileOutputStream(newFile);
-            //开始处理流
-            while (inputStream.read(data) != -1) {
-                outputStream.write(data);
+            // 测试代码
+            ExifInterface exif = null;
+            int digree = -1;
+            try {
+                exif = new ExifInterface(oldFilePath);
+            } catch (IOException e) {
+                e.printStackTrace();
+                exif = null;
             }
-            inputStream.close();
-            outputStream.close();
+            if (exif != null) {
+                // 读取图片中相机方向信息
+                int ori = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION,
+                        ExifInterface.ORIENTATION_UNDEFINED);
+                // 计算旋转角度
+                switch (ori) {
+                    case ExifInterface.ORIENTATION_ROTATE_90:
+                        digree = 90;
+                        break;
+                    case ExifInterface.ORIENTATION_ROTATE_180:
+                        digree = 180;
+                        break;
+                    case ExifInterface.ORIENTATION_ROTATE_270:
+                        digree = 270;
+                        break;
+                    default:
+                        digree = 0;
+                        break;
+                }
+            }
+
+            {
+                // 封面图
+                Bitmap coverImageBitmap = loadBitmap(oldFilePath);
+                // 视频分解出来的原图
+                Bitmap videoImageBitmap = loadBitmap(videoImageFile);
+
+                // 如果图片相机信息中的角度
+                if(digree != 0){
+                    // 旋转图片
+                    Matrix m = new Matrix();
+                    m.postRotate(digree);
+                    coverImageBitmap = Bitmap.createBitmap(coverImageBitmap, 0, 0, coverImageBitmap.getWidth(),
+                            coverImageBitmap.getHeight(), m, true);
+                }
+
+                // 视频分解图的宽高
+                int videoImageWidth = videoImageBitmap.getWidth();
+                int videoImageHeight = videoImageBitmap.getHeight();
+
+                // 封面图重新计算宽高
+                int coverWidth = coverImageBitmap.getWidth();
+                int coverHeight = coverImageBitmap.getHeight();
+
+                // 封面图和视频图的宽高比例
+                float widthRatio = videoImageWidth*1.0f / coverWidth;
+                float heightRatio = videoImageHeight*1.0f / coverHeight;
+
+                // 封面图的宽高比例
+                float coverRatio = coverWidth*1.0f / coverHeight;
+
+                // 如果宽高比例大于1.6就裁减封面图 不然的话直接缩放拉伸会变形
+                if(coverRatio >= 1.6f){
+                   // 减裁新的封面
+                    coverImageBitmap =  cropBitmap(coverImageBitmap,coverRatio,videoImageWidth,videoImageHeight);
+                    // 重新计算封面图宽高 START
+                    coverWidth = coverImageBitmap.getWidth();
+                    coverHeight = coverImageBitmap.getHeight();
+
+                    widthRatio = videoImageWidth*1.0f / coverWidth;
+                    heightRatio = videoImageHeight*1.0f / coverHeight;
+                    coverRatio = coverWidth*1.0f / coverHeight;
+                    // 重新计算封面图宽高 END
+                }
+
+                Matrix m2 = new Matrix();
+                m2.postScale(widthRatio,heightRatio);
+
+                coverImageBitmap = Bitmap.createBitmap(coverImageBitmap, 0, 0, coverWidth, coverHeight, m2, true);
+
+                // 到这里代表照片是被旋转了的，所以需要在把角度重新调整好后覆盖保存
+                saveBitmap(coverImageBitmap,newFilePath);
+            }
+            // 测试代码
+
+//            File oldFile = new File(oldFilePath);
+//            //获得原文件流
+//            FileInputStream inputStream = new FileInputStream(oldFile);
+//            byte[] data = new byte[1024];
+//
+//            File newFile = new File(newFilePath);
+//            //输出流
+//            FileOutputStream outputStream =new FileOutputStream(newFile);
+//            //开始处理流
+//            while (inputStream.read(data) != -1) {
+//                outputStream.write(data);
+//            }
+//            inputStream.close();
+//            outputStream.close();
             return true;
         }catch (Exception e){
             LOG.showE("报错了："+e.toString());
         }
         return false;
+    }
+
+    /**
+     * 裁剪
+     * @param bitmap 原图
+     * @param ratio 宽高比例
+     * @param width 目标宽度
+     * @param height 目标高度
+     * @return 裁剪后的图像
+     */
+    private static Bitmap cropBitmap(Bitmap bitmap, float ratio, int width, int height) {
+        int w; // 得到图片的宽，高
+        int h = bitmap.getHeight();
+        w = (int) (h / ratio);
+        return Bitmap.createBitmap(bitmap, width/2-w/2, 0, w , h, null, false);
     }
 
     public static boolean fileExists(String filePath) {
@@ -220,9 +320,30 @@ public class FileUtil {
                 m.postRotate(digree);
                 bm = Bitmap.createBitmap(bm, 0, 0, bm.getWidth(),
                         bm.getHeight(), m, true);
+
+                // 到这里代表照片是被旋转了的，所以需要在把角度重新调整好后覆盖保存
+                //saveBitmap(bm,imagePath);
             }
             return bm;
         }
+    }
+
+    private static void saveBitmap(Bitmap bitmap,String imagePath){
+            try {
+//                File dirFile = new File(imagePath);
+//                if (!dirFile.exists()) {              //如果不存在，那就建立这个文件夹
+//                    dirFile.mkdirs();
+//                }
+                File file = new File(imagePath);
+                FileOutputStream fos = new FileOutputStream(file);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+                fos.flush();
+                fos.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
     }
 
     /**

@@ -24,6 +24,7 @@ import android.widget.Toast;
 import com.manyu.videoshare.R;
 import com.manyu.videoshare.base.BaseVideoActivity;
 import com.manyu.videoshare.util.FFmpegUtil;
+import com.manyu.videoshare.util.ToastUtils;
 import com.manyu.videoshare.util.ToolUtils;
 import com.manyu.videoshare.util.UriToPathUtil;
 import com.manyu.videoshare.util.universally.FileUtil;
@@ -250,7 +251,7 @@ public class ModifyCoverActivity extends BaseVideoActivity implements View.OnCli
 
     // 第三步：替换第一帧图片
     private void modifyStep3(){
-        FileUtil.fileCopy(imagePath,filePath+"pages"+File.separator+"0001.jpg");
+        FileUtil.fileCopy(imagePath,filePath+"pages"+File.separator+"0001.jpg",filePath+"pages"+File.separator+"0002.jpg");
         modifyStep4();
         LOG.showE("合成封面文件替换完成");
     }
@@ -422,6 +423,13 @@ public class ModifyCoverActivity extends BaseVideoActivity implements View.OnCli
     private void displayImage(String imagPath) {
         if (imagPath != null) {
             bitmap = FileUtil.loadBitmap(imagPath,true);
+//            int tw = bitmap.getWidth();
+//            int th = bitmap.getHeight();
+//            float wr = tw * 1.0f / th;
+//            if(wr < 0.5 || wr > 4)
+//            {
+//                ToastUtils.showShort("图片尺寸不合规，建议不使用宽高差太大的图片");
+//            }
             iv_cover.setImageBitmap(bitmap);
         } else {
             Toast.makeText(this, "图片获取失败", Toast.LENGTH_SHORT).show();
