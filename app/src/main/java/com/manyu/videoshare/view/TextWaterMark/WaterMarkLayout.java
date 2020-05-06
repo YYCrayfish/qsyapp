@@ -51,7 +51,7 @@ public class WaterMarkLayout extends RelativeLayout {
         super(context, attrs);
     }
 
-    public void addWaterMark(WaterMark waterMark, int x, int y){
+    public void addWaterMark(WaterMark waterMark, int x, int y) {
         // 重置X Y数据
         waterMark.setX(x);
         waterMark.setY(y);
@@ -70,57 +70,57 @@ public class WaterMarkLayout extends RelativeLayout {
         addView(waterMark);
     }
 
-    public void addWaterMark(WaterMark waterMark){
-        int x = (getWidth()  - waterMark.getWidth()) / 2;
+    public void addWaterMark(WaterMark waterMark) {
+        int x = (getWidth() - waterMark.getWidth()) / 2;
         int y = (getHeight() - waterMark.getHeight()) / 2;
 
         // 重载
-        addWaterMark(waterMark,x,y);
+        addWaterMark(waterMark, x, y);
     }
 
-    public void setWaterMarkShadowColor(String colorStr){
-        if(currentWaterMark != null)
+    public void setWaterMarkShadowColor(String colorStr) {
+        if (currentWaterMark != null)
             currentWaterMark.setWaterMarkShadowColor(colorStr);
     }
 
-    public void setWaterMarkShadowAlpha(int alpha){
-        if(currentWaterMark != null)
+    public void setWaterMarkShadowAlpha(int alpha) {
+        if (currentWaterMark != null)
             currentWaterMark.setWaterMarkShadowAlpha(alpha);
     }
 
-    public void setWaterMarkColor(String colorStr){
-        if(currentWaterMark != null)
+    public void setWaterMarkColor(String colorStr) {
+        if (currentWaterMark != null)
             currentWaterMark.setWaterMarkColor(colorStr);
     }
 
-    public void setWaterMarkAlpha(int alpha){
-        if(currentWaterMark != null)
+    public void setWaterMarkAlpha(int alpha) {
+        if (currentWaterMark != null)
             currentWaterMark.setWaterMarkAlpha(alpha);
     }
 
     // 设置字体颜色
-    public void setWaterMarkTextColor(String colorStr){
-        if(currentWaterMark != null){
+    public void setWaterMarkTextColor(String colorStr) {
+        if (currentWaterMark != null) {
             currentWaterMark.setWaterMarkTextColor(colorStr);
         }
     }
 
     // 设置透明度
-    public void setWaterMarkTextAlpha(int alpha){
-        if(currentWaterMark != null)
+    public void setWaterMarkTextAlpha(int alpha) {
+        if (currentWaterMark != null)
             currentWaterMark.setWaterMarkTextAlpha(alpha);
     }
 
     // 设置边框字体颜色
-    public void setWaterMarkBorderColor(String colorStr){
-        if(currentWaterMark != null){
+    public void setWaterMarkBorderColor(String colorStr) {
+        if (currentWaterMark != null) {
             currentWaterMark.setWaterMarkBorderColor(colorStr);
         }
     }
 
     // 设置边框透明度
-    public void setWaterMarkBorderAlpha(int alpha){
-        if(currentWaterMark != null)
+    public void setWaterMarkBorderAlpha(int alpha) {
+        if (currentWaterMark != null)
             currentWaterMark.setWaterMarkBorderAlpha(alpha);
     }
 
@@ -149,7 +149,7 @@ public class WaterMarkLayout extends RelativeLayout {
         public boolean onTouch(View view, MotionEvent motionEvent) {
             // 这个赋值操作的作用是可以在触摸到对应的水印时，控制对应的水印
             currentWaterMark = (WaterMark) view;
-            switch (motionEvent.getAction() & MotionEvent.ACTION_MASK){
+            switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
                 case MotionEvent.ACTION_DOWN:
                     LOG.showE("水印的点击");
                     break;
@@ -162,11 +162,11 @@ public class WaterMarkLayout extends RelativeLayout {
     };
 
     // 点击删除水印的自定义事件 PS:为了接收一个水印ID，便于删除对应的水印
-    private class OnClickDelete implements OnClickListener{
+    private class OnClickDelete implements OnClickListener {
 
         long waterMarkId;
 
-        public OnClickDelete(long waterMarkId){
+        public OnClickDelete(long waterMarkId) {
             this.waterMarkId = waterMarkId;
         }
 
@@ -177,8 +177,8 @@ public class WaterMarkLayout extends RelativeLayout {
         }
     }
 
-    private void showLog(String tex){
-        Log.e("xushiyong",tex);
+    private void showLog(String tex) {
+        Log.e("xushiyong", tex);
     }
 
     @Override
@@ -187,20 +187,22 @@ public class WaterMarkLayout extends RelativeLayout {
         float moveX = event.getX();
         float moveY = event.getY();
 
-        switch (event.getAction() & MotionEvent.ACTION_MASK){
+        switch (event.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_MOVE:
                 boolean isAbleMove = CalcUtil.spacing(firstTouchX, firstTouchY, event.getX(), event.getY()) > 20;
-                if(!(currentWaterMark == null) && isAbleMove){
+                if (!(currentWaterMark == null) && isAbleMove) {
 
                     // 压住了缩放按钮
-                    if(touchDown){
+                    if (touchDown) {
                         currentWaterMark.measure(0, 0);
+                        float centerX = currentWaterMark.getX() + currentWaterMark.getMeasuredWidth() / 2;
+                        float centerY = currentWaterMark.getY() + currentWaterMark.getMeasuredHeight() / 2;
 
-                        currentAngle = CalcUtil.angleBetweenLines(currentWaterMark.getX() + currentWaterMark.getMeasuredWidth() / 2, currentWaterMark.getY() + currentWaterMark.getMeasuredWidth() / 2, firstTouchX - touchX, firstTouchY - touchY, currentWaterMark.getX() + currentWaterMark.getMeasuredWidth() / 2, currentWaterMark.getY() + currentWaterMark.getMeasuredWidth() / 2, event.getX() - touchX, event.getY() - touchY) + lastAngle;
+                        currentAngle = CalcUtil.angleBetweenLines(centerX, centerY, firstTouchX - touchX, firstTouchY - touchY, centerX, centerY, event.getX() - touchX, event.getY() - touchY) + lastAngle;
                         currentWaterMark.setRotation(currentAngle);
 
                         // 水印中心点 和 当前压按点的距离
-                        float newDist = (float) CalcUtil.spacing(currentWaterMark.getX() + currentWaterMark.getMeasuredWidth() / 2, currentWaterMark.getY() + currentWaterMark.getMeasuredWidth() / 2, event.getX(), event.getY());
+                        float newDist = (float) CalcUtil.spacing(centerX, centerY, event.getX(), event.getY());
                         if (oldDist != 0) {
                             scale = newDist / oldDist;
                         }
@@ -219,23 +221,25 @@ public class WaterMarkLayout extends RelativeLayout {
 //                        缩放值：0.33751738(newDist:77.83315 -- oldDist:230.60487)
                         //showLog("当前距离："+newDist+"  距离："+oldDist+"  缩放："+scale);
 
-                        if ( newDist > oldDist + 1) {
+                        if (newDist > oldDist + 1) {
                             zoom(scale);
                             oldDist = newDist;
                         }
-                        if ( newDist < oldDist - 1) {
+                        if (newDist < oldDist - 1) {
                             zoom(scale);
                             oldDist = newDist;
                         }
-                    }
-                    else{
+                        currentWaterMark.measure(0, 0);
+                        currentWaterMark.setX(centerX - currentWaterMark.getMeasuredWidth() / 2);
+                        currentWaterMark.setY(centerY - currentWaterMark.getMeasuredHeight() / 2);
+                    } else {
                         // 因为手机屏幕是第二区间，所以这里减扣掉控件的宽高这样就可以在拖动时可以看完完整的文字内容
                         float tempX = event.getX() - currentWaterMark.getWidth() / 2;
                         float tempY = event.getY() - currentWaterMark.getHeight() / 2;
                         // 避免出屏幕界区
                         //if((event.getX() > 10 && event.getY() > 10 )){
-                            currentWaterMark.setX(tempX);
-                            currentWaterMark.setY(tempY);
+                        currentWaterMark.setX(tempX);
+                        currentWaterMark.setY(tempY);
                         //}
                     }
                 }
@@ -262,9 +266,9 @@ public class WaterMarkLayout extends RelativeLayout {
     private void zoom(float f) {
         // 避免出现缩放的范围过大或过小
         float tempTextSize = textSize * (f);
-        if(tempTextSize > maxScan)
+        if (tempTextSize > maxScan)
             tempTextSize = maxScan;
-        else if( tempTextSize < minScan)
+        else if (tempTextSize < minScan)
             tempTextSize = minScan;
 
         currentWaterMark.setTextSize(tempTextSize);
@@ -274,13 +278,14 @@ public class WaterMarkLayout extends RelativeLayout {
 
     /**
      * 删除水印
+     *
      * @param waterMarkID
      * @return
      */
     private void deleteWaterMark(long waterMarkID) {
-        for ( int i = 0; i < waterMarkList.size(); i++ ) {
+        for (int i = 0; i < waterMarkList.size(); i++) {
             WaterMark wm = waterMarkList.get(i);
-            if ( wm.getWaterMarkId() == waterMarkID ) {
+            if (wm.getWaterMarkId() == waterMarkID) {
                 waterMarkList.remove(i);
                 removeView(wm);
                 break;

@@ -1,39 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="wrap_content"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
     <!--水印文字-->
     <com.manyu.videoshare.view.TextWaterMark.TextViewBorder
         android:id="@+id/waterText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="12dp"
+        android:background="@drawable/shape_water_border"
+        android:gravity="center"
         android:padding="4dp"
-        android:textSize="15sp"
+        android:singleLine="true"
         android:text="都会死的还是就看"
         android:textColor="@color/white"
-        android:layout_marginTop="12dp"
-        android:layout_marginLeft="12dp"
-        android:background="@drawable/shape_water_border"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:textSize="15sp" />
 
     <!--删除-->
     <ImageView
         android:id="@+id/waterButtonDelete"
-        android:background="@mipmap/ic_puase"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
         android:layout_width="24dp"
-        android:layout_height="24dp" />
+        android:layout_height="24dp"
+        android:background="@mipmap/ic_puase" />
 
     <!--拖动和缩放-->
     <ImageView
         android:id="@+id/waterButtonControl"
-        android:background="@mipmap/ic_puase"
-        android:layout_below="@id/waterText"
-        android:layout_toRightOf="@id/waterText"
-        android:layout_marginTop="-12dp"
-        android:layout_marginLeft="-12dp"
         android:layout_width="24dp"
-        android:layout_height="24dp" />
+        android:layout_height="24dp"
+        android:layout_gravity="bottom|end"
+        android:background="@mipmap/ic_puase" />
 
-</RelativeLayout>
+</FrameLayout>
