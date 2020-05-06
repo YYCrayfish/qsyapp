@@ -20,11 +20,15 @@ import java.util.List;
 
 @SuppressLint("ValidFragment")
 public class OperateFragment extends BaseFragment {
+
+    public static final int TYPE_IN_SCRAWL = 4;
+
     private View view;
     private TextView degree;
     private SelectView selectView;
     private SelectColorView selectColorView;
     private int eventType;
+    private View revoke;
 
     public static OperateFragment newInstance(String title, int type) {
         Bundle args = new Bundle();
@@ -36,7 +40,7 @@ public class OperateFragment extends BaseFragment {
         return fragment;
     }
 
-    public BaseFragment getFragment(){
+    public BaseFragment getFragment() {
         return this;
     }
 
@@ -58,29 +62,47 @@ public class OperateFragment extends BaseFragment {
         degree = view.findViewById(R.id.tv_degree);
         selectView = view.findViewById(R.id.selectView);
         selectColorView = view.findViewById(R.id.selectColorView);
+        revoke = view.findViewById(R.id.btn_revoke);
+        revoke.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (onRevoke != null) {
+                    onRevoke.run();
+                }
+            }
+        });
 
         eventType = getArguments().getInt("type");
+
+        if (eventType == TYPE_IN_SCRAWL) {
+            revoke.setVisibility(View.VISIBLE);
+        } else {
+            revoke.setVisibility(View.GONE);
+        }
 
         // 设置事件处理
         selectColorView.setOnSelectListener(new FragmentCallBack(1));
         selectView.showValue(list, new FragmentCallBack(2));
     }
 
-    private class FragmentCallBack implements UDataCallBack{
+    private class FragmentCallBack implements UDataCallBack {
 
         private int dataType;// 1|颜色  2|透明度
 
-        public FragmentCallBack(int type){
+        public FragmentCallBack(int type) {
             this.dataType = type;
         }
 
         @Override
         public void onDataReceive(String data) {
-            LOG.showE("事件类型："+eventType);
-            if(dataType == 1){
-                onSelectListener.onSelect(eventType,data);
-            }else{
-                onSelectListener.onSelectItem(eventType,data);
+            LOG.showE("事件类型：" + eventType);
+            if (onSelectListener == null) {
+                return;
+            }
+            if (dataType == 1) {
+                onSelectListener.onSelect(eventType, data);
+            } else {
+                onSelectListener.onSelectItem(eventType, data);
                 degree.setText(data + "%");
             }
         }
@@ -94,6 +116,13 @@ public class OperateFragment extends BaseFragment {
 
     public interface onSelectListener {
         void onSelectItem(int eventType, String value);//透明度
+
         void onSelect(int eventType, String colorStr);//颜色
+    }
+
+    private Runnable onRevoke;
+
+    public void setOnRevokeListener(Runnable onRevoke) {
+        this.onRevoke = onRevoke;
     }
 }

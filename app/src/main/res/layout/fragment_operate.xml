@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.NestedScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -10,11 +10,27 @@
         android:gravity="center_horizontal"
         android:orientation="vertical">
 
-        <com.manyu.videoshare.view.SelectColorView
-            android:id="@+id/selectColorView"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_marginTop="20dp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:gravity="center">
+
+            <com.manyu.videoshare.view.SelectColorView
+                android:id="@+id/selectColorView"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp" />
+
+            <ImageView
+                android:id="@+id/btn_revoke"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_marginStart="10dp"
+                android:src="@drawable/watermark_draw_undo"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+        </LinearLayout>
 
         <TextView
             android:layout_width="wrap_content"

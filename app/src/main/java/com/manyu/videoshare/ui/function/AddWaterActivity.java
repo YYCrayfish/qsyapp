@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
@@ -50,6 +51,7 @@ import com.manyu.videoshare.view.MyViewPager;
 import com.manyu.videoshare.view.StrokeText;
 import com.manyu.videoshare.view.TextWaterMark.WaterMark;
 import com.manyu.videoshare.view.TextWaterMark.WaterMarkLayout;
+import com.manyu.videoshare.view.scraw.ScrawlBoardView;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -71,6 +73,7 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
     public static int TABINDEX = -1;
     private ImageView imgWater;
     private ImageView tvWater;
+    private ScrawlBoardView scrawl;
     private RelativeLayout rlImg;
     private RelativeLayout rltv;
     private LinearLayout tvToolbar;
@@ -79,9 +82,13 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
     private StrokeText moveTv;
     private MyViewPager viewPager;
     private TabLayout tabLayout;
+    private View scrawlToolBar;
 
     private WaterMarkLayout layoutWaterMark;
 
+    private View iv_scrawl;
+    private View iv_close_scrawl;
+    private View iv_ok_scrawl;
     private ImageView iv_close;
     private ImageView iv_edit;
     private ImageView iv_color;
@@ -148,6 +155,8 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
         ToolUtils.setBar(this);
         imgWater = findViewById(R.id.img);
         tvWater = findViewById(R.id.text);
+        scrawl = findViewById(R.id.scrawl_board);
+        scrawl.setEnabled(false);
         rlImg = findViewById(R.id.rl_image);
         rltv = findViewById(R.id.rl_text);
         layoutWaterMark = findViewById(R.id.layoutWaterMark);
@@ -160,7 +169,13 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
         iv_color = findViewById(R.id.iv_color);
         tv_Aa = findViewById(R.id.tv_Aa);
         iv_ok = findViewById(R.id.iv_ok);
+        iv_scrawl = findViewById(R.id.iv_scrawl);
+        iv_close_scrawl = findViewById(R.id.iv_close_scrawl);
+        iv_ok_scrawl = findViewById(R.id.iv_ok_scrawl);
 
+        iv_ok_scrawl.setOnClickListener(this);
+        iv_close_scrawl.setOnClickListener(this);
+        iv_scrawl.setOnClickListener(this);
         iv_close.setOnClickListener(this);
         iv_edit.setOnClickListener(this);
         iv_color.setOnClickListener(this);
@@ -174,6 +189,36 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
         moveIv = findViewById(R.id.move_iv);
         moveTv = findViewById(R.id.move_tv);
         tvToolbar = findViewById(R.id.tv_bottom_toolbar);
+
+        scrawlToolBar = findViewById(R.id.scrawl_bottom_toolbar);
+        OperateFragment fragment = OperateFragment.newInstance("", OperateFragment.TYPE_IN_SCRAWL);
+        fragment.setOnRevokeListener(new Runnable() {
+            @Override
+            public void run() {
+                scrawl.cancelPath();
+            }
+        });
+        fragment.setOnSelectListener(new OperateFragment.onSelectListener() {
+            @Override
+            public void onSelectItem(int eventType, String value) {
+                int alpha = (int) (255 * (Integer.parseInt(value) / 100.0f));
+                int color = scrawl.getPaintColor();
+                color &= 0x00FFFFFF;
+                color |= alpha << 24;
+                scrawl.setPaintColor(color);
+            }
+
+            @Override
+            public void onSelect(int eventType, String colorStr) {
+                int color = scrawl.getPaintColor();
+                int alpha = color >> 24;
+                color = Color.parseColor("#" + colorStr);
+                color &= 0x00FFFFFF;
+                color |= alpha << 24;
+                scrawl.setPaintColor(color);
+            }
+        });
+        getSupportFragmentManager().beginTransaction().replace(R.id.scrawl_color_tool, fragment).commit();
     }
 
     @Override
@@ -186,9 +231,9 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
         screenWidth = dm.widthPixels;
         screenHeight = dm.heightPixels;
         // 不能指定路径为data下，不然会无法读取到视频
-        outPath = Environment.getExternalStorageDirectory().getPath()+"/qsymy"+File.separator;//getBaseContext().getCacheDir().getAbsolutePath() + File.separator;
+        outPath = Environment.getExternalStorageDirectory().getPath() + "/qsymy" + File.separator;//getBaseContext().getCacheDir().getAbsolutePath() + File.separator;
         File temp = new File(outPath);
-        if(!temp.exists())
+        if (!temp.exists())
             temp.mkdirs();
         moveIv = findViewById(R.id.move_iv);
         moveIv.setOnTouchListener(movingEventListener);
@@ -219,30 +264,30 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
     }
 
     // Fragment页面的数据回调汇总处理
-    private class FragmentDataReceive implements OperateFragment.onSelectListener{
+    private class FragmentDataReceive implements OperateFragment.onSelectListener {
 
         @Override
         public void onSelectItem(int eventType, String value) {
             int alpha = (int) (255 * (Integer.parseInt(value) / 100.0f));
-            if(eventType == 0)
+            if (eventType == 0)
                 layoutWaterMark.setWaterMarkTextAlpha(alpha);
-            else if(eventType == 1)
+            else if (eventType == 1)
                 layoutWaterMark.setWaterMarkBorderAlpha(alpha);
-            else if(eventType == 2)
+            else if (eventType == 2)
                 layoutWaterMark.setWaterMarkAlpha(alpha);
-            else if(eventType == 3)
+            else if (eventType == 3)
                 layoutWaterMark.setWaterMarkShadowAlpha(alpha);
         }
 
         @Override
         public void onSelect(int eventType, String colorStr) {
-            if(eventType == 0)
+            if (eventType == 0)
                 layoutWaterMark.setWaterMarkTextColor(colorStr);
-            else if(eventType == 1)
+            else if (eventType == 1)
                 layoutWaterMark.setWaterMarkBorderColor(colorStr);
-            else if(eventType == 2)
+            else if (eventType == 2)
                 layoutWaterMark.setWaterMarkColor(colorStr);
-            else if(eventType == 3)
+            else if (eventType == 3)
                 layoutWaterMark.setWaterMarkShadowColor(colorStr);
         }
     }
@@ -385,7 +430,7 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
 
     @Override
     public void onDestroy() {
-        if(unbinder != null)
+        if (unbinder != null)
             unbinder.unbind();
         super.onDestroy();
     }
@@ -443,8 +488,8 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
                     Log.e("ffmpeg_result", "失败");
                 }
             });
-        }catch (Exception e){
-            Log.e("xushiyong","抛出异常~~"+e.toString());
+        } catch (Exception e) {
+            Log.e("xushiyong", "抛出异常~~" + e.toString());
         }
     }
 
@@ -609,6 +654,16 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
             case R.id.iv_ok:
                 tvToolbar.setVisibility(View.GONE);
                 break;
+            case R.id.iv_scrawl:
+                tvToolbar.setVisibility(View.GONE);
+                scrawlToolBar.setVisibility(View.VISIBLE);
+                scrawl.setEnabled(true);
+                break;
+            case R.id.iv_close_scrawl:
+            case R.id.iv_ok_scrawl:
+                scrawlToolBar.setVisibility(View.GONE);
+                scrawl.setEnabled(false);
+                break;
         }
     }
 
@@ -621,6 +676,7 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
                     if (!TextUtils.isEmpty(content)) {
                         type = 1;
                         tvToolbar.setVisibility(View.VISIBLE);
+                        scrawlToolBar.setVisibility(View.GONE);
 //                        tvRl.setVisibility(View.VISIBLE);
 //                        tvRl.addTextView(videoW / 2, videoH / 2, content, 0, tvColorStr);
                         layoutWaterMark.setVisibility(View.VISIBLE);
