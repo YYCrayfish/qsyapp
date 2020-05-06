@@ -21,7 +21,6 @@ public class WaterMark extends RelativeLayout {
 
     private TextViewBorder text;
     private ImageView image;
-    private float textSize = 15;
     private ImageView btnControl;
     private ImageView btnDelete;
     long waterMarkId;
@@ -52,10 +51,19 @@ public class WaterMark extends RelativeLayout {
     String defaultWaterMarkShadowColor = "ffffff";
     int defaultWaterMarkShadowAlpha = 255;
     // 缩放限制
-    private float maxScan;
-    private float minScan;
     private float maxWidth;
     private float maxHeight;
+    private float minWidth;
+    private float minHeight;
+
+    // 开始触摸时的对角线长度的一半，作为计算缩放的基准
+    private float baseSize;
+    // 开始触摸时的字体大小
+    private float baseTextSize;
+    // 开始触摸时的图片宽度
+    private int baseWidth;
+    // 开始触摸时的图片高度
+    private int baseHeight;
 
     public WaterMark(Context context) {
         super(context);
@@ -64,13 +72,12 @@ public class WaterMark extends RelativeLayout {
         addView(view);
 
         float density = Resources.getSystem().getDisplayMetrics().density;
-        maxScan = (int) (60 * density + 0.5f);
-        minScan = (int) (8 * density + 0.5f);
         maxWidth = (int) (400 * density + 0.5f);
         maxHeight = (int) (400 * density + 0.5f);
+        minWidth = (int) (20 * density + 0.5f);
+        minHeight = (int) (20 * density + 0.5f);
 
         text = findViewById(R.id.waterText);
-        textSize = text.getTextSize();
         image = findViewById(R.id.waterImage);
         btnControl = findViewById(R.id.waterButtonControl);
         btnDelete = findViewById(R.id.waterButtonDelete);
@@ -145,36 +152,41 @@ public class WaterMark extends RelativeLayout {
         btnControl.setRotation(-rotation);
     }
 
-    public void setScale(float scale) {
-        // 避免出现缩放的范围过大或过小
-        float tempTextSize = textSize * (scale);
-        if (tempTextSize > maxScan)
-            tempTextSize = maxScan;
-        else if (tempTextSize < minScan)
-            tempTextSize = minScan;
+    public void setBaseSize(float baseSize) {
+        this.baseSize = baseSize;
+        baseWidth = image.getWidth();
+        baseHeight = image.getHeight();
+        baseTextSize = text.getTextSize();
+    }
 
+    public void setScale(float size) {
+        float scale = size / baseSize;
         if (text != null && text.getVisibility() == View.VISIBLE) {
+            float tempTextSize = baseTextSize * (scale);
+            float originTextSize = text.getTextSize();
             text.setTextSize(TypedValue.COMPLEX_UNIT_PX, tempTextSize);
             measure(0, 0);
-            if (getMeasuredWidth() > maxWidth || getMeasuredHeight() > maxHeight) {
-                text.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+            int measuredWidth = getMeasuredWidth();
+            int measuredHeight = getMeasuredHeight();
+            if (measuredWidth > maxWidth ||
+                    measuredHeight > maxHeight ||
+                    measuredWidth < minWidth ||
+                    measuredHeight < minHeight) {
+                text.setTextSize(TypedValue.COMPLEX_UNIT_PX, originTextSize);
                 return;
             }
         }
         if (image != null && image.getVisibility() == View.VISIBLE) {
             ViewGroup.LayoutParams lp = image.getLayoutParams();
-            int sW = (int) (lp.width * scale);
-            int sH = (int) (lp.height * scale);
-            if (sW > maxWidth || sH > maxHeight) {
+            int sW = (int) (baseWidth * scale);
+            int sH = (int) (baseHeight * scale);
+            if (sW > maxWidth || sH > maxHeight || sW < minWidth || sH < minHeight) {
                 return;
             }
             lp.width = sW;
             lp.height = sH;
             image.setLayoutParams(lp);
         }
-
-        // 这里很关键
-        textSize = tempTextSize;
     }
 
     /**

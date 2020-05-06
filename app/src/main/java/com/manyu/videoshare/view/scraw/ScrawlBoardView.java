@@ -10,6 +10,7 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Xfermode;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -18,9 +19,9 @@ import java.util.List;
 
 public class ScrawlBoardView extends View {
 
-    Paint paint, eraserPaint;
-    float startX, startY, endX, endY;
-    Context context;
+    private Paint paint, eraserPaint;
+    private float startX, startY, endX, endY;
+    private int currentPaintColor = 0xFF000000;
 
     boolean isEraser;
     List<DrawPathBean> drawPathList = new ArrayList<>();
@@ -38,7 +39,7 @@ public class ScrawlBoardView extends View {
         paint.setAntiAlias(true);
         paint.setDither(true);
         paint.setFilterBitmap(true);
-        paint.setColor(Color.BLACK);
+        paint.setColor(currentPaintColor);
         paint.setStrokeWidth(10);
 
         eraserPaint = new Paint();
@@ -47,8 +48,6 @@ public class ScrawlBoardView extends View {
         eraserPaint.setColor(Color.TRANSPARENT);
         Xfermode xfermode = new PorterDuffXfermode(PorterDuff.Mode.CLEAR);
         eraserPaint.setXfermode(xfermode);
-
-        this.context = context;
     }
 
     public ScrawlBoardView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
@@ -87,7 +86,7 @@ public class ScrawlBoardView extends View {
                 currentPath.moveTo(startX, startY);
                 bean.setPath(currentPath);
                 bean.setEraser(isEraser);
-                bean.setPaintColor(isEraser ? eraserPaint.getColor() : paint.getColor());
+                bean.setPaintColor(isEraser ? eraserPaint.getColor() : currentPaintColor);
                 bean.setPaintStrokeWidth(paint.getStrokeWidth());
                 drawPathList.add(bean);
                 break;
@@ -123,14 +122,15 @@ public class ScrawlBoardView extends View {
             isEraser = true;
             return;
         }
-        paint.setColor(color);
+        currentPaintColor = color;
+        Log.d("test==========>", "reset color alpha = " + (color >>> 24));
     }
 
     /**
      * 获取画笔颜色
      */
     public int getPaintColor() {
-        return paint.getColor();
+        return currentPaintColor;
     }
 
     /**

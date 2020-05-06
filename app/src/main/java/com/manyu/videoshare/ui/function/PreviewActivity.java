@@ -75,6 +75,12 @@ public class PreviewActivity extends BaseVideoActivity implements View.OnClickLi
     }
 
     @Override
+    public void onBackPressed() {
+        setResult(99);
+        super.onBackPressed();
+    }
+
+    @Override
     public void initData() {
         path = getIntent().getStringExtra("path");
         type = getIntent().getIntExtra("type", 0);

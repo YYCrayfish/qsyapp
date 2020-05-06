@@ -17,6 +17,7 @@ import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -33,6 +34,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import com.manyu.videoshare.R;
 import com.manyu.videoshare.base.BaseFragment;
@@ -76,7 +78,6 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
     private ScrawlBoardView scrawl;
     private LinearLayout tvToolbar;
     private LinearLayout color_tool;
-    private StrokeText moveTv;
     private MyViewPager viewPager;
     private TabLayout tabLayout;
     private View scrawlToolBar;
@@ -180,7 +181,6 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
         tabLayout = findViewById(R.id.tabLayout);
         imgWater.setOnClickListener(this);
         tvWater.setOnClickListener(this);
-        moveTv = findViewById(R.id.move_tv);
         tvToolbar = findViewById(R.id.tv_bottom_toolbar);
 
         scrawlToolBar = findViewById(R.id.scrawl_bottom_toolbar);
@@ -204,7 +204,7 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
             @Override
             public void onSelect(int eventType, String colorStr) {
                 int color = scrawl.getPaintColor();
-                int alpha = color >> 24;
+                int alpha = color >>> 24;
                 color = Color.parseColor("#" + colorStr);
                 color &= 0x00FFFFFF;
                 color |= alpha << 24;
@@ -216,10 +216,6 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
 
     @Override
     public void initData() {
-//        List<String> list = new ArrayList<>();
-//        for (int i = 10; i <= 100; i++) {
-//            list.add("" + i);
-//        }
         DisplayMetrics dm = getResources().getDisplayMetrics();
         screenWidth = dm.widthPixels;
         screenHeight = dm.heightPixels;
@@ -228,7 +224,6 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
         File temp = new File(outPath);
         if (!temp.exists())
             temp.mkdirs();
-        moveTv.setOnTouchListener(movingEventListener);
         if (TABINDEX != -1) {
             viewPager.setCurrentItem(TABINDEX);
         }
@@ -283,88 +278,6 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
         }
     }
 
-    private View.OnTouchListener movingEventListener = new View.OnTouchListener() {
-        int lastX, lastY, x, y;
-
-        @Override
-        public boolean onTouch(View v, MotionEvent event) {
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    lastX = (int) event.getRawX();
-                    lastY = (int) event.getRawY();
-                    x = (int) event.getRawX();
-                    y = (int) event.getRawY();
-                    break;
-                case MotionEvent.ACTION_MOVE:
-                    int dx = (int) event.getRawX() - lastX;
-                    int dy = (int) event.getRawY() - lastY;
-
-                    int left = v.getLeft() + dx;
-                    int top = v.getTop() + dy;
-                    int right = v.getRight() + dx;
-                    int bottom = v.getBottom() + dy;
-                    // 设置不能出界
-                    if (left < 0) {
-                        left = 0;
-                        right = left + v.getWidth();
-                    }
-
-                    if (right > screenWidth) {
-                        right = screenWidth;
-                        left = right - v.getWidth();
-                    }
-
-                    if (top < 0) {
-                        top = 0;
-                        bottom = top + v.getHeight();
-                    }
-
-                    if (bottom > screenHeight) {
-                        bottom = screenHeight;
-                        top = bottom - v.getHeight();
-                    }
-
-                    v.layout(left, top, right, bottom);
-                    tvW = right - left;
-                    tvH = bottom - top;
-                    lastX = (int) event.getRawX();
-                    lastY = (int) event.getRawY();
-                    if (videoW > videoH) {
-                        if (videoW > screenWidth) {
-                            overlay = "overlay=" + (left * (videoW / screenWidth)) + ":" + (top * (videoW / screenWidth));
-                        } else {
-                            overlay = "overlay=" + left + ":" + top;
-                        }
-                    } else {
-                        if (videoH > screenHeight) {
-                            overlay = "overlay=" + (left * (videoH / screenHeight)) + ":" + (top * (videoH / screenHeight));
-                        } else {
-                            overlay = "overlay=" + left + ":" + top;
-                        }
-                    }
-                    break;
-                case MotionEvent.ACTION_UP:
-                    //检测移动的距离，如果很微小可以认为是点击事件
-                    if (Math.abs(event.getRawX() - x) < 10 && Math.abs(event.getRawY() - y) < 10) {
-                        try {
-                            Field field = View.class.getDeclaredField("mListenerInfo");
-                            field.setAccessible(true);
-                            Object object = field.get(v);
-                            field = object.getClass().getDeclaredField("mOnClickListener");
-                            field.setAccessible(true);
-                            object = field.get(object);
-                            if (object != null && object instanceof View.OnClickListener) {
-                                ((View.OnClickListener) object).onClick(v);
-                            }
-                        } catch (Exception e) {
-                        }
-                    }
-                    break;
-            }
-            return true;
-        }
-    };
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -389,7 +302,10 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
                 videoPath = UriToPathUtil.getRealFilePath(this, uri);
                 videoViewTool.init(AddWaterActivity.this, null, uri);
                 setHandW();
-                videoViewTool.videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                final VideoView videoView = videoViewTool.videoView;
+                final View videoCover = findViewById(R.id.vv_cover);
+                final ConstraintLayout.LayoutParams lp = (ConstraintLayout.LayoutParams) videoView.getLayoutParams();
+                videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                     @Override
                     public void onPrepared(MediaPlayer mp) {
                         videoViewTool.videoSeekBar.reset();
@@ -400,6 +316,9 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
                                 videoW = mp.getVideoWidth();
                                 //FixMe 获取视频资源的高度
                                 videoH = mp.getVideoHeight();
+                                lp.dimensionRatio = "w," + videoW + ":" + videoH;
+                                videoView.setLayoutParams(lp);
+                                videoCover.setVisibility(View.GONE);
                             }
                         });
                     }
@@ -481,13 +400,13 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
     }
 
     private void tvToImg() {
-//        Bitmap b = ImageUtil.getBitmap(tvRl);
         layoutWaterMark.setSaveMode(true);
         Bitmap b = ImageUtil.getBitmap(layoutWaterMark);
+        Bitmap ret = Bitmap.createScaledBitmap(b, videoW, videoH, true);
         FileOutputStream outputStream = null;
         try {
             outputStream = new FileOutputStream(outPath + "qsy_aw_tv.png");
-            b.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+            ret.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
             outputStream.flush();
         } catch (IOException e) {
             e.printStackTrace();
@@ -496,6 +415,8 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
                 if (outputStream != null) {
                     outputStream.close();
                 }
+                b.recycle();
+                ret.recycle();
             } catch (IOException e) {
                 e.printStackTrace();
             }

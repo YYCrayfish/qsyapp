@@ -31,7 +31,6 @@ public class WaterMarkLayout extends RelativeLayout {
     private int touchX;
     private int touchY;
 
-    private float oldDist = 0;
     private float currentAngle = 0;
     private float lastAngle = 0;
     private float scale = 0;
@@ -212,20 +211,17 @@ public class WaterMarkLayout extends RelativeLayout {
                     // 压住了缩放按钮
                     if (touchDown) {
                         currentWaterMark.measure(0, 0);
-                        currentAngle = CalcUtil.angleBetweenLines(currentMarkCenterX, currentMarkCenterY, firstTouchX - touchX, firstTouchY - touchY, currentMarkCenterX, currentMarkCenterY, event.getX() - touchX, event.getY() - touchY) + lastAngle;
                         // 水印中心点 和 当前压按点的距离
-                        float newDist = (float) CalcUtil.spacing(currentMarkCenterX, currentMarkCenterY, event.getX(), event.getY());
-                        if (oldDist != 0) {
-                            scale = newDist / oldDist;
-                        }
-                        if (newDist > oldDist + 1 || newDist < oldDist - 1) {
-                            currentWaterMark.setScale(scale);
-                            oldDist = newDist;
+                        float newDist = (float) CalcUtil.spacing(currentMarkCenterX, currentMarkCenterY, moveX, moveY);
+                        float diffAngle = CalcUtil.angleBetweenLines(newDist, currentWaterMark.getWidth() / 2);
+                        currentAngle = CalcUtil.angleBetweenPoints(currentMarkCenterX, currentMarkCenterY, moveX, moveY) + diffAngle;
+                        currentWaterMark.setRotation(currentAngle);
+                        if (newDist != 0) {
+                            currentWaterMark.setScale(newDist);
                         }
                         post(new Runnable() {
                             @Override
                             public void run() {
-                                currentWaterMark.setRotation(currentAngle);
                                 currentWaterMark.setX(currentMarkCenterX - (currentWaterMark.getWidth() / 2));
                                 currentWaterMark.setY(currentMarkCenterY - (currentWaterMark.getHeight() / 2));
                             }
@@ -247,9 +243,8 @@ public class WaterMarkLayout extends RelativeLayout {
                 if (currentWaterMark != null) {
                     currentMarkCenterX = currentWaterMark.getX() + currentWaterMark.getWidth() / 2;
                     currentMarkCenterY = currentWaterMark.getY() + currentWaterMark.getHeight() / 2;
-                    currentWaterMark.measure(0, 0);
+                    currentWaterMark.setBaseSize((float) CalcUtil.spacing(currentMarkCenterX, currentMarkCenterY, moveX, moveY));
                 }
-                oldDist = (float) CalcUtil.spacing(currentWaterMark.getX() + currentWaterMark.getMeasuredWidth() / 2, currentWaterMark.getY() + currentWaterMark.getMeasuredWidth() / 2, firstTouchX, firstTouchY);
                 break;
             case MotionEvent.ACTION_UP:
                 lastAngle = currentAngle;
