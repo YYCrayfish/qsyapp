@@ -78,7 +78,7 @@ public class PreviewActivity extends BaseVideoActivity implements View.OnClickLi
     public void initData() {
         path = getIntent().getStringExtra("path");
         type = getIntent().getIntExtra("type", 0);
-        newPath = newPath + "qsy_" + UriToPathUtil.getFileNameByPath(path);
+        newPath = newPath + "qsy_" + System.currentTimeMillis() + UriToPathUtil.getFileNameByPath(path);
         videoView.setVideoPath(path);
         videoView.start();
     }
