@@ -34,7 +34,7 @@
         android:id="@+id/waterButtonDelete"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:background="@mipmap/ic_puase" />
+        android:background="@drawable/watermark_controller_delete" />
 
     <!--拖动和缩放-->
     <ImageView
@@ -42,6 +42,6 @@
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_gravity="bottom|end"
-        android:background="@mipmap/ic_puase" />
+        android:background="@drawable/watermark_controller_deformation" />
 
 </FrameLayout>
