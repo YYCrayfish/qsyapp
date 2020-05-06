@@ -153,7 +153,7 @@ public class WaterMark extends RelativeLayout {
         else if (tempTextSize < minScan)
             tempTextSize = minScan;
 
-        if (text != null) {
+        if (text != null && text.getVisibility() == View.VISIBLE) {
             text.setTextSize(TypedValue.COMPLEX_UNIT_PX, tempTextSize);
             measure(0, 0);
             if (getMeasuredWidth() > maxWidth || getMeasuredHeight() > maxHeight) {
@@ -161,7 +161,7 @@ public class WaterMark extends RelativeLayout {
                 return;
             }
         }
-        if (image != null) {
+        if (image != null && image.getVisibility() == View.VISIBLE) {
             ViewGroup.LayoutParams lp = image.getLayoutParams();
             int sW = (int) (lp.width * scale);
             int sH = (int) (lp.height * scale);

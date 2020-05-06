@@ -371,7 +371,7 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
         if (requestCode != 0x233 && resultCode == RESULT_CANCELED) {
             finish();
         } else if (resultCode == RESULT_OK) {
-            if (requestCode == 1) {
+            if (requestCode == 0x233) {
                 /**
                  * 判断手机版本，因为在4.4版本都手机处理图片返回的方法就不一样了
                  * 4.4以后返回的不是真实的uti而是一个封装过后的uri 所以要对封装过后的uri进行解析
