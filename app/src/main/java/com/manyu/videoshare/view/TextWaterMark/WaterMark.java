@@ -1,4 +1,4 @@
-package com.manyu.videoshare.view;
+package com.manyu.videoshare.view.TextWaterMark;
 
 import android.content.Context;
 import android.graphics.Color;

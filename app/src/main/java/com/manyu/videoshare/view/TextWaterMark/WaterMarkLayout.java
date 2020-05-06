@@ -1,17 +1,14 @@
-package com.manyu.videoshare.view;
+package com.manyu.videoshare.view.TextWaterMark;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.manyu.videoshare.util.CalcUtil;
 import com.manyu.videoshare.util.universally.LOG;
-import com.manyu.videoshare.view.TextWaterMark.TextViewParams;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -186,6 +183,10 @@ public class WaterMarkLayout extends RelativeLayout {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        // 获取拖动事件的发生位置
+        float moveX = event.getX();
+        float moveY = event.getY();
+
         switch (event.getAction() & MotionEvent.ACTION_MASK){
             case MotionEvent.ACTION_MOVE:
                 boolean isAbleMove = CalcUtil.spacing(firstTouchX, firstTouchY, event.getX(), event.getY()) > 20;

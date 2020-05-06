@@ -55,7 +55,7 @@
                 <!--app:layout_constraintLeft_toLeftOf="@id/vv"-->
                 <!--app:layout_constraintRight_toRightOf="@id/vv"-->
                 <!--app:layout_constraintTop_toTopOf="@id/vv"/>-->
-            <com.manyu.videoshare.view.WaterMarkLayout
+            <com.manyu.videoshare.view.TextWaterMark.WaterMarkLayout
                 android:id="@+id/layoutWaterMark"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
@@ -151,6 +151,7 @@
                         app:layout_constraintLeft_toLeftOf="@id/img"
                         app:layout_constraintRight_toRightOf="@id/img"
                         app:layout_constraintTop_toBottomOf="@id/img" />
+
                     <TextView
                         android:id="@+id/tv_scrawl"
                         android:layout_width="wrap_content"

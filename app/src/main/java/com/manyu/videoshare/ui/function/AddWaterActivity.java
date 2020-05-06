@@ -48,8 +48,8 @@ import com.manyu.videoshare.util.UriToPathUtil;
 import com.manyu.videoshare.util.VideoViewTool;
 import com.manyu.videoshare.view.MyViewPager;
 import com.manyu.videoshare.view.StrokeText;
-import com.manyu.videoshare.view.WaterMark;
-import com.manyu.videoshare.view.WaterMarkLayout;
+import com.manyu.videoshare.view.TextWaterMark.WaterMark;
+import com.manyu.videoshare.view.TextWaterMark.WaterMarkLayout;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -58,6 +58,8 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import io.microshow.rxffmpeg.RxFFmpegInvoke;
 import io.microshow.rxffmpeg.RxFFmpegSubscriber;
 
@@ -108,6 +110,7 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
     private String tranStr = "";
     private List<BaseFragment> listFragment;
     private VideoViewTool videoViewTool = new VideoViewTool();
+    private Unbinder unbinder;
 
     public void start(Context context) {
         Intent intent = new Intent();
@@ -131,6 +134,7 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_water);
+        unbinder = ButterKnife.bind(this);
         start(this);
     }
 
@@ -381,6 +385,8 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
 
     @Override
     public void onDestroy() {
+        if(unbinder != null)
+            unbinder.unbind();
         super.onDestroy();
     }
 
