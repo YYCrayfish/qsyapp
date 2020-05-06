@@ -152,4 +152,8 @@ public class ScrawlBoardView extends View {
         drawPathList.clear();
         postInvalidate();
     }
+
+    public int pathCount() {
+        return drawPathList.size();
+    }
 }

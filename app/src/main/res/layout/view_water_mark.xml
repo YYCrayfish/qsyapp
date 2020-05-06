@@ -18,6 +18,17 @@
         android:textColor="@color/white"
         android:textSize="15sp" />
 
+    <!--水印图片-->
+    <ImageView
+        android:id="@+id/waterImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="12dp"
+        android:background="@drawable/shape_water_border"
+        android:padding="4dp"
+        android:scaleType="fitXY"
+        android:visibility="gone" />
+
     <!--删除-->
     <ImageView
         android:id="@+id/waterButtonDelete"

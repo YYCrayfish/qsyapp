@@ -32,17 +32,18 @@ public class WaterMarkLayout extends RelativeLayout {
     private int touchY;
 
     private float oldDist = 0;
-    private float textSize = 15;
     private float currentAngle = 0;
     private float lastAngle = 0;
     private float scale = 0;
-    // 缩放限制
-    private float maxScan = 60;
-    private float minScan = 8;
 
     // 第一次触摸按下
     private float firstTouchX = 0;
     private float firstTouchY = 0;
+
+    private float moveX = 0;
+    private float moveY = 0;
+    private float currentMarkCenterX;
+    private float currentMarkCenterY;
 
 
     public WaterMarkLayout(Context context) {
@@ -78,12 +79,18 @@ public class WaterMarkLayout extends RelativeLayout {
         addView(waterMark);
     }
 
-    public void addWaterMark(WaterMark waterMark) {
-        int x = (getWidth() - waterMark.getWidth()) / 2;
-        int y = (getHeight() - waterMark.getHeight()) / 2;
-
+    public void addWaterMark(final WaterMark waterMark) {
         // 重载
-        addWaterMark(waterMark, x, y);
+        addWaterMark(waterMark, 0, 0);
+        post(new Runnable() {
+            @Override
+            public void run() {
+                int x = (getWidth() - waterMark.getWidth()) / 2;
+                int y = (getHeight() - waterMark.getHeight()) / 2;
+                waterMark.setX(x);
+                waterMark.setY(y);
+            }
+        });
     }
 
     public void setWaterMarkShadowColor(String colorStr) {
@@ -206,59 +213,40 @@ public class WaterMarkLayout extends RelativeLayout {
                     // 压住了缩放按钮
                     if (touchDown) {
                         currentWaterMark.measure(0, 0);
-                        float centerX = currentWaterMark.getX() + currentWaterMark.getMeasuredWidth() / 2;
-                        float centerY = currentWaterMark.getY() + currentWaterMark.getMeasuredHeight() / 2;
-
-                        currentAngle = CalcUtil.angleBetweenLines(centerX, centerY, firstTouchX - touchX, firstTouchY - touchY, centerX, centerY, event.getX() - touchX, event.getY() - touchY) + lastAngle;
-                        currentWaterMark.setRotation(currentAngle);
-
+                        currentAngle = CalcUtil.angleBetweenLines(currentMarkCenterX, currentMarkCenterY, firstTouchX - touchX, firstTouchY - touchY, currentMarkCenterX, currentMarkCenterY, event.getX() - touchX, event.getY() - touchY) + lastAngle;
                         // 水印中心点 和 当前压按点的距离
-                        float newDist = (float) CalcUtil.spacing(centerX, centerY, event.getX(), event.getY());
+                        float newDist = (float) CalcUtil.spacing(currentMarkCenterX, currentMarkCenterY, event.getX(), event.getY());
                         if (oldDist != 0) {
                             scale = newDist / oldDist;
                         }
-
-//                        缩放值：2.6468241(newDist:221.5906 -- oldDist:83.71943)
-//                        缩放值：0.41843542(newDist:92.72136 -- oldDist:221.5906)
-//                        缩放值：2.3968143(newDist:222.23589 -- oldDist:92.72136)
-//                        缩放值：0.35420856(newDist:78.71785 -- oldDist:222.23589)
-//                        缩放值：2.9475708(newDist:232.02643 -- oldDist:78.71785)
-//                        缩放值：0.48130453(newDist:111.67537 -- oldDist:232.02643)
-//                        缩放值：1.9769487(newDist:220.77647 -- oldDist:111.67537)
-//                        缩放值：0.37807494(newDist:83.470055 -- oldDist:220.77647)
-//                        缩放值：2.7917287(newDist:233.02576 -- oldDist:83.470055)
-//                        缩放值：0.4274602(newDist:99.60924 -- oldDist:233.02576)
-//                        缩放值：2.3150952(newDist:230.60487 -- oldDist:99.60924)
-//                        缩放值：0.33751738(newDist:77.83315 -- oldDist:230.60487)
-                        //showLog("当前距离："+newDist+"  距离："+oldDist+"  缩放："+scale);
-
-                        if (newDist > oldDist + 1) {
-                            zoom(scale);
+                        if (newDist > oldDist + 1 || newDist < oldDist - 1) {
+                            currentWaterMark.setScale(scale);
                             oldDist = newDist;
                         }
-                        if (newDist < oldDist - 1) {
-                            zoom(scale);
-                            oldDist = newDist;
-                        }
-                        currentWaterMark.measure(0, 0);
-                        currentWaterMark.setX(centerX - currentWaterMark.getMeasuredWidth() / 2);
-                        currentWaterMark.setY(centerY - currentWaterMark.getMeasuredHeight() / 2);
+                        post(new Runnable() {
+                            @Override
+                            public void run() {
+                                currentWaterMark.setRotation(currentAngle);
+                                currentWaterMark.setX(currentMarkCenterX - (currentWaterMark.getWidth() / 2));
+                                currentWaterMark.setY(currentMarkCenterY - (currentWaterMark.getHeight() / 2));
+                            }
+                        });
                     } else {
-                        // 因为手机屏幕是第二区间，所以这里减扣掉控件的宽高这样就可以在拖动时可以看完完整的文字内容
-                        float tempX = event.getX() - currentWaterMark.getWidth() / 2;
-                        float tempY = event.getY() - currentWaterMark.getHeight() / 2;
-                        // 避免出屏幕界区
-                        //if((event.getX() > 10 && event.getY() > 10 )){
-                        currentWaterMark.setX(tempX);
-                        currentWaterMark.setY(tempY);
-                        //}
+                        currentWaterMark.setX(currentWaterMark.getX() + (moveX - this.moveX));
+                        currentWaterMark.setY(currentWaterMark.getY() + (moveY - this.moveY));
                     }
+                    this.moveX = event.getX();
+                    this.moveY = event.getY();
                 }
                 break;
             case MotionEvent.ACTION_DOWN:
                 LOG.showE("普通的触摸的点击");
                 firstTouchX = event.getX();
                 firstTouchY = event.getY();
+                this.moveX = firstTouchX;
+                this.moveY = firstTouchY;
+                currentMarkCenterX = currentWaterMark.getX() + currentWaterMark.getWidth() / 2;
+                currentMarkCenterY = currentWaterMark.getY() + currentWaterMark.getHeight() / 2;
                 currentWaterMark.measure(0, 0);
                 oldDist = (float) CalcUtil.spacing(currentWaterMark.getX() + currentWaterMark.getMeasuredWidth() / 2, currentWaterMark.getY() + currentWaterMark.getMeasuredWidth() / 2, firstTouchX, firstTouchY);
                 break;
@@ -270,21 +258,6 @@ public class WaterMarkLayout extends RelativeLayout {
                 break;
         }
         return true;
-    }
-
-
-    // 缩放的重新定义实现
-    private void zoom(float f) {
-        // 避免出现缩放的范围过大或过小
-        float tempTextSize = textSize * (f);
-        if (tempTextSize > maxScan)
-            tempTextSize = maxScan;
-        else if (tempTextSize < minScan)
-            tempTextSize = minScan;
-
-        currentWaterMark.setTextSize(tempTextSize);
-        // 这里很关键
-        textSize = tempTextSize;
     }
 
     /**
@@ -301,6 +274,16 @@ public class WaterMarkLayout extends RelativeLayout {
                 removeView(wm);
                 break;
             }
+        }
+    }
+
+    public boolean hasMark() {
+        return waterMarkList.size() != 0 || scrawlBoardView.pathCount() > 0;
+    }
+
+    public void setSaveMode(boolean isSaveMode) {
+        for (WaterMark waterMark : waterMarkList) {
+            waterMark.setControlBtnVisible(!isSaveMode);
         }
     }
 }

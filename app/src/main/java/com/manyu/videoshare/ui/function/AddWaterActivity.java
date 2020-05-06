@@ -74,11 +74,8 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
     private ImageView imgWater;
     private ImageView tvWater;
     private ScrawlBoardView scrawl;
-    private RelativeLayout rlImg;
-    private RelativeLayout rltv;
     private LinearLayout tvToolbar;
     private LinearLayout color_tool;
-    private ImageView moveIv;
     private StrokeText moveTv;
     private MyViewPager viewPager;
     private TabLayout tabLayout;
@@ -108,7 +105,6 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
     private String videoPath;//原视频路径
     private String outPath;//视频输出暂存路径
     private String overlay = "overlay=main_w/2-overlay_w/2:main_h/2-overlay_h/2";
-    private Bitmap bitmap = null;
     private IRequestPermissions requestPermissions = RequestPermissions.getInstance();//动态权限请求
     private TextWaterDialog dialog;
 
@@ -155,8 +151,6 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
         ToolUtils.setBar(this);
         imgWater = findViewById(R.id.img);
         tvWater = findViewById(R.id.text);
-        rlImg = findViewById(R.id.rl_image);
-        rltv = findViewById(R.id.rl_text);
         layoutWaterMark = findViewById(R.id.layoutWaterMark);
         scrawl = layoutWaterMark.getScrawlBoardView();
         scrawl.setEnabled(false);
@@ -186,7 +180,6 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
         tabLayout = findViewById(R.id.tabLayout);
         imgWater.setOnClickListener(this);
         tvWater.setOnClickListener(this);
-        moveIv = findViewById(R.id.move_iv);
         moveTv = findViewById(R.id.move_tv);
         tvToolbar = findViewById(R.id.tv_bottom_toolbar);
 
@@ -235,8 +228,6 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
         File temp = new File(outPath);
         if (!temp.exists())
             temp.mkdirs();
-        moveIv = findViewById(R.id.move_iv);
-        moveIv.setOnTouchListener(movingEventListener);
         moveTv.setOnTouchListener(movingEventListener);
         if (TABINDEX != -1) {
             viewPager.setCurrentItem(TABINDEX);
@@ -492,6 +483,7 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
 
     private void tvToImg() {
 //        Bitmap b = ImageUtil.getBitmap(tvRl);
+        layoutWaterMark.setSaveMode(true);
         Bitmap b = ImageUtil.getBitmap(layoutWaterMark);
         FileOutputStream outputStream = null;
         try {
@@ -509,6 +501,7 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
                 e.printStackTrace();
             }
         }
+        layoutWaterMark.setSaveMode(false);
     }
 
     private void setHandW() {
@@ -587,9 +580,11 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
     private void displayImage(String imagPath) {
         if (imagPath != null) {
             type = 2;
-            bitmap = BitmapFactory.decodeFile(imagPath);
-            moveIv.setImageBitmap(bitmap);
-            rlImg.setVisibility(View.VISIBLE);
+            layoutWaterMark.setVisibility(View.VISIBLE);
+            WaterMark waterMark = new WaterMark(AddWaterActivity.this);
+            waterMark.setImage(imagPath);
+            layoutWaterMark.addWaterMark(waterMark);
+            scrawl.setEnabled(false);
             videoViewTool.videoStart();
         } else {
             Toast.makeText(this, "图片获取失败", Toast.LENGTH_SHORT).show();
@@ -606,7 +601,7 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
                 if (type == 0) {
                     return;
                 }
-                if (bitmap == null && type == 2) {
+                if (!layoutWaterMark.hasMark()) {
                     return;
                 }
                 if (!requestPermissions()) {

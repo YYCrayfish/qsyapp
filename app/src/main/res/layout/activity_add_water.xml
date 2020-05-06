@@ -61,8 +61,8 @@
                 android:layout_height="0dp"
                 android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="@id/vv"
-                app:layout_constraintLeft_toLeftOf="@id/vv"
-                app:layout_constraintRight_toRightOf="@id/vv"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="@id/vv" />
 
             <RelativeLayout

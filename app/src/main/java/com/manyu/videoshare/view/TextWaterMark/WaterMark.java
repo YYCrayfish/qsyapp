@@ -1,11 +1,15 @@
 package com.manyu.videoshare.view.TextWaterMark;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -16,6 +20,8 @@ import com.manyu.videoshare.view.TextWaterMark.TextViewBorder;
 public class WaterMark extends RelativeLayout {
 
     private TextViewBorder text;
+    private ImageView image;
+    private float textSize = 15;
     private ImageView btnControl;
     private ImageView btnDelete;
     long waterMarkId;
@@ -45,62 +51,153 @@ public class WaterMark extends RelativeLayout {
     int defaultWaterMarkAlpha = 255;
     String defaultWaterMarkShadowColor = "ffffff";
     int defaultWaterMarkShadowAlpha = 255;
+    // 缩放限制
+    private float maxScan;
+    private float minScan;
+    private float maxWidth;
+    private float maxHeight;
 
-    public WaterMark(Context context){
+    public WaterMark(Context context) {
         super(context);
         LayoutInflater layoutInflater = LayoutInflater.from(context);
-        View view = layoutInflater.inflate(R.layout.view_water_mark,null);
+        View view = layoutInflater.inflate(R.layout.view_water_mark, null);
         addView(view);
 
+        float density = Resources.getSystem().getDisplayMetrics().density;
+        maxScan = (int) (60 * density + 0.5f);
+        minScan = (int) (8 * density + 0.5f);
+        maxWidth = (int) (400 * density + 0.5f);
+        maxHeight = (int) (400 * density + 0.5f);
+
         text = findViewById(R.id.waterText);
+        textSize = text.getTextSize();
+        image = findViewById(R.id.waterImage);
         btnControl = findViewById(R.id.waterButtonControl);
         btnDelete = findViewById(R.id.waterButtonDelete);
     }
 
-    public void setText(String content){
-        if(!(text == null))
+    public void setImage(String bmPath) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(bmPath, options);
+        options.inSampleSize = calculateInSampleSize(options, ((int) maxWidth / 2), ((int) maxHeight / 2));
+        options.inJustDecodeBounds = false;
+        Bitmap bm = BitmapFactory.decodeFile(bmPath, options);
+
+        if (image != null) {
+            image.setVisibility(View.VISIBLE);
+            image.setImageBitmap(bm);
+            ViewGroup.LayoutParams lp = image.getLayoutParams();
+            lp.width = bm.getWidth();
+            lp.height = bm.getHeight();
+        }
+        if (text != null) {
+            text.setVisibility(View.GONE);
+        }
+    }
+
+    private int calculateInSampleSize(final BitmapFactory.Options options, final int maxWidth, final int maxHeight) {
+        int height = options.outHeight;
+        int width = options.outWidth;
+        int inSampleSize = 1;
+        while (height > maxHeight || width > maxWidth) {
+            height >>= 1;
+            width >>= 1;
+            inSampleSize <<= 1;
+        }
+        return inSampleSize;
+    }
+
+    public void setText(String content) {
+        if (text != null) {
             text.setText(content);
+            text.setVisibility(View.VISIBLE);
+        }
+        if (image != null) {
+            image.setVisibility(View.GONE);
+        }
     }
 
-    public void setWaterMarkShadowColor(String colorStr){
+    public void setWaterMarkShadowColor(String colorStr) {
         defaultWaterMarkShadowColor = colorStr;
-        text.setShadow(getIntColor(defaultWaterMarkShadowAlpha,defaultWaterMarkShadowColor));
+        text.setShadow(getIntColor(defaultWaterMarkShadowAlpha, defaultWaterMarkShadowColor));
     }
 
-    public void setWaterMarkShadowAlpha(int alpha){
+    public void setWaterMarkShadowAlpha(int alpha) {
         defaultWaterMarkShadowAlpha = alpha;
-        text.setShadow(getIntColor(defaultWaterMarkShadowAlpha,defaultWaterMarkShadowColor));
+        text.setShadow(getIntColor(defaultWaterMarkShadowAlpha, defaultWaterMarkShadowColor));
     }
 
-    public void setWaterMarkColor(String colorStr){
+    public void setWaterMarkColor(String colorStr) {
         currentWaterMarkColor = colorStr;
-        text.setBGColor(true,getIntColor(currentWaterMarkAlpha,currentWaterMarkColor));
+        text.setBGColor(true, getIntColor(currentWaterMarkAlpha, currentWaterMarkColor));
     }
 
-    public void setWaterMarkAlpha(int alpha){
+    public void setWaterMarkAlpha(int alpha) {
         currentWaterMarkAlpha = alpha;
-        text.setBGColor(true,getIntColor(currentWaterMarkAlpha,currentWaterMarkColor));
+        text.setBGColor(true, getIntColor(currentWaterMarkAlpha, currentWaterMarkColor));
+    }
+
+    @Override
+    public void setRotation(float rotation) {
+        super.setRotation(rotation);
+        btnDelete.setRotation(-rotation);
+        btnControl.setRotation(-rotation);
+    }
+
+    public void setScale(float scale) {
+        // 避免出现缩放的范围过大或过小
+        float tempTextSize = textSize * (scale);
+        if (tempTextSize > maxScan)
+            tempTextSize = maxScan;
+        else if (tempTextSize < minScan)
+            tempTextSize = minScan;
+
+        if (text != null) {
+            text.setTextSize(TypedValue.COMPLEX_UNIT_PX, tempTextSize);
+            measure(0, 0);
+            if (getMeasuredWidth() > maxWidth || getMeasuredHeight() > maxHeight) {
+                text.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+                return;
+            }
+        }
+        if (image != null) {
+            ViewGroup.LayoutParams lp = image.getLayoutParams();
+            int sW = (int) (lp.width * scale);
+            int sH = (int) (lp.height * scale);
+            if (sW > maxWidth || sH > maxHeight) {
+                return;
+            }
+            lp.width = sW;
+            lp.height = sH;
+            image.setLayoutParams(lp);
+        }
+
+        // 这里很关键
+        textSize = tempTextSize;
     }
 
     /**
      * 设置水印文字颜色
-     * @param colorStr  格式例如：ffffff 白色  前面不带#号
+     *
+     * @param colorStr 格式例如：ffffff 白色  前面不带#号
      */
-    public void setWaterMarkTextColor(String colorStr){
+    public void setWaterMarkTextColor(String colorStr) {
         currentColor = colorStr;
         setTextColorWithAlpha();
     }
 
     /**
      * 设置水印文字透明度
+     *
      * @param alpha
      */
-    public void setWaterMarkTextAlpha(int alpha){
+    public void setWaterMarkTextAlpha(int alpha) {
         currentAlpha = alpha;
 
         // 设置背景透明
         View view = findViewById(R.id.waterText);
-        if(view != null)
+        if (view != null)
             view.getBackground().setAlpha(alpha);
 
         // 设置文字透明
@@ -109,70 +206,80 @@ public class WaterMark extends RelativeLayout {
 
     /**
      * 设置边框水印文字颜色
-     * @param colorStr  格式例如：ffffff 白色  前面不带#号
+     *
+     * @param colorStr 格式例如：ffffff 白色  前面不带#号
      */
-    public void setWaterMarkBorderColor(String colorStr){
+    public void setWaterMarkBorderColor(String colorStr) {
         currentBorderColor = colorStr;
-        text.setBorderColor(getIntColor(currentBorderAlpha,currentBorderColor));
+        text.setBorderColor(getIntColor(currentBorderAlpha, currentBorderColor));
     }
 
-    private int getIntColor(int alpha, String color){
+    private int getIntColor(int alpha, String color) {
         String hex = Integer.toHexString(alpha);
-        int tempColor = Color.parseColor("#"+hex+color);
+        int tempColor = Color.parseColor("#" + hex + color);
         return tempColor;
     }
 
     /**
      * 设置水印边框透明度
+     *
      * @param alpha
      */
-    public void setWaterMarkBorderAlpha(int alpha){
+    public void setWaterMarkBorderAlpha(int alpha) {
         currentBorderAlpha = alpha;
         String hex = Integer.toHexString(currentBorderAlpha);
-        int tempColor = Color.parseColor("#"+hex+currentBorderColor);
+        int tempColor = Color.parseColor("#" + hex + currentBorderColor);
         text.setBorderColor(tempColor);
     }
 
     /**
-     *   设置文字颜色和透明度
-    */
-    private void setTextColorWithAlpha(){
-        if(text != null){
+     * 设置文字颜色和透明度
+     */
+    private void setTextColorWithAlpha() {
+        if (text != null) {
             // 解析拼接出一个带透明度的颜色值 PS:因为Color.argb似乎没有效果，只能替换这种方式来更变文字透明度
             String hex = Integer.toHexString(currentAlpha);
-            int tempColor = Color.parseColor("#"+hex+currentColor);
+            int tempColor = Color.parseColor("#" + hex + currentColor);
             text.setTextColor(tempColor);
         }
     }
 
-    public ImageView getBtnControl(){
+    public ImageView getBtnControl() {
         return btnControl;
     }
 
-    public ImageView getBtnDelete(){return btnDelete;}
-
-    public void setTextSize(float textSize){
-        if(text != null)
-            text.setTextSize(TypedValue.COMPLEX_UNIT_DIP,textSize);
+    public ImageView getBtnDelete() {
+        return btnDelete;
     }
 
-    public float getTextSize(){
-        return text!=null ? text.getTextSize():0;
+    public void setTextSize(float textSize) {
+        if (text != null)
+            text.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSize);
+    }
+
+    public float getTextSize() {
+        return text != null ? text.getTextSize() : 0;
     }
 
     // 隐藏按钮 在生成视频前需要先隐藏掉，不然视频上的水印图片会带有这两个小控制按钮
-    public void hideButton(){
-        if(btnControl != null)
+    public void hideButton() {
+        if (btnControl != null)
             btnControl.setVisibility(View.GONE);
-        if(btnDelete != null)
+        if (btnDelete != null)
             btnDelete.setVisibility(View.GONE);
     }
 
-    public void setWaterMarkId(long id){
+    public void setWaterMarkId(long id) {
         waterMarkId = id;
     }
 
-    public long getWaterMarkId(){
+    public long getWaterMarkId() {
         return waterMarkId;
+    }
+
+    public void setControlBtnVisible(boolean visible) {
+        int flag = visible ? View.VISIBLE : View.GONE;
+        btnControl.setVisibility(flag);
+        btnDelete.setVisibility(flag);
     }
 }
