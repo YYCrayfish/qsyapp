@@ -209,7 +209,6 @@ public class WaterMarkLayout extends RelativeLayout {
             case MotionEvent.ACTION_MOVE:
                 boolean isAbleMove = CalcUtil.spacing(firstTouchX, firstTouchY, event.getX(), event.getY()) > 20;
                 if (!(currentWaterMark == null) && isAbleMove) {
-
                     // 压住了缩放按钮
                     if (touchDown) {
                         currentWaterMark.measure(0, 0);
@@ -245,9 +244,11 @@ public class WaterMarkLayout extends RelativeLayout {
                 firstTouchY = event.getY();
                 this.moveX = firstTouchX;
                 this.moveY = firstTouchY;
-                currentMarkCenterX = currentWaterMark.getX() + currentWaterMark.getWidth() / 2;
-                currentMarkCenterY = currentWaterMark.getY() + currentWaterMark.getHeight() / 2;
-                currentWaterMark.measure(0, 0);
+                if (currentWaterMark != null) {
+                    currentMarkCenterX = currentWaterMark.getX() + currentWaterMark.getWidth() / 2;
+                    currentMarkCenterY = currentWaterMark.getY() + currentWaterMark.getHeight() / 2;
+                    currentWaterMark.measure(0, 0);
+                }
                 oldDist = (float) CalcUtil.spacing(currentWaterMark.getX() + currentWaterMark.getMeasuredWidth() / 2, currentWaterMark.getY() + currentWaterMark.getMeasuredWidth() / 2, firstTouchX, firstTouchY);
                 break;
             case MotionEvent.ACTION_UP:
