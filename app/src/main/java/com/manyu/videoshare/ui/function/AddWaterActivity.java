@@ -155,11 +155,11 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
         ToolUtils.setBar(this);
         imgWater = findViewById(R.id.img);
         tvWater = findViewById(R.id.text);
-        scrawl = findViewById(R.id.scrawl_board);
-        scrawl.setEnabled(false);
         rlImg = findViewById(R.id.rl_image);
         rltv = findViewById(R.id.rl_text);
         layoutWaterMark = findViewById(R.id.layoutWaterMark);
+        scrawl = layoutWaterMark.getScrawlBoardView();
+        scrawl.setEnabled(false);
 //        tvRl = findViewById(R.id.tvRl);
         color_tool = findViewById(R.id.color_tool);
         recycler = findViewById(R.id.recycler);
@@ -444,14 +444,11 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
     }
 
     private void addWater(String path) {
-        if (type == 1) {
+        // 这里把Text文本转为了图片 因为添加水印时，需要传一个水印地图地址的参数
+        tvToImg();
+        imagePath = outPath + "qsy_aw_tv.png";//文字转图片暂存路径
+        overlay = "overlay=" + 0 + ":" + 0;
 
-            // 这里把Text文本转为了图片 因为添加水印时，需要传一个水印地图地址的参数
-            tvToImg();
-
-            imagePath = outPath + "qsy_aw_tv.png";//文字转图片暂存路径
-            overlay = "overlay=" + 0 + ":" + 0;
-        }
         outPath = outPath + "aw_" + UriToPathUtil.getFileNameByPath(path);
         ///storage/emulated/0/tencent/MicroMsg/WeiXin/wx_camera_1587654132226.mp4,
         // //data/user/0/com.manyu.videoshare/cache/qsy_aw_tv.png,
@@ -657,7 +654,9 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
             case R.id.iv_scrawl:
                 tvToolbar.setVisibility(View.GONE);
                 scrawlToolBar.setVisibility(View.VISIBLE);
+                layoutWaterMark.setVisibility(View.VISIBLE);
                 scrawl.setEnabled(true);
+                type = 3;
                 break;
             case R.id.iv_close_scrawl:
             case R.id.iv_ok_scrawl:
@@ -676,7 +675,6 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
                     if (!TextUtils.isEmpty(content)) {
                         type = 1;
                         tvToolbar.setVisibility(View.VISIBLE);
-                        scrawlToolBar.setVisibility(View.GONE);
 //                        tvRl.setVisibility(View.VISIBLE);
 //                        tvRl.addTextView(videoW / 2, videoH / 2, content, 0, tvColorStr);
                         layoutWaterMark.setVisibility(View.VISIBLE);

@@ -27,7 +27,7 @@ public class ScrawlBoardView extends View {
     private Path currentPath;
 
     public ScrawlBoardView(Context context) {
-        super(context);
+        this(context, null);
     }
 
     public ScrawlBoardView(Context context, @Nullable AttributeSet attrs) {

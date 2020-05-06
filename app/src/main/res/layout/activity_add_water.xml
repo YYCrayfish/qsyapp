@@ -28,15 +28,6 @@
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <com.manyu.videoshare.view.scraw.ScrawlBoardView
-                android:id="@+id/scrawl_board"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                app:layout_constraintBottom_toBottomOf="@id/vv"
-                app:layout_constraintLeft_toLeftOf="@id/vv"
-                app:layout_constraintRight_toRightOf="@id/vv"
-                app:layout_constraintTop_toTopOf="@id/vv" />
-
             <RelativeLayout
                 android:id="@+id/rl_image"
                 android:layout_width="0dp"

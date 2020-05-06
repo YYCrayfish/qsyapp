@@ -9,6 +9,7 @@ import android.widget.RelativeLayout;
 
 import com.manyu.videoshare.util.CalcUtil;
 import com.manyu.videoshare.util.universally.LOG;
+import com.manyu.videoshare.view.scraw.ScrawlBoardView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +22,7 @@ public class WaterMarkLayout extends RelativeLayout {
     // 水印组件列表
     private List<WaterMark> waterMarkList = new ArrayList<>();
 
+    private ScrawlBoardView scrawlBoardView;
     // 当前的水印
     private WaterMark currentWaterMark;
     // 触摸的判断 是否按下
@@ -44,11 +46,17 @@ public class WaterMarkLayout extends RelativeLayout {
 
 
     public WaterMarkLayout(Context context) {
-        super(context);
+        this(context, null);
     }
 
     public WaterMarkLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
+        scrawlBoardView = new ScrawlBoardView(context);
+        addView(scrawlBoardView, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+    }
+
+    public ScrawlBoardView getScrawlBoardView() {
+        return scrawlBoardView;
     }
 
     public void addWaterMark(WaterMark waterMark, int x, int y) {
@@ -183,6 +191,9 @@ public class WaterMarkLayout extends RelativeLayout {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        if (scrawlBoardView.isEnabled()) {
+            return scrawlBoardView.onTouchEvent(event);
+        }
         // 获取拖动事件的发生位置
         float moveX = event.getX();
         float moveY = event.getY();
