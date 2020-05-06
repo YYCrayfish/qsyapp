@@ -368,9 +368,8 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == 0) {
+        if (requestCode != 0x233 && resultCode == RESULT_CANCELED) {
             finish();
-            return;
         } else if (resultCode == RESULT_OK) {
             if (requestCode == 1) {
                 /**
@@ -621,7 +620,7 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
                 } else {
                     intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
                 }
-                startActivityForResult(intent, 1);
+                startActivityForResult(intent, 0x233);
                 break;
             case R.id.iv_edit:
             case R.id.text:
