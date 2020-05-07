@@ -195,20 +195,12 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
             @Override
             public void onSelectItem(int eventType, String value) {
                 int alpha = (int) (255 * (Integer.parseInt(value) / 100.0f));
-                int color = scrawl.getPaintColor();
-                color &= 0x00FFFFFF;
-                color |= alpha << 24;
-                scrawl.setPaintColor(color);
+                scrawl.setPaintAlpha(alpha);
             }
 
             @Override
             public void onSelect(int eventType, String colorStr) {
-                int color = scrawl.getPaintColor();
-                int alpha = color >>> 24;
-                color = Color.parseColor("#" + colorStr);
-                color &= 0x00FFFFFF;
-                color |= alpha << 24;
-                scrawl.setPaintColor(color);
+                scrawl.setPaintColor(Color.parseColor("#" + colorStr));
             }
         });
         getSupportFragmentManager().beginTransaction().replace(R.id.scrawl_color_tool, fragment).commit();
@@ -401,9 +393,9 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
 
     private void tvToImg() {
         layoutWaterMark.setSaveMode(true);
+        FileOutputStream outputStream = null;
         Bitmap b = ImageUtil.getBitmap(layoutWaterMark);
         Bitmap ret = Bitmap.createScaledBitmap(b, videoW, videoH, true);
-        FileOutputStream outputStream = null;
         try {
             outputStream = new FileOutputStream(outPath + "qsy_aw_tv.png");
             ret.compress(Bitmap.CompressFormat.PNG, 100, outputStream);

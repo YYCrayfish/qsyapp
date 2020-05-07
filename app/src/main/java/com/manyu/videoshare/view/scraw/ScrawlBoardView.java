@@ -21,11 +21,12 @@ public class ScrawlBoardView extends View {
 
     private Paint paint, eraserPaint;
     private float startX, startY, endX, endY;
-    private int currentPaintColor = 0xFF000000;
+    private int currentPaintColor = 0xFFFFFF;
 
     boolean isEraser;
     List<DrawPathBean> drawPathList = new ArrayList<>();
     private Path currentPath;
+    private int currentPaintAlpha = 0xFF;
 
     public ScrawlBoardView(Context context) {
         this(context, null);
@@ -57,7 +58,7 @@ public class ScrawlBoardView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        for (int i = drawPathList.size() - 1; i >= 0; i--) {
+        for (int i = 0; i < drawPathList.size(); i++) {
             DrawPathBean entry = drawPathList.get(i);
             int paintColor = entry.getPaintColor();
             Paint pathPaint;
@@ -66,7 +67,9 @@ public class ScrawlBoardView extends View {
             } else {
                 pathPaint = paint;
             }
-            pathPaint.setColor(paintColor);
+            int color = paintColor & 0x00FFFFFF;
+            color |= currentPaintAlpha << 24;
+            pathPaint.setColor(color);
             canvas.drawPath(entry.getPath(), pathPaint);
         }
     }
@@ -124,6 +127,18 @@ public class ScrawlBoardView extends View {
         }
         currentPaintColor = color;
         Log.d("test==========>", "reset color alpha = " + (color >>> 24));
+    }
+
+    /**
+     * 设置画笔透明度
+     * @param alpha 0-255
+     */
+    public void setPaintAlpha(int alpha) {
+        if (alpha < 0 || alpha > 0xFF) {
+            return;
+        }
+        currentPaintAlpha = alpha;
+        invalidate();
     }
 
     /**
