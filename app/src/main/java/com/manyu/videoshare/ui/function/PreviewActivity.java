@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.text.TextUtils;
@@ -103,6 +104,11 @@ public class PreviewActivity extends BaseVideoActivity implements View.OnClickLi
             case R.id.save:
                 if (FileUtil.copyFileOnly(path, newPath)) {
                     ToastUtils.showShort("视频已经成功保存到相册中");
+
+                    Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                    Uri uri = Uri.fromFile(new File(newPath));
+                    intent.setData(uri);
+                    sendBroadcast(intent);
                 }
                 break;
         }
