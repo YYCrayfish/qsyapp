@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.RelativeLayout;
 
 import com.manyu.videoshare.util.CalcUtil;
+import com.manyu.videoshare.util.ImageUtil;
 import com.manyu.videoshare.util.universally.LOG;
 import com.manyu.videoshare.view.scraw.ScrawlBoardView;
 
@@ -76,6 +77,8 @@ public class WaterMarkLayout extends RelativeLayout {
 
         // 添加本布局中
         addView(waterMark);
+
+        currentWaterMark = waterMark;
     }
 
     public void addWaterMark(final WaterMark waterMark) {
@@ -201,8 +204,8 @@ public class WaterMarkLayout extends RelativeLayout {
             return scrawlBoardView.onTouchEvent(event);
         }
         // 获取拖动事件的发生位置
-        float moveX = event.getX();
-        float moveY = event.getY();
+        final float moveX = event.getX();
+        final float moveY = event.getY();
 
         switch (event.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_MOVE:
@@ -212,16 +215,17 @@ public class WaterMarkLayout extends RelativeLayout {
                     if (touchDown) {
                         currentWaterMark.measure(0, 0);
                         // 水印中心点 和 当前压按点的距离
-                        float newDist = (float) CalcUtil.spacing(currentMarkCenterX, currentMarkCenterY, moveX, moveY);
-                        float diffAngle = CalcUtil.angleBetweenLines(newDist, currentWaterMark.getWidth() / 2);
-                        currentAngle = CalcUtil.angleBetweenPoints(currentMarkCenterX, currentMarkCenterY, moveX, moveY) + diffAngle;
-                        currentWaterMark.setRotation(currentAngle);
+                        final float newDist = (float) CalcUtil.spacing(currentMarkCenterX, currentMarkCenterY, moveX, moveY);
                         if (newDist != 0) {
                             currentWaterMark.setScale(newDist);
                         }
                         post(new Runnable() {
                             @Override
                             public void run() {
+                                float diffAngle = CalcUtil.degree(currentWaterMark.getWidth(), currentWaterMark.getHeight());
+                                currentAngle = CalcUtil.angleBetweenPoints(moveX, moveY, currentMarkCenterX, currentMarkCenterY) - diffAngle;
+                                Log.d("test---------->", "angle = " + diffAngle + "; currentAngle = " + currentAngle);
+                                currentWaterMark.setRotation(currentAngle);
                                 currentWaterMark.setX(currentMarkCenterX - (currentWaterMark.getWidth() / 2));
                                 currentWaterMark.setY(currentMarkCenterY - (currentWaterMark.getHeight() / 2));
                             }

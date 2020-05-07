@@ -44,12 +44,12 @@ public class CalcUtil {
         return -angle;
     }
 
-    public static float angleBetweenLines(float lineSize1, float lineSize2) {
-        return (float) (Math.atan2(lineSize2, lineSize1) * 180 / Math.PI);
+    public static float degree(float lineSize1, float lineSize2) {
+        return (float) (Math.atan(lineSize2 / lineSize1) * 180 / Math.PI);
     }
 
     public static float angleBetweenPoints(float p1x, float p1y, float p2x, float p2y) {
-        return (float) -(Math.atan2(p2x - p1x, p2y - p1y) * 180 / Math.PI);
+        return (float) -(Math.atan2(p2x - p1x, p2y - p1y) * 180 / Math.PI + 90);
     }
 
     /**

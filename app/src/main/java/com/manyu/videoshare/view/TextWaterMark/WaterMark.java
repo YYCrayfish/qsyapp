@@ -5,6 +5,8 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -15,11 +17,11 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.manyu.videoshare.R;
-import com.manyu.videoshare.view.TextWaterMark.TextViewBorder;
+import com.manyu.videoshare.util.ImageUtil;
 
 public class WaterMark extends RelativeLayout {
 
-    private TextViewBorder text;
+    private TextView text;
     private ImageView image;
     private ImageView btnControl;
     private ImageView btnDelete;
@@ -33,7 +35,7 @@ public class WaterMark extends RelativeLayout {
     // 当前水印边框透明度 默认不透明
     int currentBorderAlpha = 255;
     // 当前水印颜色
-    String currentWaterMarkColor = "00ffffff";
+    String currentWaterMarkColor = "-1";
     // 当前水印透明度
     int currentWaterMarkAlpha = 255;
     // 当前水印颜色
@@ -79,6 +81,7 @@ public class WaterMark extends RelativeLayout {
 
         text = findViewById(R.id.waterText);
         image = findViewById(R.id.waterImage);
+        resetMarkBg();
         btnControl = findViewById(R.id.waterButtonControl);
         btnDelete = findViewById(R.id.waterButtonDelete);
     }
@@ -127,22 +130,34 @@ public class WaterMark extends RelativeLayout {
 
     public void setWaterMarkShadowColor(String colorStr) {
         defaultWaterMarkShadowColor = colorStr;
-        text.setShadow(getIntColor(defaultWaterMarkShadowAlpha, defaultWaterMarkShadowColor));
+        int color = getIntColor(defaultWaterMarkShadowAlpha, defaultWaterMarkShadowColor);
+        text.setShadowLayer(10, 15, 15, color);
     }
 
     public void setWaterMarkShadowAlpha(int alpha) {
         defaultWaterMarkShadowAlpha = alpha;
-        text.setShadow(getIntColor(defaultWaterMarkShadowAlpha, defaultWaterMarkShadowColor));
+        int color = getIntColor(defaultWaterMarkShadowAlpha, defaultWaterMarkShadowColor);
+        text.setShadowLayer(10, 15, 15, color);
     }
 
+    /**
+     * 设置水印底色颜色
+     *
+     * @param colorStr
+     */
     public void setWaterMarkColor(String colorStr) {
         currentWaterMarkColor = colorStr;
-        text.setBGColor(true, getIntColor(currentWaterMarkAlpha, currentWaterMarkColor));
+        resetMarkBg();
     }
 
+    /**
+     * 设置水印底色透明度
+     *
+     * @param alpha
+     */
     public void setWaterMarkAlpha(int alpha) {
         currentWaterMarkAlpha = alpha;
-        text.setBGColor(true, getIntColor(currentWaterMarkAlpha, currentWaterMarkColor));
+        resetMarkBg();
     }
 
     @Override
@@ -150,43 +165,6 @@ public class WaterMark extends RelativeLayout {
         super.setRotation(rotation);
         btnDelete.setRotation(-rotation);
         btnControl.setRotation(-rotation);
-    }
-
-    public void setBaseSize(float baseSize) {
-        this.baseSize = baseSize;
-        baseWidth = image.getWidth();
-        baseHeight = image.getHeight();
-        baseTextSize = text.getTextSize();
-    }
-
-    public void setScale(float size) {
-        float scale = size / baseSize;
-        if (text != null && text.getVisibility() == View.VISIBLE) {
-            float tempTextSize = baseTextSize * (scale);
-            float originTextSize = text.getTextSize();
-            text.setTextSize(TypedValue.COMPLEX_UNIT_PX, tempTextSize);
-            measure(0, 0);
-            int measuredWidth = getMeasuredWidth();
-            int measuredHeight = getMeasuredHeight();
-            if (measuredWidth > maxWidth ||
-                    measuredHeight > maxHeight ||
-                    measuredWidth < minWidth ||
-                    measuredHeight < minHeight) {
-                text.setTextSize(TypedValue.COMPLEX_UNIT_PX, originTextSize);
-                return;
-            }
-        }
-        if (image != null && image.getVisibility() == View.VISIBLE) {
-            ViewGroup.LayoutParams lp = image.getLayoutParams();
-            int sW = (int) (baseWidth * scale);
-            int sH = (int) (baseHeight * scale);
-            if (sW > maxWidth || sH > maxHeight || sW < minWidth || sH < minHeight) {
-                return;
-            }
-            lp.width = sW;
-            lp.height = sH;
-            image.setLayoutParams(lp);
-        }
     }
 
     /**
@@ -223,13 +201,7 @@ public class WaterMark extends RelativeLayout {
      */
     public void setWaterMarkBorderColor(String colorStr) {
         currentBorderColor = colorStr;
-        text.setBorderColor(getIntColor(currentBorderAlpha, currentBorderColor));
-    }
-
-    private int getIntColor(int alpha, String color) {
-        String hex = Integer.toHexString(alpha);
-        int tempColor = Color.parseColor("#" + hex + color);
-        return tempColor;
+        resetMarkBg();
     }
 
     /**
@@ -239,21 +211,65 @@ public class WaterMark extends RelativeLayout {
      */
     public void setWaterMarkBorderAlpha(int alpha) {
         currentBorderAlpha = alpha;
-        String hex = Integer.toHexString(currentBorderAlpha);
-        int tempColor = Color.parseColor("#" + hex + currentBorderColor);
-        text.setBorderColor(tempColor);
+        resetMarkBg();
     }
 
     /**
      * 设置文字颜色和透明度
      */
     private void setTextColorWithAlpha() {
-        if (text != null) {
-            // 解析拼接出一个带透明度的颜色值 PS:因为Color.argb似乎没有效果，只能替换这种方式来更变文字透明度
-            String hex = Integer.toHexString(currentAlpha);
-            int tempColor = Color.parseColor("#" + hex + currentColor);
-            text.setTextColor(tempColor);
+        if (text == null) {
+            return;
         }
+        // 解析拼接出一个带透明度的颜色值 PS:因为Color.argb似乎没有效果，只能替换这种方式来更变文字透明度
+        text.setTextColor(getIntColor(currentAlpha, currentColor));
+    }
+
+    /**
+     * 设置缩放
+     *
+     * @param size
+     */
+    public void setScale(float size) {
+        float scale = size / baseSize;
+        if (text != null && text.getVisibility() == View.VISIBLE) {
+            float tempTextSize = baseTextSize * (scale);
+            float originTextSize = text.getTextSize();
+            text.setTextSize(TypedValue.COMPLEX_UNIT_PX, tempTextSize);
+            measure(0, 0);
+            int measuredWidth = getMeasuredWidth();
+            int measuredHeight = getMeasuredHeight();
+            if (measuredWidth > maxWidth ||
+                    measuredHeight > maxHeight ||
+                    measuredWidth < minWidth ||
+                    measuredHeight < minHeight) {
+                text.setTextSize(TypedValue.COMPLEX_UNIT_PX, originTextSize);
+                return;
+            }
+        }
+        if (image != null && image.getVisibility() == View.VISIBLE) {
+            ViewGroup.LayoutParams lp = image.getLayoutParams();
+            int sW = (int) (baseWidth * scale);
+            int sH = (int) (baseHeight * scale);
+            if (sW > maxWidth || sH > maxHeight || sW < minWidth || sH < minHeight) {
+                return;
+            }
+            lp.width = sW;
+            lp.height = sH;
+            image.setLayoutParams(lp);
+        }
+    }
+
+    /**
+     * 设置基准尺寸（后续的缩放以基准尺寸计算）
+     *
+     * @param baseSize
+     */
+    public void setBaseSize(float baseSize) {
+        this.baseSize = baseSize;
+        baseWidth = image.getWidth();
+        baseHeight = image.getHeight();
+        baseTextSize = text.getTextSize();
     }
 
     public ImageView getBtnControl() {
@@ -273,14 +289,6 @@ public class WaterMark extends RelativeLayout {
         return text != null ? text.getTextSize() : 0;
     }
 
-    // 隐藏按钮 在生成视频前需要先隐藏掉，不然视频上的水印图片会带有这两个小控制按钮
-    public void hideButton() {
-        if (btnControl != null)
-            btnControl.setVisibility(View.GONE);
-        if (btnDelete != null)
-            btnDelete.setVisibility(View.GONE);
-    }
-
     public void setWaterMarkId(long id) {
         waterMarkId = id;
     }
@@ -289,9 +297,32 @@ public class WaterMark extends RelativeLayout {
         return waterMarkId;
     }
 
+    // 隐藏按钮 在生成视频前需要先隐藏掉，不然视频上的水印图片会带有这两个小控制按钮
     public void setControlBtnVisible(boolean visible) {
         int flag = visible ? View.VISIBLE : View.GONE;
         btnControl.setVisibility(flag);
         btnDelete.setVisibility(flag);
+    }
+
+    private void resetMarkBg() {
+        GradientDrawable borderBg = new GradientDrawable();
+        borderBg.setColor(getIntColor(currentWaterMarkAlpha, currentWaterMarkColor));
+        borderBg.setStroke(ImageUtil.dp2px(getContext(), 1), getIntColor(currentBorderAlpha, currentBorderColor));
+        image.setBackgroundDrawable(borderBg);
+        text.setBackgroundDrawable(borderBg);
+        invalidate();
+    }
+
+    private int getIntColor(int alpha, String color) {
+        if (alpha < 0) {
+            alpha = 0;
+        } else if (alpha > 255) {
+            alpha = 255;
+        }
+        int colorWithOutAlpha = Integer.parseInt(color, 16);
+        if (colorWithOutAlpha < 0) {
+            return Color.TRANSPARENT;
+        }
+        return alpha << 24 | colorWithOutAlpha;
     }
 }
