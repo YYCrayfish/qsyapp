@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -26,12 +25,10 @@ import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
@@ -50,7 +47,6 @@ import com.manyu.videoshare.util.ToolUtils;
 import com.manyu.videoshare.util.UriToPathUtil;
 import com.manyu.videoshare.util.VideoViewTool;
 import com.manyu.videoshare.view.MyViewPager;
-import com.manyu.videoshare.view.StrokeText;
 import com.manyu.videoshare.view.TextWaterMark.WaterMark;
 import com.manyu.videoshare.view.TextWaterMark.WaterMarkLayout;
 import com.manyu.videoshare.view.scraw.ScrawlBoardView;
@@ -58,7 +54,6 @@ import com.manyu.videoshare.view.scraw.ScrawlBoardView;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -183,6 +178,19 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
         tvWater.setOnClickListener(this);
         tvToolbar = findViewById(R.id.tv_bottom_toolbar);
 
+        layoutWaterMark.setOnMarkerClickListener(new WaterMarkLayout.OnMarkerClickListener() {
+            @Override
+            public void onMarkerClick(WaterMark mark) {
+                // 点击文字的水印时，显示文字工具
+                if (mark == null) {
+                    hideAllToolBar();
+                } else if (mark.isTextMarker()) {
+                    showTvToolBar();
+                }
+            }
+        });
+
+        // 涂鸦相关
         scrawlToolBar = findViewById(R.id.scrawl_bottom_toolbar);
         OperateFragment fragment = OperateFragment.newInstance("", OperateFragment.TYPE_IN_SCRAWL);
         fragment.setOnRevokeListener(new Runnable() {
@@ -392,7 +400,7 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
     }
 
     private void tvToImg() {
-        layoutWaterMark.setSaveMode(true);
+        layoutWaterMark.hideAllController();
         FileOutputStream outputStream = null;
         Bitmap b = ImageUtil.getBitmap(layoutWaterMark);
         Bitmap ret = Bitmap.createScaledBitmap(b, videoW, videoH, true);
@@ -413,7 +421,6 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
                 e.printStackTrace();
             }
         }
-        layoutWaterMark.setSaveMode(false);
     }
 
     private void setHandW() {
@@ -539,10 +546,6 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
             case R.id.text:
                 initDialog();
                 break;
-
-            case R.id.iv_close:
-                tvToolbar.setVisibility(View.GONE);
-                break;
             case R.id.iv_color:
                 iv_color.setBackground(getResources().getDrawable(R.drawable.shape_323232_co4));
                 tv_Aa.setBackgroundColor(getResources().getColor(R.color.tran));
@@ -555,20 +558,14 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
                 color_tool.setVisibility(View.GONE);
                 recycler.setVisibility(View.VISIBLE);
                 break;
-            case R.id.iv_ok:
-                tvToolbar.setVisibility(View.GONE);
-                break;
             case R.id.iv_scrawl:
-                tvToolbar.setVisibility(View.GONE);
-                scrawlToolBar.setVisibility(View.VISIBLE);
-                layoutWaterMark.setVisibility(View.VISIBLE);
-                scrawl.setEnabled(true);
-                type = 3;
+                showScrawToolBar();
                 break;
+            case R.id.iv_close:
+            case R.id.iv_ok:
             case R.id.iv_close_scrawl:
             case R.id.iv_ok_scrawl:
-                scrawlToolBar.setVisibility(View.GONE);
-                scrawl.setEnabled(false);
+                hideAllToolBar();
                 break;
         }
     }
@@ -580,11 +577,7 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
                 @Override
                 public void getText(String content) {
                     if (!TextUtils.isEmpty(content)) {
-                        type = 1;
-                        tvToolbar.setVisibility(View.VISIBLE);
-//                        tvRl.setVisibility(View.VISIBLE);
-//                        tvRl.addTextView(videoW / 2, videoH / 2, content, 0, tvColorStr);
-                        layoutWaterMark.setVisibility(View.VISIBLE);
+                        showTvToolBar();
                         WaterMark waterMark = new WaterMark(AddWaterActivity.this);
                         waterMark.setText(content);
                         layoutWaterMark.addWaterMark(waterMark);
@@ -593,6 +586,30 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
             });
         }
         dialog.show();
+    }
+
+    private void showScrawToolBar() {
+        tvToolbar.setVisibility(View.GONE);
+        scrawlToolBar.setVisibility(View.VISIBLE);
+        layoutWaterMark.setVisibility(View.VISIBLE);
+        scrawl.setEnabled(true);
+        type = 3;
+    }
+
+    private void showTvToolBar() {
+        type = 1;
+        tvToolbar.setVisibility(View.VISIBLE);
+        scrawlToolBar.setVisibility(View.GONE);
+        layoutWaterMark.setVisibility(View.VISIBLE);
+        scrawl.setEnabled(false);
+    }
+
+    private void hideAllToolBar() {
+        tvToolbar.setVisibility(View.GONE);
+        scrawlToolBar.setVisibility(View.GONE);
+        layoutWaterMark.hideAllController();
+        layoutWaterMark.showAllMark();
+        scrawl.setEnabled(false);
     }
 
     public static class PagerAdapter extends FragmentPagerAdapter {

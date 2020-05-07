@@ -5,13 +5,14 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
+import android.graphics.PointF;
 import android.graphics.drawable.GradientDrawable;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -57,6 +58,7 @@ public class WaterMark extends RelativeLayout {
     private float maxHeight;
     private float minWidth;
     private float minHeight;
+    private final int insidePadding;
 
     // 开始触摸时的对角线长度的一半，作为计算缩放的基准
     private float baseSize;
@@ -74,10 +76,11 @@ public class WaterMark extends RelativeLayout {
         addView(view);
 
         float density = Resources.getSystem().getDisplayMetrics().density;
-        maxWidth = (int) (400 * density + 0.5f);
-        maxHeight = (int) (400 * density + 0.5f);
-        minWidth = (int) (20 * density + 0.5f);
-        minHeight = (int) (20 * density + 0.5f);
+        maxWidth = ImageUtil.dp2px(context, 400);
+        maxHeight = ImageUtil.dp2px(context, 400);
+        minWidth = ImageUtil.dp2px(context, 20);
+        minHeight = ImageUtil.dp2px(context, 20);
+        insidePadding = ImageUtil.dp2px(context, 24);
 
         text = findViewById(R.id.waterText);
         image = findViewById(R.id.waterImage);
@@ -231,6 +234,14 @@ public class WaterMark extends RelativeLayout {
      * @param size
      */
     public void setScale(float size) {
+        float rMaxWidth = maxWidth;
+        float rMaxHeight = maxHeight;
+        if (getParent() instanceof View) {
+            View parent = (View) getParent();
+            rMaxWidth = Math.min(parent.getWidth() - insidePadding, maxWidth);
+            rMaxHeight = Math.min(parent.getHeight() - insidePadding, maxHeight);
+        }
+
         float scale = size / baseSize;
         if (text != null && text.getVisibility() == View.VISIBLE) {
             float tempTextSize = baseTextSize * (scale);
@@ -239,8 +250,8 @@ public class WaterMark extends RelativeLayout {
             measure(0, 0);
             int measuredWidth = getMeasuredWidth();
             int measuredHeight = getMeasuredHeight();
-            if (measuredWidth > maxWidth ||
-                    measuredHeight > maxHeight ||
+            if (measuredWidth > rMaxWidth ||
+                    measuredHeight > rMaxHeight ||
                     measuredWidth < minWidth ||
                     measuredHeight < minHeight) {
                 text.setTextSize(TypedValue.COMPLEX_UNIT_PX, originTextSize);
@@ -251,7 +262,7 @@ public class WaterMark extends RelativeLayout {
             ViewGroup.LayoutParams lp = image.getLayoutParams();
             int sW = (int) (baseWidth * scale);
             int sH = (int) (baseHeight * scale);
-            if (sW > maxWidth || sH > maxHeight || sW < minWidth || sH < minHeight) {
+            if (sW > rMaxWidth || sH > rMaxHeight || sW < minWidth || sH < minHeight) {
                 return;
             }
             lp.width = sW;
@@ -302,6 +313,19 @@ public class WaterMark extends RelativeLayout {
         int flag = visible ? View.VISIBLE : View.GONE;
         btnControl.setVisibility(flag);
         btnDelete.setVisibility(flag);
+        if (visible) {
+            resetMarkBg();
+        } else {
+            image.setBackgroundDrawable(null);
+            text.setBackgroundDrawable(null);
+        }
+    }
+
+    /**
+     * 是否是文字类型的水印
+     */
+    public boolean isTextMarker() {
+        return text.getVisibility() == View.VISIBLE;
     }
 
     private void resetMarkBg() {

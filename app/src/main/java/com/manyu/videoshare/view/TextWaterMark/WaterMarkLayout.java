@@ -8,8 +8,6 @@ import android.view.View;
 import android.widget.RelativeLayout;
 
 import com.manyu.videoshare.util.CalcUtil;
-import com.manyu.videoshare.util.ImageUtil;
-import com.manyu.videoshare.util.universally.LOG;
 import com.manyu.videoshare.view.scraw.ScrawlBoardView;
 
 import java.util.ArrayList;
@@ -26,15 +24,9 @@ public class WaterMarkLayout extends RelativeLayout {
     private ScrawlBoardView scrawlBoardView;
     // 当前的水印
     private WaterMark currentWaterMark;
-    // 触摸的判断 是否按下
-    private boolean touchDown = false;
-    // 拖动产生的水印 X Y
-    private int touchX;
-    private int touchY;
 
-    private float currentAngle = 0;
-    private float lastAngle = 0;
-    private float scale = 0;
+    private boolean markTouchFlag = false;
+    private boolean buttonTouchFlag = false;
 
     // 第一次触摸按下
     private float firstTouchX = 0;
@@ -44,7 +36,9 @@ public class WaterMarkLayout extends RelativeLayout {
     private float moveY = 0;
     private float currentMarkCenterX;
     private float currentMarkCenterY;
+    private boolean isAbleMove;
 
+    private OnMarkerClickListener onMarkerClickListener;
 
     public WaterMarkLayout(Context context) {
         this(context, null);
@@ -145,16 +139,10 @@ public class WaterMarkLayout extends RelativeLayout {
     OnTouchListener onTouchWaterButtonListener = new OnTouchListener() {
         @Override
         public boolean onTouch(View view, MotionEvent motionEvent) {
-            switch (motionEvent.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    touchDown = true;
-                    touchX = ((int) motionEvent.getX());
-                    touchY = ((int) motionEvent.getY());
-                    LOG.showE("水印的按钮的点击");
-                    break;
-                case MotionEvent.ACTION_UP:
-                    touchDown = false;
-                    break;
+            // 只做flag记录，不做任何处理
+            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                currentWaterMark = (WaterMark) view.getParent().getParent();
+                buttonTouchFlag = true;
             }
             return false;
         }
@@ -164,19 +152,209 @@ public class WaterMarkLayout extends RelativeLayout {
     OnTouchListener onTouchListener = new OnTouchListener() {
         @Override
         public boolean onTouch(View view, MotionEvent motionEvent) {
-            // 这个赋值操作的作用是可以在触摸到对应的水印时，控制对应的水印
-            currentWaterMark = (WaterMark) view;
-            switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
-                case MotionEvent.ACTION_DOWN:
-                    LOG.showE("水印的点击");
-                    break;
-                case MotionEvent.ACTION_UP:
-                    touchDown = false;
-                    break;
+            // 只做flag记录，不做任何处理
+            if ((motionEvent.getAction() & MotionEvent.ACTION_MASK) == MotionEvent.ACTION_DOWN) {
+                currentWaterMark = (WaterMark) view;
+                markTouchFlag = true;
             }
             return false;
         }
     };
+
+    private void showLog(String tex) {
+        Log.e("xushiyong", tex);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (scrawlBoardView.isEnabled()) {
+            return scrawlBoardView.onTouchEvent(event);
+        }
+        // 获取拖动事件的发生位置
+        final float moveX = event.getX();
+        final float moveY = event.getY();
+
+        switch (event.getAction() & MotionEvent.ACTION_MASK) {
+            case MotionEvent.ACTION_MOVE:
+                if (!isAbleMove) {
+                    isAbleMove = CalcUtil.spacing(firstTouchX, firstTouchY, event.getX(), event.getY()) > 20;
+                }
+                if (isAbleMove) {
+                    if (buttonTouchFlag) {
+                        resizeMark(moveX, moveY);
+                    } else if (markTouchFlag) {
+                        dragMark(moveX, moveY);
+                    }
+                    this.moveX = event.getX();
+                    this.moveY = event.getY();
+                }
+                break;
+            case MotionEvent.ACTION_DOWN:
+                startTouchMark(event.getX(), event.getY());
+                break;
+            case MotionEvent.ACTION_UP:
+                endTouchMark();
+                break;
+        }
+        return true;
+    }
+
+    /**
+     * 开始触摸
+     */
+    private void startTouchMark(float x, float y) {
+        isAbleMove = false;
+        firstTouchX = x;
+        firstTouchY = y;
+        this.moveX = firstTouchX;
+        this.moveY = firstTouchY;
+        if (currentWaterMark != null) {
+            currentMarkCenterX = currentWaterMark.getX() + currentWaterMark.getWidth() / 2;
+            currentMarkCenterY = currentWaterMark.getY() + currentWaterMark.getHeight() / 2;
+            // 设置基准尺寸为按下时，按下坐标点和水印中心点的距离
+            currentWaterMark.setBaseSize((float) CalcUtil.spacing(currentMarkCenterX, currentMarkCenterY, moveX, moveY));
+
+            for (WaterMark waterMark : waterMarkList) {
+                waterMark.setControlBtnVisible(waterMark == currentWaterMark);
+            }
+        }
+
+    }
+
+    /**
+     * 结束触摸
+     */
+    private void endTouchMark() {
+        if (currentWaterMark == null) {
+            buttonTouchFlag = false;
+            markTouchFlag = false;
+            return;
+        }
+
+        if (!isAbleMove && (markTouchFlag || buttonTouchFlag)) {
+            // 表示有过点击水印的行为，显示水印的控制按钮，同时回调页面做其他处理
+            for (WaterMark waterMark : waterMarkList) {
+                int flag = waterMark == currentWaterMark ? View.VISIBLE : View.GONE;
+                waterMark.setVisibility(flag);
+            }
+            if (onMarkerClickListener != null) {
+                onMarkerClickListener.onMarkerClick(currentWaterMark);
+            }
+        }
+
+        if (!isAbleMove && !markTouchFlag && !buttonTouchFlag) {
+            // 表示点击空白区域，隐藏所有的控制按钮
+            for (WaterMark waterMark : waterMarkList) {
+                waterMark.setControlBtnVisible(false);
+            }
+            currentWaterMark = null;
+            if (onMarkerClickListener != null) {
+                onMarkerClickListener.onMarkerClick(null);
+            }
+        }
+
+        buttonTouchFlag = false;
+        markTouchFlag = false;
+    }
+
+    /**
+     * 缩放&旋转
+     */
+    private void resizeMark(float x, float y) {
+        if (currentWaterMark == null) {
+            return;
+        }
+        // 水印中心点 和 当前压按点的距离
+        final float newDist = (float) CalcUtil.spacing(currentMarkCenterX, currentMarkCenterY, x, y);
+        if (newDist == 0) {
+            return;
+        }
+        // 缩放
+        currentWaterMark.setScale(newDist);
+        postRotation();
+    }
+
+    private void postRotation() {
+        post(new Runnable() {
+            @Override
+            public void run() {
+                int width = currentWaterMark.getWidth();
+                int height = currentWaterMark.getHeight();
+                // 计算角度
+                float diffAngle = CalcUtil.degree(width, height);
+                float currentAngle = CalcUtil.angleBetweenPoints(moveX, moveY, currentMarkCenterX, currentMarkCenterY) - diffAngle;
+                currentWaterMark.setRotation(currentAngle);
+
+                postResetPosition();
+            }
+        });
+    }
+
+    private void postResetPosition() {
+        post(new Runnable() {
+            @Override
+            public void run() {
+                int width = currentWaterMark.getWidth();
+                int height = currentWaterMark.getHeight();
+                // 重新设置位置
+                currentWaterMark.setX(currentMarkCenterX - width / 2f);
+                currentWaterMark.setY(currentMarkCenterY - height / 2f);
+            }
+        });
+    }
+
+    /**
+     * 拖动水印
+     */
+    private void dragMark(float x, float y) {
+        if (currentWaterMark == null) {
+            return;
+        }
+        currentWaterMark.setX(currentWaterMark.getX() + (x - this.moveX));
+        currentWaterMark.setY(currentWaterMark.getY() + (y - this.moveY));
+    }
+
+    /**
+     * 删除水印
+     *
+     * @param waterMarkID
+     */
+    private void deleteWaterMark(long waterMarkID) {
+        for (int i = 0; i < waterMarkList.size(); i++) {
+            WaterMark wm = waterMarkList.get(i);
+            if (wm.getWaterMarkId() == waterMarkID) {
+                waterMarkList.remove(i);
+                removeView(wm);
+                // 删除的同时，去除当前水印的标记
+                currentWaterMark = null;
+                if (onMarkerClickListener == null) {
+                    onMarkerClickListener.onMarkerClick(null);
+                }
+                break;
+            }
+        }
+    }
+
+    public boolean hasMark() {
+        return waterMarkList.size() != 0 || scrawlBoardView.pathCount() > 0;
+    }
+
+    public void hideAllController() {
+        for (WaterMark waterMark : waterMarkList) {
+            waterMark.setControlBtnVisible(false);
+        }
+        currentWaterMark = null;
+    }
+
+    public void showAllMark() {
+        for (WaterMark waterMark : waterMarkList) {
+            waterMark.setVisibility(View.VISIBLE);
+        }
+    }
+
+    public void setOnMarkerClickListener(OnMarkerClickListener onMarkerClickListener) {
+        this.onMarkerClickListener = onMarkerClickListener;
+    }
 
     // 点击删除水印的自定义事件 PS:为了接收一个水印ID，便于删除对应的水印
     private class OnClickDelete implements OnClickListener {
@@ -194,96 +372,7 @@ public class WaterMarkLayout extends RelativeLayout {
         }
     }
 
-    private void showLog(String tex) {
-        Log.e("xushiyong", tex);
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        if (scrawlBoardView.isEnabled()) {
-            return scrawlBoardView.onTouchEvent(event);
-        }
-        // 获取拖动事件的发生位置
-        final float moveX = event.getX();
-        final float moveY = event.getY();
-
-        switch (event.getAction() & MotionEvent.ACTION_MASK) {
-            case MotionEvent.ACTION_MOVE:
-                boolean isAbleMove = CalcUtil.spacing(firstTouchX, firstTouchY, event.getX(), event.getY()) > 20;
-                if (!(currentWaterMark == null) && isAbleMove) {
-                    // 压住了缩放按钮
-                    if (touchDown) {
-                        currentWaterMark.measure(0, 0);
-                        // 水印中心点 和 当前压按点的距离
-                        final float newDist = (float) CalcUtil.spacing(currentMarkCenterX, currentMarkCenterY, moveX, moveY);
-                        if (newDist != 0) {
-                            currentWaterMark.setScale(newDist);
-                        }
-                        post(new Runnable() {
-                            @Override
-                            public void run() {
-                                float diffAngle = CalcUtil.degree(currentWaterMark.getWidth(), currentWaterMark.getHeight());
-                                currentAngle = CalcUtil.angleBetweenPoints(moveX, moveY, currentMarkCenterX, currentMarkCenterY) - diffAngle;
-                                Log.d("test---------->", "angle = " + diffAngle + "; currentAngle = " + currentAngle);
-                                currentWaterMark.setRotation(currentAngle);
-                                currentWaterMark.setX(currentMarkCenterX - (currentWaterMark.getWidth() / 2));
-                                currentWaterMark.setY(currentMarkCenterY - (currentWaterMark.getHeight() / 2));
-                            }
-                        });
-                    } else {
-                        currentWaterMark.setX(currentWaterMark.getX() + (moveX - this.moveX));
-                        currentWaterMark.setY(currentWaterMark.getY() + (moveY - this.moveY));
-                    }
-                    this.moveX = event.getX();
-                    this.moveY = event.getY();
-                }
-                break;
-            case MotionEvent.ACTION_DOWN:
-                LOG.showE("普通的触摸的点击");
-                firstTouchX = event.getX();
-                firstTouchY = event.getY();
-                this.moveX = firstTouchX;
-                this.moveY = firstTouchY;
-                if (currentWaterMark != null) {
-                    currentMarkCenterX = currentWaterMark.getX() + currentWaterMark.getWidth() / 2;
-                    currentMarkCenterY = currentWaterMark.getY() + currentWaterMark.getHeight() / 2;
-                    currentWaterMark.setBaseSize((float) CalcUtil.spacing(currentMarkCenterX, currentMarkCenterY, moveX, moveY));
-                }
-                break;
-            case MotionEvent.ACTION_UP:
-                lastAngle = currentAngle;
-
-                // 因为抬起来时如果和按下去的触点不同，不会受到抬起事件，所以需要最大范围的触屏监听中赋值
-                touchDown = false;
-                break;
-        }
-        return true;
-    }
-
-    /**
-     * 删除水印
-     *
-     * @param waterMarkID
-     * @return
-     */
-    private void deleteWaterMark(long waterMarkID) {
-        for (int i = 0; i < waterMarkList.size(); i++) {
-            WaterMark wm = waterMarkList.get(i);
-            if (wm.getWaterMarkId() == waterMarkID) {
-                waterMarkList.remove(i);
-                removeView(wm);
-                break;
-            }
-        }
-    }
-
-    public boolean hasMark() {
-        return waterMarkList.size() != 0 || scrawlBoardView.pathCount() > 0;
-    }
-
-    public void setSaveMode(boolean isSaveMode) {
-        for (WaterMark waterMark : waterMarkList) {
-            waterMark.setControlBtnVisible(!isSaveMode);
-        }
+    public interface OnMarkerClickListener {
+        void onMarkerClick(WaterMark mark);
     }
 }
