@@ -316,7 +316,11 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
                                 videoW = mp.getVideoWidth();
                                 //FixMe 获取视频资源的高度
                                 videoH = mp.getVideoHeight();
-                                lp.dimensionRatio = "w," + videoW + ":" + videoH;
+                                if (videoW > videoH) {
+                                    lp.dimensionRatio = "h," + videoW + ":" + videoH;
+                                } else {
+                                    lp.dimensionRatio = "w," + videoW + ":" + videoH;
+                                }
                                 videoView.setLayoutParams(lp);
                                 videoCover.setVisibility(View.GONE);
                             }
