@@ -160,6 +160,8 @@ public class RemoveWatermarkActivity extends BaseVideoActivity implements View.O
                 PreviewActivity.start(RemoveWatermarkActivity.this, newPath);
                 list.clear();
                 newPath = getBaseContext().getCacheDir().getAbsolutePath() + File.separator;
+                //TODO 上报水印去除成功
+                Log.e("Logger", "上报水印去除成功");
             }
 
             @Override

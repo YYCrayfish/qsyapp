@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Base64;
 import android.util.Log;
 
 import com.alibaba.fastjson.JSONObject;
@@ -52,12 +53,15 @@ public class HttpUtils {
                     Constants.PATH = Constants.BACKPATH;
                     httpString(ul,params,httpCallback);*/
                // }
+                Log.e("Logger", "onError === " + e.getMessage());
                 httpCallback.httpError(call, e);
             }
 
             @Override
             public void onResponse(String result, int id) {
-                //result = new String(Base64.decode(result, Base64.DEFAULT));
+//                String mResult = new String(Base64.decode(result, Base64.DEFAULT));
+                Log.e("Logger", "result === " + result);
+//                Log.e("Logger", "mResult === " + mResult);
                 try {
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if(jsonObject.getIntValue("code") == 998){//result.contains("\\u767b\\u5f55\\u5df2\\u8fc7\\u671f")){

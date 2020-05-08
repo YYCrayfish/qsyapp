@@ -21,15 +21,19 @@ public class Constants {
      https://apiq.meituapp.com/index.php/v1/system/appinit
      */
     public static String s = "s#KJomu3Nd1Fjc9sS4Y5Jh$rkA^%OpL75";
-    //正式
-    public static String PATH;// = "https://api.dspqsy.com/index.php";
-    //测试
-    //public static String PATH = "http://apiw2.3ssjx.com:85/index.php";//"http://apiw.3ssjx.com:85/index.php";
+//    //正式
+//    public static String PATH;// = "https://api.dspqsy.com/index.php";
+//    测试
+    public static String PATH = "http://qsyapi.bizhiwangapp.com/index.php";//"http://apiw2.3ssjx.com:85/index.php";//"http://apiw.3ssjx.com:85/index.php";
 
     //注册
     public static String REGISTER = PATH + "/v1/register/doRegister";
     //登录
     public static String LOGIN = PATH + "/v1/login/doLogin";
+    //剩余解析次数
+    public static String ANALYTIC = PATH + "/v1/dewater/getParseTimes";
+    //本地去水印成功上报
+    public static String SUCCEED_REMOVE_WATER_MARK = PATH + "/v1/dewater/minusParseTimes";
     //APP初始化信息
     public static String INITAPP = PATH + "/v1/system/appinit";
     //获取验证码

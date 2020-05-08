@@ -14,7 +14,9 @@ import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.manyu.videoshare.R;
 import com.manyu.videoshare.base.BaseSharePerence;
 import com.manyu.videoshare.base.LoadingDialog;
@@ -40,7 +42,7 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
     private InitAppBean bean = null;
     private int progress = 0;
     private boolean starts = true;
-    private ImageView btnAd;
+    private ImageView launchAdImageView;
     private Context context;
 
     @Override
@@ -54,7 +56,7 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
         initData();
     }
 
-    private void hideSystemBar(){
+    private void hideSystemBar() {
         if (Build.VERSION.SDK_INT > 11 && Build.VERSION.SDK_INT < 19) {
             View v = this.getWindow().getDecorView();
             v.setSystemUiVisibility(View.GONE);
@@ -69,7 +71,7 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
-    private void setActivity(){
+    private void setActivity() {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -83,8 +85,9 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
         }).start();
 
     }
-    public void starts(){
-        if(starts) {
+
+    public void starts() {
+        if (starts) {
             starts = false;
             IntentUtils.JumpActivity(this, MainActivity.class);
             finish();
@@ -99,17 +102,16 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
         //setActivity();
         version = findViewById(R.id.about_version);
         bar = findViewById(R.id.start_progress);
-        btnAd = findViewById(R.id.start_img);
+        launchAdImageView = findViewById(R.id.start_img);
 
         String versionName = ToolUtils.getVersionName(StartActivity.this);
         version.setText("V" + versionName);
         bar.setOnClickListener(this);
-        btnAd.setOnClickListener(this);
+        launchAdImageView.setOnClickListener(this);
         try {
             String destFileDir = Environment.getExternalStorageDirectory() + "/manyu/";
             File dir = new File(destFileDir);
-            if (!dir.exists())
-            {
+            if (!dir.exists()) {
                 dir.mkdirs();
             }
             final String path = Environment.getExternalStorageDirectory() + "/manyu/";
@@ -117,32 +119,34 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
             final String name = path + md5;
             File file = new File(name);
 
-            if(!BaseSharePerence.getInstance().getFirst()){
-                if(file.exists()){
+            if (!BaseSharePerence.getInstance().getFirst()) {
+                if (file.exists()) {
                     Bitmap bitmap = BitmapFactory.decodeFile(name);
-                    if(null != bitmap)
-                        btnAd.setImageBitmap(bitmap);
-                }else{
-                    btnAd.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                    if (null != bitmap)
+                        launchAdImageView.setImageBitmap(bitmap);
+                } else {
+                    launchAdImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
                 }
-            }else{
-                btnAd.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            } else {
+                launchAdImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
 
     }
+
     private Thread runs;
-    public void startTime(int times){
+
+    public void startTime(int times) {
         final int add = 100 / (times * 10);
         runs = new Thread(new Runnable() {
 
             @Override
             public void run() {
-                while(progress < 100){
+                while (progress < 100) {
                     progress += add;
-                    if(progress >100){
+                    if (progress > 100) {
                         progress = 100;
                     }
                     System.out.println(progress);
@@ -164,14 +168,13 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
     protected void onResume() {
         super.onResume();
         getAgreement();
-        if(null != bean) {
+        if (null != bean) {
             starts = true;
             startTime(bean.getDatas().getAd_step());
         }
     }
 
     public void initData() {
-
         bar.setCircleColor(getResources().getColor(R.color.hint_color));//设置圆环的颜色
         bar.setCircleProgressColor(getResources().getColor(R.color.start_bar));//设置圆环进度的颜色
         bar.setTextColor(getResources().getColor(R.color.start_jump));//设置中间进度百分比的字符串的颜色
@@ -179,58 +182,61 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
         bar.setTextSize(ToolUtils.dip2px(12));
     }
 
-    private void getAgreement(){
-
-
-        HttpUtils.httpString(Constants.INITAPP,null, new HttpUtils.HttpCallback() {
+    private void getAgreement() {
+        HttpUtils.httpString(Constants.INITAPP, null, new HttpUtils.HttpCallback() {
             @Override
             public void httpError(Call call, Exception e) {
                 LoadingDialog.closeLoadingDialog();
                 ToastUtils.showShort("APP初始化失败，连接不到服务器");
-                if(bean == null || bean.getData() == null||bean.getData().length() == 0){
-                    startTime(3);
-                    return;
-                }
+                startTime(3);
             }
 
             @Override
             public void httpResponse(String resultData) {
                 Gson gson = new Gson();
-                bean = gson.fromJson(resultData,InitAppBean.class);
-                BaseSharePerence.getInstance().setUserAgree(bean.getDatas().getAgreement().getContent());
-                BaseSharePerence.getInstance().setPrivacyPolicy(bean.getDatas().getPrivacy().getContent());
-                Globals.log(bean.getMsg());
-                if(bean.getData() == null ||bean.getData().length() == 0){
+
+                try {
+                    bean = gson.fromJson(resultData, InitAppBean.class);
+                } catch (JsonSyntaxException e) {
+                    e.printStackTrace();
                     startTime(3);
                     return;
                 }
-                startTime(bean.getDatas().getAd_step());
-                if(BaseSharePerence.getInstance().getFirst()){
-                    //btnAd.setImageDrawable(getResources().getDrawable(R.drawable.start));
-                    BaseSharePerence.getInstance().setFirst(false);
-                    btnAd.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                }else if(bean.getDatas().getStart_page() != null){
-                    bar.setVisibility(View.VISIBLE);
-                    final String path = Environment.getExternalStorageDirectory() + "/manyu/";
-                    String md5 = "start.png";
-                    final String name = path + md5;
-                    File file = new File(name);
-                    if(!file.exists())
-                        GlideUtils.loadImgWithout(context,bean.getDatas().getStart_page().getImage(),btnAd);
-                    okHttpDownLoadApk(bean.getDatas().getStart_page().getImage());
+                if (bean != null && bean.getDatas() != null && bean.getDatas().getStart_page() != null) {
+                    BaseSharePerence.getInstance().setUserAgree(bean.getDatas().getAgreement().getContent());
+                    BaseSharePerence.getInstance().setPrivacyPolicy(bean.getDatas().getPrivacy().getContent());
+                    Globals.log(bean.getMsg());
+                    if (bean.getDatas() == null || bean.getDatas().getCopy_app().size() == 0) {
+                        startTime(3);
+                        return;
+                    }
+                    startTime(bean.getDatas().getAd_step());
+                    if (BaseSharePerence.getInstance().getFirst()) {
+                        //btnAd.setImageDrawable(getResources().getDrawable(R.drawable.start));
+                        BaseSharePerence.getInstance().setFirst(false);
+                        launchAdImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                    } else if (bean.getDatas().getStart_page() != null) {
+                        bar.setVisibility(View.VISIBLE);
+                        final String path = Environment.getExternalStorageDirectory() + "/manyu/";
+                        String md5 = "start.png";
+                        final String name = path + md5;
+                        File file = new File(name);
+                        if (!file.exists())
+                            GlideUtils.loadImgWithout(context, bean.getDatas().getStart_page().getUrl(), launchAdImageView);
+                        okHttpDownLoadApk(bean.getDatas().getStart_page().getImage());
+                    }
+                    //
                 }
-                //
-
                 LoadingDialog.closeLoadingDialog();
                 //ToastUtils.showShort(bean.getMsg());
             }
         });
     }
+
     public void okHttpDownLoadApk(String url) {
         String destFileDir = Environment.getExternalStorageDirectory() + "/manyu/";
         File dir = new File(destFileDir);
-        if (!dir.exists())
-        {
+        if (!dir.exists()) {
             dir.mkdirs();
         }
         final String path = Environment.getExternalStorageDirectory() + "/manyu/";
@@ -261,16 +267,17 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
                     }
                 });
     }
+
     @Override
     public void onClick(View v) {
         ToolUtils.havingIntent(this);
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.start_progress:
                 starts();
                 break;
             case R.id.start_img:
                 try {
-                    if(null != bean && null != bean.getData() && null != bean.getDatas() && bean.getDatas().getStart_page() != null) {
+                    if (null != bean && null != bean.getDatas() && null != bean.getDatas() && bean.getDatas().getStart_page() != null) {
                         starts = false;
                         Intent intent = new Intent();
                         intent.setAction("android.intent.action.VIEW");

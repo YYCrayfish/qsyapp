@@ -17,6 +17,7 @@ import com.manyu.videoshare.R;
 import com.manyu.videoshare.base.BaseFragment;
 import com.manyu.videoshare.base.BaseSharePerence;
 import com.manyu.videoshare.base.LoadingDialog;
+import com.manyu.videoshare.bean.AnalysisTimeBean;
 import com.manyu.videoshare.bean.UserBean;
 import com.manyu.videoshare.ui.FeedBackActivity;
 import com.manyu.videoshare.ui.MainActivity;
@@ -59,6 +60,7 @@ public class UserFragment extends BaseFragment implements View.OnClickListener {
     private LinearLayout layoutInvite;
     private LinearLayout layoutHead;
     private TextView textVipKnow;
+
     public UserFragment() {
     }
 
@@ -73,7 +75,7 @@ public class UserFragment extends BaseFragment implements View.OnClickListener {
         return view;
     }
 
-    private void initView(){
+    private void initView() {
         btnLogin = view.findViewById(R.id.user_btn_login);
         btnSetting = view.findViewById(R.id.user_btn_setting);
         btnSafity = view.findViewById(R.id.user_btn_safity);
@@ -98,25 +100,26 @@ public class UserFragment extends BaseFragment implements View.OnClickListener {
         layoutInvite.setOnClickListener(this);
     }
 
-    private void initData(){
+    private void initData() {
         int wid = ToolUtils.getScreenWidth() - ToolUtils.dip2px(32);
-        LinearLayout.LayoutParams layoutParamsInvite = new LinearLayout.LayoutParams(wid/2,LinearLayout.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams layoutParamsInvite = new LinearLayout.LayoutParams(wid / 2, LinearLayout.LayoutParams.WRAP_CONTENT);
         layoutInvite.setLayoutParams(layoutParamsInvite);
         layoutCounts.setLayoutParams(layoutParamsInvite);
     }
+
     @Override
     public void onClick(View v) {
         ToolUtils.havingIntent(getActivity());
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.user_layout_invite:
-                if(!BaseSharePerence.getInstance().getLoginKey().equals("0") && userBean != null && null == userBean.getDatas().getVip_end_time()){
+                if (!BaseSharePerence.getInstance().getLoginKey().equals("0") && userBean != null && null == userBean.getDatas().getVip_end_time()) {
                     IntentUtils.JumpActivity(getActivity(), RechargeActivity.class);
                 }
                 break;
             case R.id.user_layout_head:
-                if(BaseSharePerence.getInstance().getLoginKey().equals("0")){
+                if (BaseSharePerence.getInstance().getLoginKey().equals("0")) {
                     IntentUtils.JumpActivity(getActivity(), LoginAcitivty.class);
-                }else{
+                } else {
                     IntentUtils.JumpActivity(getActivity(), UserMessageActivity.class);
                 }
                 break;
@@ -129,29 +132,29 @@ public class UserFragment extends BaseFragment implements View.OnClickListener {
                 IntentUtils.JumpActivity(getActivity(), SettingActivity.class);
                 break;
             case R.id.user_btn_safity:
-                if(BaseSharePerence.getInstance().getLoginKey().equals("0")){
+                if (BaseSharePerence.getInstance().getLoginKey().equals("0")) {
                     IntentUtils.JumpActivity(getActivity(), LoginAcitivty.class);
-                }else {
+                } else {
                     IntentUtils.JumpActivity(getActivity(), AccountSafityAcitivty.class);
                 }
                 break;
             case R.id.user_btn_recharge:
-                if(BaseSharePerence.getInstance().getLoginKey().equals("0")){
+                if (BaseSharePerence.getInstance().getLoginKey().equals("0")) {
                     IntentUtils.JumpActivity(getActivity(), LoginAcitivty.class);
-                }else {
+                } else {
                     IntentUtils.JumpActivity(getActivity(), RechargeActivity.class);
                 }
                 break;
             case R.id.user_btn_feedback:
-                IntentUtils.JumpActivity(getActivity(),FeedBackActivity.class);
+                IntentUtils.JumpActivity(getActivity(), FeedBackActivity.class);
                 break;
             case R.id.user_message:
-                IntentUtils.JumpActivity(getActivity(),UserMessageActivity.class);
+                IntentUtils.JumpActivity(getActivity(), UserMessageActivity.class);
                 break;
             case R.id.user_btn_share:
-                if(BaseSharePerence.getInstance().getLoginKey().equals("0")){
+                if (BaseSharePerence.getInstance().getLoginKey().equals("0")) {
                     IntentUtils.JumpActivity(getActivity(), LoginAcitivty.class);
-                }else {
+                } else {
                     IntentUtils.JumpActivity(getActivity(), ShareActivity.class);
                 }
                 break;
@@ -160,25 +163,27 @@ public class UserFragment extends BaseFragment implements View.OnClickListener {
                     IntentUtils.JumpActivity(getActivity(), UserMessageActivity.class);
                 }
                 break;*/
-                default:
-                    break;
+            default:
+                break;
         }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        if(null != activity && activity.isShowMain()){
+        if (null != activity && activity.isShowMain()) {
             return;
         }
         checkLogin();
         getUserMessage();
+        getAnalysisTime();
     }
-    public void checkLogin(){
+
+    public void checkLogin() {
         String token = BaseSharePerence.getInstance().getLoginKey();
-        if(!token.equals("0")){
+        if (!token.equals("0")) {
             userVip.setVisibility(View.GONE);
-        }else{
+        } else {
             headIcon.setImageDrawable(getResources().getDrawable(R.drawable.user_head_default));
             btnLogin.setText("点击登录");
             userVip.setVisibility(View.GONE);
@@ -188,9 +193,9 @@ public class UserFragment extends BaseFragment implements View.OnClickListener {
             userDownCount.setText("-");
         }
     }
-    private void getUserMessage(){
 
-        HttpUtils.httpString(Constants.USERMESSAGE,null, new HttpUtils.HttpCallback() {
+    private void getUserMessage() {
+        HttpUtils.httpString(Constants.USERMESSAGE, null, new HttpUtils.HttpCallback() {
             @Override
             public void httpError(Call call, Exception e) {
                 LoadingDialog.closeLoadingDialog();
@@ -201,8 +206,8 @@ public class UserFragment extends BaseFragment implements View.OnClickListener {
             public void httpResponse(String resultData) {
                 Gson gson = new Gson();
                 Globals.log(resultData);
-                userBean = gson.fromJson(resultData,UserBean.class);
-                Globals.log(AuthCode.authcodeDecode(userBean.getData(),Constants.s));
+                userBean = gson.fromJson(resultData, UserBean.class);
+                Globals.log(AuthCode.authcodeDecode(userBean.getData(), Constants.s));
                 setMessage(userBean);
 
 
@@ -210,23 +215,43 @@ public class UserFragment extends BaseFragment implements View.OnClickListener {
             }
         });
     }
-    private void setMessage(UserBean bean){
-        if(null == bean.getDatas()){
+
+    private void getAnalysisTime() {
+        HttpUtils.httpString(Constants.ANALYTIC, null, new HttpUtils.HttpCallback() {
+            @Override
+            public void httpError(Call call, Exception e) {
+                LoadingDialog.closeLoadingDialog();
+                userDownCount.setText("0");
+            }
+
+            @Override
+            public void httpResponse(String resultData) {
+                Gson gson = new Gson();
+                Globals.log(resultData);
+                AnalysisTimeBean timeBean = gson.fromJson(resultData, AnalysisTimeBean.class);
+                userDownCount.setText(String.valueOf(timeBean.getData()));
+                LoadingDialog.closeLoadingDialog();
+            }
+        });
+    }
+
+    private void setMessage(UserBean bean) {
+        if (null == bean.getDatas()) {
             return;
         }
-        if(!TextUtils.isEmpty(bean.getDatas().getNickname())){
+        if (!TextUtils.isEmpty(bean.getDatas().getNickname())) {
             btnLogin.setText(bean.getDatas().getNickname());
         }
-        if(bean.getDatas().getAvatar().contains("http")) {
-            GlideUtils.loadCircleImage(getActivity(),bean.getDatas().getAvatar(), headIcon);
+        if (bean.getDatas().getAvatar().contains("http")) {
+            GlideUtils.loadCircleImage(getActivity(), bean.getDatas().getAvatar(), headIcon);
         }
-        userDownCount.setText(bean.getDatas().getParse_times()+"");
-        if(null != bean.getDatas().getVip_end_time()){
+        userDownCount.setText(bean.getDatas().getParse_times() + "");
+        if (null != bean.getDatas().getVip_end_time()) {
             //layoutVip.setVisibility(View.VISIBLE);
             userVip.setImageDrawable(getResources().getDrawable(R.drawable.isvip));
             userVipExpire.setText(ToolUtils.dataFormate(Integer.valueOf(bean.getDatas().getVip_end_time())));
             textVipKnow.setText("会员到期时间");
-        }else{
+        } else {
             userVipExpire.setText("开通VIP会员");
             //layoutVip.setVisibility(View.GONE);
             textVipKnow.setText("专享无限解析次数");
