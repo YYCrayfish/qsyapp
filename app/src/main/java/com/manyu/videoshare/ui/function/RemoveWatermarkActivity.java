@@ -1,5 +1,6 @@
 package com.manyu.videoshare.ui.function;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -14,9 +15,18 @@ import android.util.Log;
 import android.view.View;
 import android.widget.MediaController;
 
+import com.google.gson.Gson;
 import com.manyu.videoshare.R;
 import com.manyu.videoshare.base.BaseVideoActivity;
+import com.manyu.videoshare.base.LoadingDialog;
+import com.manyu.videoshare.bean.AnalysisTimeBean;
+import com.manyu.videoshare.permission.PermissionUtils;
+import com.manyu.videoshare.permission.request.IRequestPermissions;
+import com.manyu.videoshare.permission.request.RequestPermissions;
+import com.manyu.videoshare.util.Constants;
 import com.manyu.videoshare.util.FFmpegUtil;
+import com.manyu.videoshare.util.Globals;
+import com.manyu.videoshare.util.HttpUtils;
 import com.manyu.videoshare.util.ToastUtils;
 import com.manyu.videoshare.util.ToolUtils;
 import com.manyu.videoshare.util.UriToPathUtil;
@@ -29,6 +39,7 @@ import java.util.List;
 
 import io.microshow.rxffmpeg.RxFFmpegInvoke;
 import io.microshow.rxffmpeg.RxFFmpegSubscriber;
+import okhttp3.Call;
 
 /**
  * 去除水印
@@ -48,6 +59,7 @@ public class RemoveWatermarkActivity extends BaseVideoActivity implements View.O
             + File.separator + Environment.DIRECTORY_DCIM
             + File.separator + "Camera" + File.separator;
     private VideoViewTool videoViewTool = new VideoViewTool();
+    private IRequestPermissions requestPermissions = RequestPermissions.getInstance();//动态权限请求
 
     public void start(Context context) {
         Intent intent = new Intent();
@@ -119,9 +131,40 @@ public class RemoveWatermarkActivity extends BaseVideoActivity implements View.O
                 finish();
                 break;
             case R.id.title_right:
+                if (!requestPermissions()) {
+                    return;
+                }
                 removeWM(videoPath);
+                //TODO 上报水印去除成功
+                succeedRemoveWaterMark();
                 break;
         }
+    }
+
+    //请求权限
+    private boolean requestPermissions() {
+        //需要请求的权限
+        String[] permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA};
+        //开始请求权限
+        return requestPermissions.requestPermissions(
+                this,
+                permissions,
+                PermissionUtils.ResultCode1);
+    }
+
+    private void succeedRemoveWaterMark() {
+        HttpUtils.httpString(Constants.SUCCEED_REMOVE_WATER_MARK, null, new HttpUtils.HttpCallback() {
+            @Override
+            public void httpError(Call call, Exception e) {
+                //TODO 上报水印去除 --请求失败
+                LoadingDialog.closeLoadingDialog();
+            }
+
+            @Override
+            public void httpResponse(String resultData) {
+                Log.e("Logger", "上报水印去除成功");
+            }
+        });
     }
 
     private void removeWM(String path) {
@@ -160,8 +203,6 @@ public class RemoveWatermarkActivity extends BaseVideoActivity implements View.O
                 PreviewActivity.start(RemoveWatermarkActivity.this, newPath);
                 list.clear();
                 newPath = getBaseContext().getCacheDir().getAbsolutePath() + File.separator;
-                //TODO 上报水印去除成功
-                Log.e("Logger", "上报水印去除成功");
             }
 
             @Override
@@ -193,7 +234,7 @@ public class RemoveWatermarkActivity extends BaseVideoActivity implements View.O
             if (requestCode == 1) {
                 Uri uri = data.getData();
                 videoPath = UriToPathUtil.getRealFilePath(this, uri);
-                videoViewTool.init(this,null,uri);
+                videoViewTool.init(this, null, uri);
                 videoViewTool.videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                     @Override
                     public void onPrepared(MediaPlayer mp) {

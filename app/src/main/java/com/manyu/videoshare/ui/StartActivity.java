@@ -1,5 +1,6 @@
 package com.manyu.videoshare.ui;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -22,6 +23,9 @@ import com.manyu.videoshare.base.BaseSharePerence;
 import com.manyu.videoshare.base.LoadingDialog;
 import com.manyu.videoshare.base.RoundProgressBar;
 import com.manyu.videoshare.bean.InitAppBean;
+import com.manyu.videoshare.permission.PermissionUtils;
+import com.manyu.videoshare.permission.request.IRequestPermissions;
+import com.manyu.videoshare.permission.request.RequestPermissions;
 import com.manyu.videoshare.util.Constants;
 import com.manyu.videoshare.util.GlideUtils;
 import com.manyu.videoshare.util.Globals;
@@ -181,6 +185,7 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
         bar.setRoundWidth(ToolUtils.dip2px(2));//设置圆环的宽度
         bar.setTextSize(ToolUtils.dip2px(12));
     }
+
 
     private void getAgreement() {
         HttpUtils.httpString(Constants.INITAPP, null, new HttpUtils.HttpCallback() {

@@ -1,5 +1,6 @@
 package com.manyu.videoshare.ui;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AppOpsManager;
@@ -24,6 +25,9 @@ import com.manyu.videoshare.base.BaseActivity;
 import com.manyu.videoshare.base.BaseSharePerence;
 import com.manyu.videoshare.dialog.AgreeDialog;
 import com.manyu.videoshare.dialog.AgreementDialog;
+import com.manyu.videoshare.permission.PermissionUtils;
+import com.manyu.videoshare.permission.request.IRequestPermissions;
+import com.manyu.videoshare.permission.request.RequestPermissions;
 import com.manyu.videoshare.ui.fragment.MainFragment;
 import com.manyu.videoshare.ui.fragment.MainFragment1;
 import com.manyu.videoshare.ui.fragment.UserFragment;
@@ -34,7 +38,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 public class MainActivity extends BaseActivity {
-    private Fragment currentFragment=new Fragment();
+    private Fragment currentFragment = new Fragment();
     private MainFragment1 mainFragment;
     private UserFragment userFragment;
     private RadioGroup radioGroup;
@@ -44,27 +48,42 @@ public class MainActivity extends BaseActivity {
     private boolean userFirst = true;
     private AgreeDialog dialog;
     private AgreementDialog agreementDialog;
+    private IRequestPermissions requestPermissions = RequestPermissions.getInstance();//动态权限请求
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
         activity = this;
-        StatusBarUtil.setTranslucentForImageViewInFragment(MainActivity.this,0,null);
+        StatusBarUtil.setTranslucentForImageViewInFragment(MainActivity.this, 0, null);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
+        requestPermissions();
     }
+
+    //请求权限
+    private boolean requestPermissions() {
+        //需要请求的权限
+        String[] permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA};
+        //开始请求权限
+        return requestPermissions.requestPermissions(
+                this,
+                permissions,
+                PermissionUtils.ResultCode1);
+    }
+
     @Override
     public void initView() {
         radioGroup = findViewById(R.id.main_radiogroup);
 
 
-        if(mainFragment == null){
+        if (mainFragment == null) {
             mainFragment = new MainFragment1();
         }
         switchFragment(mainFragment).commit();
         mainFirst = false;
     }
+
     private static void setAndroidNativeLightStatusBar(Activity activity, boolean dark) {
         View decor = activity.getWindow().getDecorView();
         if (dark) {
@@ -73,38 +92,39 @@ public class MainActivity extends BaseActivity {
             decor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
         }
     }
+
     @Override
     public void initData() {
-        if(BaseSharePerence.getInstance().getIsInstall()) {
+        if (BaseSharePerence.getInstance().getIsInstall()) {
             initDialog();
-        }else {
+        } else {
             setNotify();
         }
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                switch (checkedId){
+                switch (checkedId) {
                     case R.id.main_radio_a:
-                        if(mainFragment == null){
+                        if (mainFragment == null) {
                             mainFragment = new MainFragment1();
                         }
-                        setAndroidNativeLightStatusBar(activity,false);
+                        setAndroidNativeLightStatusBar(activity, false);
                         switchFragment(mainFragment).commit();
                         setShowMain(true);
-                        if(!mainFirst) {
+                        if (!mainFirst) {
                             mainFragment.onResume();
                             ToolUtils.havingIntent(activity);
                         }
                         mainFirst = false;
                         break;
                     case R.id.main_radio_b:
-                        if(userFragment == null){
+                        if (userFragment == null) {
                             userFragment = new UserFragment();
                         }
-                        setAndroidNativeLightStatusBar(activity,false);
+                        setAndroidNativeLightStatusBar(activity, false);
                         switchFragment(userFragment).commit();
                         setShowMain(false);
-                        if(!userFirst) {
+                        if (!userFirst) {
                             userFragment.onResume();
                             ToolUtils.havingIntent(activity);
                         }
@@ -116,8 +136,8 @@ public class MainActivity extends BaseActivity {
         long oldTime = BaseSharePerence.getInstance().getLoginTime() / 1000;
         long times = 30 * 24 * 60 * 60;
         long currents = System.currentTimeMillis() / 1000;
-        if(oldTime != 0){
-            if((currents - oldTime) > times){
+        if (oldTime != 0) {
+            if ((currents - oldTime) > times) {
                 BaseSharePerence.getInstance().setLoginKey("0");
                 BaseSharePerence.getInstance().setLoginTime(0);
                 ToastUtils.showShort("登录已经过期，请重新登录");
@@ -126,13 +146,13 @@ public class MainActivity extends BaseActivity {
     }
 
     private void initDialog() {
-        if(dialog == null){
+        if (dialog == null) {
             dialog = new AgreeDialog(this);
             dialog.setOnClickListener(new AgreeDialog.OnClickListener() {
                 @Override
                 public void onUserAgree() {
                     if (null != BaseSharePerence.getInstance().getUserAgree()) {
-                        agreementDialog = new AgreementDialog(MainActivity.this,"用户协议", BaseSharePerence.getInstance().getUserAgree());
+                        agreementDialog = new AgreementDialog(MainActivity.this, "用户协议", BaseSharePerence.getInstance().getUserAgree());
                         agreementDialog.show();
                     } else {
                         ToastUtils.showShort("APP初始化失败");
@@ -142,7 +162,7 @@ public class MainActivity extends BaseActivity {
                 @Override
                 public void onPrivacyPolicy() {
                     if (null != BaseSharePerence.getInstance().getPrivacyPolicy()) {
-                        agreementDialog = new AgreementDialog(MainActivity.this,"隐私政策", BaseSharePerence.getInstance().getPrivacyPolicy());
+                        agreementDialog = new AgreementDialog(MainActivity.this, "隐私政策", BaseSharePerence.getInstance().getPrivacyPolicy());
                         agreementDialog.show();
                     } else {
                         ToastUtils.showShort("APP初始化失败");
@@ -174,7 +194,7 @@ public class MainActivity extends BaseActivity {
             if (currentFragment != null) {
                 transaction.hide(currentFragment);
             }
-            transaction.add(R.id.main_fragment, targetFragment,targetFragment.getClass().getName());
+            transaction.add(R.id.main_fragment, targetFragment, targetFragment.getClass().getName());
 
         } else {
             transaction.hide(currentFragment)
@@ -183,7 +203,9 @@ public class MainActivity extends BaseActivity {
         currentFragment = targetFragment;
         return transaction;
     }
+
     private long exitTime = 0;
+
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {
@@ -204,7 +226,8 @@ public class MainActivity extends BaseActivity {
         }
         return super.onKeyDown(keyCode, event);
     }
-    public void setNotify(){
+
+    public void setNotify() {
         boolean enabled = isNotificationEnabled(MainActivity.this);
 
         if (!enabled) {
@@ -240,6 +263,7 @@ public class MainActivity extends BaseActivity {
 
     /**
      * 获取通知权限
+     *
      * @param context
      */
     @TargetApi(Build.VERSION_CODES.KITKAT)
@@ -268,6 +292,7 @@ public class MainActivity extends BaseActivity {
         }
         return false;
     }
+
     public boolean isShowMain() {
         return showMain;
     }
