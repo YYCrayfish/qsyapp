@@ -5,14 +5,15 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import com.manyu.videoshare.R;
 
 public class TextWaterDialog extends Dialog {
     private EditText editText;
-    private TextView textView;
+    private Button textView;
+    private Button mCloseBtn;
     private OnClickListener listener;
 
     public TextWaterDialog(@NonNull Context context) {
@@ -33,6 +34,13 @@ public class TextWaterDialog extends Dialog {
     private void initView() {
         editText = findViewById(R.id.et_content);
         textView = findViewById(R.id.yes);
+        mCloseBtn = findViewById(R.id.close);
+        mCloseBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dismiss();
+            }
+        });
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
