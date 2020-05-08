@@ -5,7 +5,7 @@
     android:layout_height="wrap_content">
 
     <!--水印文字-->
-    <TextView
+    <com.manyu.videoshare.view.TextWaterMark.TextViewBorder
         android:id="@+id/waterText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -13,10 +13,7 @@
         android:layout_margin="12dp"
         android:gravity="center"
         android:padding="4dp"
-        android:singleLine="true"
-        android:textColor="@color/white"
-        android:textSize="15sp"
-        tools:background="@drawable/shape_water_border"
+        android:background="@drawable/shape_water_border"
         tools:text="都会死的还是就看" />
 
     <!--水印图片-->

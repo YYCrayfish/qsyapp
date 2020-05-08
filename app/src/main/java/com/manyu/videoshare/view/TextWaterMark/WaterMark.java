@@ -1,28 +1,23 @@
 package com.manyu.videoshare.view.TextWaterMark;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.PointF;
 import android.graphics.drawable.GradientDrawable;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewParent;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.manyu.videoshare.R;
 import com.manyu.videoshare.util.ImageUtil;
 
 public class WaterMark extends RelativeLayout {
 
-    private TextView text;
+    private TextViewBorder text;
     private ImageView image;
     private ImageView btnControl;
     private ImageView btnDelete;
@@ -75,7 +70,6 @@ public class WaterMark extends RelativeLayout {
         View view = layoutInflater.inflate(R.layout.view_water_mark, null);
         addView(view);
 
-        float density = Resources.getSystem().getDisplayMetrics().density;
         maxWidth = ImageUtil.dp2px(context, 400);
         maxHeight = ImageUtil.dp2px(context, 400);
         minWidth = ImageUtil.dp2px(context, 20);
@@ -84,9 +78,9 @@ public class WaterMark extends RelativeLayout {
 
         text = findViewById(R.id.waterText);
         image = findViewById(R.id.waterImage);
-        resetMarkBg();
         btnControl = findViewById(R.id.waterButtonControl);
         btnDelete = findViewById(R.id.waterButtonDelete);
+        setControlBtnVisible(true);
     }
 
     public void setImage(String bmPath) {
@@ -150,7 +144,10 @@ public class WaterMark extends RelativeLayout {
      */
     public void setWaterMarkColor(String colorStr) {
         currentWaterMarkColor = colorStr;
-        resetMarkBg();
+        if (text == null) {
+            return;
+        }
+        text.setBgColor(getIntColor(currentWaterMarkAlpha, currentWaterMarkColor));
     }
 
     /**
@@ -160,7 +157,10 @@ public class WaterMark extends RelativeLayout {
      */
     public void setWaterMarkAlpha(int alpha) {
         currentWaterMarkAlpha = alpha;
-        resetMarkBg();
+        if (text == null) {
+            return;
+        }
+        text.setBgColor(getIntColor(currentWaterMarkAlpha, currentWaterMarkColor));
     }
 
     @Override
@@ -187,12 +187,6 @@ public class WaterMark extends RelativeLayout {
      */
     public void setWaterMarkTextAlpha(int alpha) {
         currentAlpha = alpha;
-
-        // 设置背景透明
-        View view = findViewById(R.id.waterText);
-        if (view != null)
-            view.getBackground().setAlpha(alpha);
-
         // 设置文字透明
         setTextColorWithAlpha();
     }
@@ -204,7 +198,10 @@ public class WaterMark extends RelativeLayout {
      */
     public void setWaterMarkBorderColor(String colorStr) {
         currentBorderColor = colorStr;
-        resetMarkBg();
+        if (text == null) {
+            return;
+        }
+        text.setBorderColor(getIntColor(currentBorderAlpha, currentBorderColor));
     }
 
     /**
@@ -214,7 +211,10 @@ public class WaterMark extends RelativeLayout {
      */
     public void setWaterMarkBorderAlpha(int alpha) {
         currentBorderAlpha = alpha;
-        resetMarkBg();
+        if (text == null) {
+            return;
+        }
+        text.setBorderColor(getIntColor(currentBorderAlpha, currentBorderColor));
     }
 
     /**
@@ -292,8 +292,10 @@ public class WaterMark extends RelativeLayout {
     }
 
     public void setTextSize(float textSize) {
-        if (text != null)
-            text.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSize);
+        if (text == null) {
+            return;
+        }
+        text.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSize);
     }
 
     public float getTextSize() {
@@ -314,7 +316,11 @@ public class WaterMark extends RelativeLayout {
         btnControl.setVisibility(flag);
         btnDelete.setVisibility(flag);
         if (visible) {
-            resetMarkBg();
+            GradientDrawable borderBg = new GradientDrawable();
+            borderBg.setCornerRadius(ImageUtil.dp2px(getContext(), 2));
+            borderBg.setStroke(ImageUtil.dp2px(getContext(), 1), Color.WHITE);
+            image.setBackgroundDrawable(borderBg);
+            text.setBackgroundDrawable(borderBg);
         } else {
             image.setBackgroundDrawable(null);
             text.setBackgroundDrawable(null);
@@ -326,15 +332,6 @@ public class WaterMark extends RelativeLayout {
      */
     public boolean isTextMarker() {
         return text.getVisibility() == View.VISIBLE;
-    }
-
-    private void resetMarkBg() {
-        GradientDrawable borderBg = new GradientDrawable();
-        borderBg.setColor(getIntColor(currentWaterMarkAlpha, currentWaterMarkColor));
-        borderBg.setStroke(ImageUtil.dp2px(getContext(), 1), getIntColor(currentBorderAlpha, currentBorderColor));
-        image.setBackgroundDrawable(borderBg);
-        text.setBackgroundDrawable(borderBg);
-        invalidate();
     }
 
     private int getIntColor(int alpha, String color) {
