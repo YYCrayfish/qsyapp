@@ -58,7 +58,7 @@ public class MainActivity extends BaseActivity {
         activity = this;
         StatusBarUtil.setTranslucentForImageViewInFragment(MainActivity.this, 0, null);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        requestPermissions();
+//        requestPermissions();
     }
 
     //请求权限

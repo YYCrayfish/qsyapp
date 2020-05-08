@@ -284,11 +284,7 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
                 try {
                     if (null != bean && null != bean.getDatas() && null != bean.getDatas() && bean.getDatas().getStart_page() != null) {
                         starts = false;
-                        Intent intent = new Intent();
-                        intent.setAction("android.intent.action.VIEW");
-                        Uri content_url = Uri.parse(bean.getDatas().getStart_page().getUrl());
-                        intent.setDataAndType(content_url, "text/html");
-                        intent.addCategory(Intent.CATEGORY_BROWSABLE);
+                        Intent intent = new Intent(Intent.ACTION_VIEW,Uri.parse(bean.getDatas().getStart_page().getUrl()));
                         startActivity(intent);
                     }
                 } catch (Exception e) {

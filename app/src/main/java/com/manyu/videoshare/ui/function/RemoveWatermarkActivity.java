@@ -4,11 +4,13 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.RectF;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.constraint.ConstraintLayout;
 import android.text.TextUtils;
 import android.util.Log;
@@ -27,6 +29,7 @@ import com.manyu.videoshare.util.Constants;
 import com.manyu.videoshare.util.FFmpegUtil;
 import com.manyu.videoshare.util.Globals;
 import com.manyu.videoshare.util.HttpUtils;
+import com.manyu.videoshare.util.RomUtils;
 import com.manyu.videoshare.util.ToastUtils;
 import com.manyu.videoshare.util.ToolUtils;
 import com.manyu.videoshare.util.UriToPathUtil;
@@ -55,9 +58,7 @@ public class RemoveWatermarkActivity extends BaseVideoActivity implements View.O
     private float scale;
     private RectF rect = new RectF();
     private List<RectF> list;
-    private String newPath = Environment.getExternalStorageDirectory()
-            + File.separator + Environment.DIRECTORY_DCIM
-            + File.separator + "Camera" + File.separator;
+    private String newPath = Environment.getExternalStorageDirectory() + File.separator + Environment.DIRECTORY_DCIM + File.separator + "Camera" + File.separator;
     private VideoViewTool videoViewTool = new VideoViewTool();
     private IRequestPermissions requestPermissions = RequestPermissions.getInstance();//动态权限请求
 
@@ -261,4 +262,5 @@ public class RemoveWatermarkActivity extends BaseVideoActivity implements View.O
             }
         }
     }
+
 }
