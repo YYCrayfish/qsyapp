@@ -315,15 +315,15 @@ public class WaterMark extends RelativeLayout {
         int flag = visible ? View.VISIBLE : View.GONE;
         btnControl.setVisibility(flag);
         btnDelete.setVisibility(flag);
+        GradientDrawable borderBg = new GradientDrawable();
         if (visible) {
-            GradientDrawable borderBg = new GradientDrawable();
             borderBg.setCornerRadius(ImageUtil.dp2px(getContext(), 2));
             borderBg.setStroke(ImageUtil.dp2px(getContext(), 1), Color.WHITE);
             image.setBackgroundDrawable(borderBg);
             text.setBackgroundDrawable(borderBg);
         } else {
-            image.setBackgroundDrawable(null);
-            text.setBackgroundDrawable(null);
+            image.setBackgroundDrawable(borderBg);
+            text.setBackgroundDrawable(borderBg);
         }
     }
 
