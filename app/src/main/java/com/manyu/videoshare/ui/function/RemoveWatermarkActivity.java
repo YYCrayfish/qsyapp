@@ -142,11 +142,11 @@ public class RemoveWatermarkActivity extends BaseVideoActivity implements View.O
             if (list.get(i).top < 0) {
                 list.get(i).top = 0;
             }
-            if (list.get(i).right > videoW) {
-                list.get(i).right = videoW;
+            if (list.get(i).right > videoW - 1) {
+                list.get(i).right = videoW - 1;
             }
-            if (list.get(i).bottom > videoH) {
-                list.get(i).bottom = videoH;
+            if (list.get(i).bottom > videoH - 1) {
+                list.get(i).bottom = videoH - 1;
             }
         }
         newPath = newPath + "jq_" + (int) rect.left + "_" + (int) rect.top + "_" + UriToPathUtil.getFileNameByPath(path);
