@@ -10,12 +10,18 @@ import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.VideoView;
 
 import com.manyu.videoshare.R;
+import com.manyu.videoshare.base.BaseApplication;
 import com.manyu.videoshare.base.BaseVideoActivity;
+import com.manyu.videoshare.base.LoadingDialog;
+import com.manyu.videoshare.util.Constants;
+import com.manyu.videoshare.util.DialogIncomeTipUtil;
+import com.manyu.videoshare.util.HttpUtils;
 import com.manyu.videoshare.util.ToastUtils;
 import com.manyu.videoshare.util.ToolUtils;
 import com.manyu.videoshare.util.UriToPathUtil;
@@ -27,6 +33,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
+import okhttp3.Call;
+
+import static com.manyu.videoshare.util.SystemProgramUtils.REQUEST_CODE_MOVE_WATER_MARK;
+
 /**
  * 视频预览
  */
@@ -34,7 +44,7 @@ import java.io.FileOutputStream;
 public class PreviewActivity extends BaseVideoActivity implements View.OnClickListener {
 
     private String path;
-    private TextView save;
+    private Button save;
     private VideoView videoView;
     private int type;
     private String newPath = ConfigureParameter.SYSTEM_CAMERA_PATH;
@@ -51,6 +61,7 @@ public class PreviewActivity extends BaseVideoActivity implements View.OnClickLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_preview);
+        type = getIntent().getIntExtra("type", -1);
     }
 
     @Override
@@ -102,9 +113,18 @@ public class PreviewActivity extends BaseVideoActivity implements View.OnClickLi
                 finish();
                 break;
             case R.id.save:
+                if (type == REQUEST_CODE_MOVE_WATER_MARK) {
+                    if (BaseApplication.getInstance().getUserAnalysisTime() > 0) {
+                        //TODO 上报水印去除成功
+                        succeedRemoveWaterMark();
+                        BaseApplication.getInstance().setUserAnalysisTime(BaseApplication.getInstance().getUserAnalysisTime() - 1);
+                    } else {
+                        new DialogIncomeTipUtil(this, "可用次数不足，无法保存。").show();
+                        return;
+                    }
+                }
                 if (FileUtil.copyFileOnly(path, newPath)) {
                     ToastUtils.showShort("视频已经成功保存到相册中");
-
                     Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
                     Uri uri = Uri.fromFile(new File(newPath));
                     intent.setData(uri);
@@ -112,6 +132,21 @@ public class PreviewActivity extends BaseVideoActivity implements View.OnClickLi
                 }
                 break;
         }
+    }
+
+    private void succeedRemoveWaterMark() {
+        HttpUtils.httpString(Constants.SUCCEED_REMOVE_WATER_MARK, null, new HttpUtils.HttpCallback() {
+            @Override
+            public void httpError(Call call, Exception e) {
+                //TODO 上报水印去除 --请求失败
+                LoadingDialog.closeLoadingDialog();
+            }
+
+            @Override
+            public void httpResponse(String resultData) {
+                Log.e("Logger", "上报水印去除成功");
+            }
+        });
     }
 
     @Override

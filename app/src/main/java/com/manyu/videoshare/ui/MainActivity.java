@@ -19,10 +19,14 @@ import android.view.View;
 import android.view.Window;
 import android.widget.RadioGroup;
 
+import com.google.gson.Gson;
 import com.jaeger.library.StatusBarUtil;
 import com.manyu.videoshare.R;
 import com.manyu.videoshare.base.BaseActivity;
+import com.manyu.videoshare.base.BaseApplication;
 import com.manyu.videoshare.base.BaseSharePerence;
+import com.manyu.videoshare.base.LoadingDialog;
+import com.manyu.videoshare.bean.AnalysisTimeBean;
 import com.manyu.videoshare.dialog.AgreeDialog;
 import com.manyu.videoshare.dialog.AgreementDialog;
 import com.manyu.videoshare.permission.PermissionUtils;
@@ -31,11 +35,16 @@ import com.manyu.videoshare.permission.request.RequestPermissions;
 import com.manyu.videoshare.ui.fragment.MainFragment;
 import com.manyu.videoshare.ui.fragment.MainFragment1;
 import com.manyu.videoshare.ui.fragment.UserFragment;
+import com.manyu.videoshare.util.Constants;
+import com.manyu.videoshare.util.Globals;
+import com.manyu.videoshare.util.HttpUtils;
 import com.manyu.videoshare.util.ToastUtils;
 import com.manyu.videoshare.util.ToolUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+
+import okhttp3.Call;
 
 public class MainActivity extends BaseActivity {
     private Fragment currentFragment = new Fragment();
@@ -59,6 +68,26 @@ public class MainActivity extends BaseActivity {
         StatusBarUtil.setTranslucentForImageViewInFragment(MainActivity.this, 0, null);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 //        requestPermissions();
+        getAnalysisTime();
+    }
+
+
+    private void getAnalysisTime() {
+        HttpUtils.httpString(Constants.ANALYTIC, null, new HttpUtils.HttpCallback() {
+            @Override
+            public void httpError(Call call, Exception e) {
+                LoadingDialog.closeLoadingDialog();
+            }
+
+            @Override
+            public void httpResponse(String resultData) {
+                Gson gson = new Gson();
+                Globals.log(resultData);
+                AnalysisTimeBean timeBean = gson.fromJson(resultData, AnalysisTimeBean.class);
+                LoadingDialog.closeLoadingDialog();
+                BaseApplication.getInstance().setUserAnalysisTime(timeBean.getData());
+            }
+        });
     }
 
     //请求权限

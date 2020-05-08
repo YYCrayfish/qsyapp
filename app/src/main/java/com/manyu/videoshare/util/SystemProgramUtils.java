@@ -20,6 +20,7 @@ public class SystemProgramUtils {
     public static final int REQUEST_CODE_PAIZHAO = 1;
     public static final int REQUEST_CODE_ZHAOPIAN = 2;
     public static final int REQUEST_CODE_CAIQIE = 3;
+    public static final int REQUEST_CODE_MOVE_WATER_MARK = 4;
 
     public static void paizhao(Activity activity, File outputFile){
         Intent intent = new Intent();

@@ -19,6 +19,7 @@ import android.widget.MediaController;
 
 import com.google.gson.Gson;
 import com.manyu.videoshare.R;
+import com.manyu.videoshare.base.BaseApplication;
 import com.manyu.videoshare.base.BaseVideoActivity;
 import com.manyu.videoshare.base.LoadingDialog;
 import com.manyu.videoshare.bean.AnalysisTimeBean;
@@ -26,6 +27,7 @@ import com.manyu.videoshare.permission.PermissionUtils;
 import com.manyu.videoshare.permission.request.IRequestPermissions;
 import com.manyu.videoshare.permission.request.RequestPermissions;
 import com.manyu.videoshare.util.Constants;
+import com.manyu.videoshare.util.DialogIncomeTipUtil;
 import com.manyu.videoshare.util.FFmpegUtil;
 import com.manyu.videoshare.util.Globals;
 import com.manyu.videoshare.util.HttpUtils;
@@ -43,6 +45,8 @@ import java.util.List;
 import io.microshow.rxffmpeg.RxFFmpegInvoke;
 import io.microshow.rxffmpeg.RxFFmpegSubscriber;
 import okhttp3.Call;
+
+import static com.manyu.videoshare.util.SystemProgramUtils.REQUEST_CODE_MOVE_WATER_MARK;
 
 /**
  * 去除水印
@@ -136,8 +140,6 @@ public class RemoveWatermarkActivity extends BaseVideoActivity implements View.O
                     return;
                 }
                 removeWM(videoPath);
-                //TODO 上报水印去除成功
-                succeedRemoveWaterMark();
                 break;
         }
     }
@@ -151,21 +153,6 @@ public class RemoveWatermarkActivity extends BaseVideoActivity implements View.O
                 this,
                 permissions,
                 PermissionUtils.ResultCode1);
-    }
-
-    private void succeedRemoveWaterMark() {
-        HttpUtils.httpString(Constants.SUCCEED_REMOVE_WATER_MARK, null, new HttpUtils.HttpCallback() {
-            @Override
-            public void httpError(Call call, Exception e) {
-                //TODO 上报水印去除 --请求失败
-                LoadingDialog.closeLoadingDialog();
-            }
-
-            @Override
-            public void httpResponse(String resultData) {
-                Log.e("Logger", "上报水印去除成功");
-            }
-        });
     }
 
     private void removeWM(String path) {
@@ -201,7 +188,7 @@ public class RemoveWatermarkActivity extends BaseVideoActivity implements View.O
             public void onFinish() {
                 progressEnd();
                 Log.e("ffmpeg_result", "成功");
-                PreviewActivity.start(RemoveWatermarkActivity.this, newPath);
+                PreviewActivity.start(RemoveWatermarkActivity.this, newPath,REQUEST_CODE_MOVE_WATER_MARK);
                 list.clear();
                 newPath = getBaseContext().getCacheDir().getAbsolutePath() + File.separator;
             }
