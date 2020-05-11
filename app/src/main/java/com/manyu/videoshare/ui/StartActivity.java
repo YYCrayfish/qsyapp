@@ -13,7 +13,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.Window;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -50,7 +49,6 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
     private boolean starts = true;
     private ImageView launchAdImageView;
     private Context context;
-    private LinearLayout layout_launch_logo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,7 +126,6 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
             File file = new File(name);
 
             if (!BaseSharePerence.getInstance().getFirst()) {
-                layout_launch_logo.setVisibility(View.GONE);
                 if (file.exists()) {
                     Bitmap bitmap = BitmapFactory.decodeFile(name);
                     if (null != bitmap)
@@ -138,7 +135,6 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
                 }
             } else {
                 launchAdImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                layout_launch_logo.setVisibility(View.VISIBLE);
             }
         } catch (Exception e) {
             e.printStackTrace();
