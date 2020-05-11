@@ -38,7 +38,7 @@
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="44dp"
             android:text="立即开通"
             android:textColor="@color/white"
             android:textSize="14sp"

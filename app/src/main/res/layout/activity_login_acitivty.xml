@@ -15,7 +15,7 @@
         android:layout_marginRight="16dp"
         android:orientation="vertical">
 
-        <com.manyu.videoshare.widget.RegularEditText
+        <EditText
             android:id="@+id/login_edit_phone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -30,7 +30,7 @@
 
         <include layout="@layout/include_line_a" />
 
-        <com.manyu.videoshare.widget.RegularEditText
+        <EditText
             android:id="@+id/login_edit_pass"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

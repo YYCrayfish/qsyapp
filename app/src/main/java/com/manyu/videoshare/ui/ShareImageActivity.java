@@ -1,6 +1,8 @@
 package com.manyu.videoshare.ui;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -10,11 +12,20 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.manyu.videoshare.R;
 import com.manyu.videoshare.base.BaseActivity;
@@ -26,6 +37,12 @@ import com.manyu.videoshare.permission.requestresult.RequestPermissionsResultSet
 import com.manyu.videoshare.util.ToastUtils;
 import com.manyu.videoshare.util.ToolUtils;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.UUID;
+
 public class ShareImageActivity extends BaseActivity implements View.OnClickListener {
     private ImageView zxing;
     IRequestPermissions requestPermissions = RequestPermissions.getInstance();//动态权限请求
@@ -36,6 +53,13 @@ public class ShareImageActivity extends BaseActivity implements View.OnClickList
     private ImageView imgcopy;
     private String url;
     private ImageView btnBack;
+    private TextView mShredMineInviteCode;
+    private LinearLayout mShredInviteWayLayout;
+    private RelativeLayout mSharedRootView;
+    private String invite;
+    private static final String SD_PATH = Environment.getExternalStorageDirectory().getPath();
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,7 +73,9 @@ public class ShareImageActivity extends BaseActivity implements View.OnClickList
         imgcopy = findViewById(R.id.shareimg_copy);
         imgsave = findViewById(R.id.shareimg_save);
         btnBack = findViewById(R.id.shareimg_img_back);
-
+        mShredMineInviteCode = findViewById(R.id.share_mine_invite_code);
+        mShredInviteWayLayout = findViewById(R.id.share_invite_way_layout);
+        mSharedRootView = findViewById(R.id.share_root_layout);
         imgsave.setOnClickListener(this);
         imgcopy.setOnClickListener(this);
         btnBack.setOnClickListener(this);
@@ -62,98 +88,42 @@ public class ShareImageActivity extends BaseActivity implements View.OnClickList
         Intent intent = getIntent();
         url = intent.getStringExtra("url");
         code = intent.getStringExtra("code");
+        invite = "我的邀请码：" + code;
+        mShredMineInviteCode.setText(invite);
         int height = ToolUtils.getScreenHeigh();
         int width = ToolUtils.getScreenWidth();
         int nums = (int) (height * 0.2);
-        Bitmap logo = BitmapFactory.decodeResource(getResources(),R.drawable.logo);
-        myBitmap = ToolUtils.createQRCode(url,nums,nums,logo);
+        Bitmap logo = BitmapFactory.decodeResource(getResources(), R.drawable.logo);
+        myBitmap = ToolUtils.createQRCode(url, nums, nums, logo);
 
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(nums,nums);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(nums, nums);
         params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        params.setMargins(ToolUtils.dip2px(27),0,0,(int)(height * 0.165));
+        params.setMargins(ToolUtils.dip2px(27), 0, 0, (int) (height * 0.165));
         zxing.setLayoutParams(params);
         zxing.setImageBitmap(myBitmap);
 
     }
 
-    private void saveShare(String code,Bitmap bitmap){
 
-        Bitmap src = BitmapFactory.decodeResource(getResources(),R.drawable.shareming_back);
-        int srcWidth =  src.getWidth();
-        int srcHeight = src.getHeight();
-        int logWidth = bitmap.getWidth();
-        bitmap = ToolUtils.imageScale(bitmap,(int)(srcHeight * 0.2),(int)(srcHeight * 0.2));
-        Bitmap back = Bitmap.createBitmap(srcWidth, srcHeight, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(back);
-        canvas.drawBitmap(src, 0, 0, null);
-
-
-        String invite = "我的邀请码：" + code;
-        Paint in = new Paint(Paint.ANTI_ALIAS_FLAG);
-        in.setDither(true);
-        in.setFilterBitmap(true);//过滤一些
-        in.setColor(Color.WHITE);
-        in.setTypeface(Typeface.DEFAULT_BOLD);
-        in.setTextSize(ToolUtils.dip2px(24));
-        Rect bound = new Rect();
-        in.getTextBounds(invite, 0, invite.length(), bound);
-        int inviteLeft = (srcWidth - bound.width()) / 2;
-        int inviteTop = (srcHeight - ToolUtils.dip2px(27));
-        canvas.drawText(invite,inviteLeft,inviteTop,in);
-
-        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paint.setStyle(Paint.Style.STROKE);//空心矩形框
-        paint.setColor(Color.WHITE);
-        int left = inviteLeft - ToolUtils.dip2px(16);
-        int top = inviteTop - ToolUtils.dip2px(9) - bound.height();
-        int right = left + bound.width() + ToolUtils.dip2px(32);
-        int bottom = inviteTop + ToolUtils.dip2px(12);
-        canvas.drawRect(new RectF(left, top, right, bottom), paint);
-
-        Paint know = new Paint(Paint.ANTI_ALIAS_FLAG);
-        know.setDither(true);
-        know.setFilterBitmap(true);//过滤一些
-        know.setColor(Color.WHITE);
-        know.setTextSize(ToolUtils.dip2px(14));
-        Rect bounds = new Rect();
-        String mText = "长按识别二维码";
-        know.getTextBounds(mText, 0, mText.length(), bounds);
-        int textKnowLeft = ToolUtils.dip2px(27) + (bitmap.getWidth() - bounds.width()) / 2;//left - ToolUtils.dip2px(12);//(int) ((int)(srcWidth * 0.07)  + (srcHeight * 0.2 - bounds.width())/2) - 10;
-        int textKnowTop = (int)(srcHeight *0.64) + bitmap.getHeight() + ToolUtils.dip2px(8);//top - ToolUtils.dip2px(28);//((int)(srcHeight * 0.79) + ToolUtils.dip2px(8)) + 75;
-        canvas.drawText(mText,textKnowLeft,textKnowTop,know);
-
-
-        canvas.drawBitmap(bitmap, ToolUtils.dip2px(27),(int)(srcHeight *0.64) - ToolUtils.dip2px(8), null);
-
-
-
-        canvas.save();
-        canvas.restore();
-        if(ToolUtils.saveBitmap(back)){
-            ToastUtils.showShort("保存分享照片到相册成功");
-        }else{
-            ToastUtils.showShort("保存失败");
-        }
-
-    }
     //用户授权操作结果（可能授权了，也可能未授权）
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         //用户给APP授权的结果
         //判断grantResults是否已全部授权，如果是，执行相应操作，如果否，提醒开启权限
-        if(requestPermissionsResult.doRequestPermissionsResult(this, permissions, grantResults)){
+        if (requestPermissionsResult.doRequestPermissionsResult(this, permissions, grantResults)) {
             //请求的权限全部授权成功，此处可以做自己想做的事了
             //输出授权结果
-            saveShare(code,myBitmap);
-        }else{
+            saveMyBitmap(String.valueOf(System.currentTimeMillis()), myBitmap);
+        } else {
             //输出授权结果
         }
     }
+
     //请求权限
-    private boolean requestPermissions(){
+    private boolean requestPermissions() {
         //需要请求的权限
-        String[] permissions = {Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.CAMERA};
+        String[] permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA};
         //开始请求权限
         return requestPermissions.requestPermissions(
                 this,
@@ -164,20 +134,85 @@ public class ShareImageActivity extends BaseActivity implements View.OnClickList
     @Override
     public void onClick(View v) {
         ToolUtils.havingIntent(this);
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.shareimg_copy:
                 ToolUtils.setClipData(url);
                 ToastUtils.showShort("已经复制到粘贴板");
                 break;
             case R.id.shareimg_save:
-                if(!requestPermissions()){
+                if (!requestPermissions()) {
                     return;
                 }
-                saveShare(code,myBitmap);
+                toggleSharedView(true);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Bitmap mBitmap = createViewBitmap(mSharedRootView);
+                        saveMyBitmap(String.valueOf(System.currentTimeMillis()), mBitmap);
+                    }
+                }, 200);
                 break;
             case R.id.shareimg_img_back:
                 finish();
                 break;
+        }
+    }
+
+    public Bitmap createViewBitmap(View v) {
+        Bitmap bitmap = Bitmap.createBitmap(v.getWidth(), v.getHeight(),
+                Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        v.draw(canvas);
+        return bitmap;
+    }
+
+    //使用IO流将bitmap对象存到本地指定文件夹
+    public void saveMyBitmap(final String bitName, final Bitmap bitmap) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String filePath = Environment.getExternalStorageDirectory().getPath();
+                File file = new File(filePath + "/DCIM/Camera/" + bitName + ".png");
+                try {
+                    file.createNewFile();
+                    FileOutputStream fOut = null;
+                    fOut = new FileOutputStream(file);
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, fOut);
+                    Message msg = Message.obtain();
+                    msg.obj = file.getPath();
+                    handler.sendMessage(msg);
+                    //Toast.makeText(PayCodeActivity.this, "保存成功", Toast.LENGTH_LONG).show();
+                    fOut.flush();
+                    fOut.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+    @SuppressLint("HandlerLeak")
+    Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            String picFile = (String) msg.obj;
+            toggleSharedView(false);
+            // 最后通知图库更新
+            sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + picFile)));
+            Toast.makeText(ShareImageActivity.this, "图片保存图库成功", Toast.LENGTH_LONG).show();
+        }
+    };
+
+    private void toggleSharedView(boolean toggle) {
+        if (toggle) {
+            mShredMineInviteCode.setVisibility(View.VISIBLE);
+            mShredInviteWayLayout.setVisibility(View.GONE);
+            btnBack.setVisibility(View.GONE);
+        } else {
+            mShredMineInviteCode.setVisibility(View.GONE);
+            mShredInviteWayLayout.setVisibility(View.VISIBLE);
+            btnBack.setVisibility(View.VISIBLE);
         }
     }
 }

@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
+import com.gyf.immersionbar.ImmersionBar;
 import com.manyu.videoshare.R;
 import com.manyu.videoshare.base.BaseActivity;
 import com.manyu.videoshare.base.BaseSharePerence;
@@ -34,10 +35,12 @@ public class SettingActivity extends BaseActivity implements View.OnClickListene
     private LinearLayout btnAbout;
     private LinearLayout btnPrivacyPolicy;
     private Context context;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting);
+        ImmersionBar.with(this).statusBarColorInt(getResources().getColor(R.color.white)).statusBarDarkFont(true).init();
         ToolUtils.setBar(this);
     }
 
@@ -51,7 +54,6 @@ public class SettingActivity extends BaseActivity implements View.OnClickListene
         btnVersion = findViewById(R.id.setting_btn_version);
         btnAbout = findViewById(R.id.setting_btn_about);
         btnPrivacyPolicy = findViewById(R.id.setting_privacy_policy);
-
         back.setOnClickListener(this);
         btnExit.setOnClickListener(this);
         btnVersion.setOnClickListener(this);
@@ -61,7 +63,7 @@ public class SettingActivity extends BaseActivity implements View.OnClickListene
 
     @Override
     public void initData() {
-        if(BaseSharePerence.getInstance().getLoginKey().equals("0")){
+        if (BaseSharePerence.getInstance().getLoginKey().equals("0")) {
             btnExit.setVisibility(View.GONE);
         }
     }
@@ -69,9 +71,9 @@ public class SettingActivity extends BaseActivity implements View.OnClickListene
     @Override
     public void onClick(View v) {
         ToolUtils.havingIntent(this);
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.setting_btn_exit:
-                ExitDialog exitDialog = new ExitDialog(context,null, new ExitDialog.AnalysisUrlListener() {
+                ExitDialog exitDialog = new ExitDialog(context, null, new ExitDialog.AnalysisUrlListener() {
                     @Override
                     public void analysis() {
                         BaseSharePerence.getInstance().setLoginKey("0");
@@ -92,11 +94,11 @@ public class SettingActivity extends BaseActivity implements View.OnClickListene
                 checkVersion();
                 break;
             case R.id.setting_btn_about:
-                IntentUtils.JumpActivity(this,AboutUsActivity.class);
+                IntentUtils.JumpActivity(this, AboutUsActivity.class);
                 break;
             case R.id.setting_privacy_policy:
                 if (null != BaseSharePerence.getInstance().getPrivacyPolicy()) {
-                    AgreementDialog agreementDialog = new AgreementDialog(this,"隐私政策", BaseSharePerence.getInstance().getPrivacyPolicy());
+                    AgreementDialog agreementDialog = new AgreementDialog(this, "隐私政策", BaseSharePerence.getInstance().getPrivacyPolicy());
                     agreementDialog.show();
                 } else {
                     ToastUtils.showShort("APP初始化失败");
@@ -111,8 +113,8 @@ public class SettingActivity extends BaseActivity implements View.OnClickListene
 
     }
 
-    public void checkVersion(){
-        HttpUtils.httpString(Constants.VERSION,null, new HttpUtils.HttpCallback() {
+    public void checkVersion() {
+        HttpUtils.httpString(Constants.VERSION, null, new HttpUtils.HttpCallback() {
             @Override
             public void httpError(Call call, Exception e) {
             }
@@ -121,21 +123,21 @@ public class SettingActivity extends BaseActivity implements View.OnClickListene
             public void httpResponse(String resultData) {
                 Globals.log(resultData);
                 Gson gson = new Gson();
-                VersionBean bean = gson.fromJson(resultData,VersionBean.class);
-                if(bean.getCode() == 200){
+                VersionBean bean = gson.fromJson(resultData, VersionBean.class);
+                if (bean.getCode() == 200) {
                     String versionName = ToolUtils.getVersionName(SettingActivity.this);
                     VersionBean.DataBean dataBean = bean.getDatas();
-                    if(null == dataBean){
+                    if (null == dataBean) {
                         ToastUtils.showShort("当前已经是最新版本了！");
                         return;
                     }
                     int compare = versionName.compareTo(dataBean.getVersions());
-                    if(compare < 0 ){
+                    if (compare < 0) {
                         //ToastUtils.showShort("有最新版本！");
-                        UpdateDialog updateDialog = new UpdateDialog(SettingActivity.this,dataBean,0);
+                        UpdateDialog updateDialog = new UpdateDialog(SettingActivity.this, dataBean, 0);
                         updateDialog.show();
                     }
-                }else{
+                } else {
                     ToastUtils.showShort(bean.getMsg());
                 }
             }

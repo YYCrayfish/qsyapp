@@ -10,7 +10,7 @@ import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.VideoView;
 
-import com.gyf.barlibrary.ImmersionBar;
+import com.gyf.immersionbar.ImmersionBar;
 import com.manyu.videoshare.R;
 import com.manyu.videoshare.base.BaseVideoActivity;
 import com.manyu.videoshare.util.MD5Utils;

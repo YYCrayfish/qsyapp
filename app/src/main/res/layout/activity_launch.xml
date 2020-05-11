@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/launch_layout_advert_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitXY" />
+    <!--广告-->
+    <TextView
+        android:id="@+id/launch_layout_logo_txt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/mDpDimen200"
+        android:drawableTop="@drawable/icon_logo"
+        android:drawablePadding="@dimen/textSize13"
+        android:gravity="center_horizontal"
+        android:text="@string/app_name"
+        android:textSize="@dimen/text_size_18sp"
+        android:textStyle="bold" />
+
+    <com.manyu.videoshare.base.RoundProgressBar
+        android:id="@+id/launch_layout_start_progress"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="45dp"
+        android:layout_marginRight="17dp"
+        android:visibility="gone" />
+</RelativeLayout>

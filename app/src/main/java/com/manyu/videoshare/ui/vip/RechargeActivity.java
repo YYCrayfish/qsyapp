@@ -67,9 +67,7 @@ public class RechargeActivity extends BaseActivity implements View.OnClickListen
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_recharge);
         //ToolUtils.setBar(this);
         StatusBarUtil.setTranslucentForImageViewInFragment(RechargeActivity.this,0,null);

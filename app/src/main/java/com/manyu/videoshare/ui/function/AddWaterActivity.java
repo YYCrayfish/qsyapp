@@ -16,6 +16,7 @@ import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -34,7 +35,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
-import com.gyf.barlibrary.ImmersionBar;
+import com.gyf.immersionbar.ImmersionBar;
 import com.manyu.videoshare.R;
 import com.manyu.videoshare.base.BaseFragment;
 import com.manyu.videoshare.base.BaseVideoActivity;
@@ -307,7 +308,6 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
                     handleImageBeforeKitKat(data);
                 }
             } else if (requestCode == 2) {
-                showLoading();
                 Uri uri = data.getData();
                 videoPath = UriToPathUtil.getRealFilePath(this, uri);
                 videoViewTool.init(AddWaterActivity.this, null, uri);
@@ -315,6 +315,7 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
                 final VideoView videoView = videoViewTool.videoView;
                 final View videoCover = findViewById(R.id.vv_cover);
                 final FrameLayout.LayoutParams mLayoutWaterMarkParams = (FrameLayout.LayoutParams) layoutWaterMark.getLayoutParams();
+//                final ConstraintLayout.LayoutParams mLayoutHostParams = (ConstraintLayout.LayoutParams) mVideoViewHost.getLayoutParams();
                 videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                     @Override
                     public void onPrepared(MediaPlayer mp) {
@@ -325,18 +326,23 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
                                 videoW = mp.getVideoWidth();
                                 //FixMe 获取视频资源的高度
                                 videoH = mp.getVideoHeight();
-
-                                Log.e("Logger", "videoH = " + videoH + ", videoW = " + videoW);
-                                videoViewTool.setVideoH(videoH);
-                                videoViewTool.setVideoW(videoW);
+//                                if (videoH > videoW) {
+//                                    //竖屏
+//                                } else {
+//                                    //横屏
+//                                }
+//                                videoViewTool.setVideoH(videoH);
+//                                videoViewTool.setVideoW(videoW);
                                 mLayoutWaterMarkParams.height = videoH;
-
                                 mLayoutWaterMarkParams.width = videoW;
 
+//                                mLayoutHostParams.width = videoW;
+//                                mLayoutHostParams.height = videoH;
+
+//                                mVideoViewHost.setLayoutParams(mLayoutHostParams);
                                 layoutWaterMark.setLayoutParams(mLayoutWaterMarkParams);
                                 videoCover.setVisibility(View.GONE);
                                 videoViewTool.videoSeekBar.reset();
-                                dismissLoading();
                             }
                         });
                     }

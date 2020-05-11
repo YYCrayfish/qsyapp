@@ -21,7 +21,7 @@ import android.view.Window;
 import android.widget.RadioGroup;
 
 import com.google.gson.Gson;
-import com.gyf.barlibrary.ImmersionBar;
+import com.gyf.immersionbar.ImmersionBar;
 import com.jaeger.library.StatusBarUtil;
 import com.manyu.videoshare.R;
 import com.manyu.videoshare.base.BaseActivity;

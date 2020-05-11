@@ -52,7 +52,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginRight="10dp"
                     android:layout_weight="1"
-                    app:cardCornerRadius="2dp"
+                    app:cardCornerRadius="8dp"
                     app:cardElevation="0dp">
 
                     <com.manyu.videoshare.view.RatioImageView
@@ -70,7 +70,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_marginLeft="10dp"
-                    app:cardCornerRadius="2dp"
+                    app:cardCornerRadius="8dp"
                     app:cardElevation="0dp">
 
                     <com.manyu.videoshare.view.RatioImageView

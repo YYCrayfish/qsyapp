@@ -28,7 +28,7 @@
                 android:layout_gravity="center"
                 android:gravity="center"
                 app:cardBackgroundColor="@color/black"
-                app:cardCornerRadius="6dp"
+                app:cardCornerRadius="8dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
@@ -55,12 +55,25 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp">
 
+            <ImageView
+                android:id="@+id/btnRefresh"
+                android:layout_width="@dimen/mDpDimen30"
+                android:layout_height="@dimen/mDpDimen17"
+                android:layout_marginTop="4dp"
+                android:background="@null"
+                android:src="@drawable/refresh_selector"
+                app:layout_constraintBottom_toBottomOf="@+id/modify_md5_new"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/modify_md5_new"
+                app:layout_constraintTop_toTopOf="@+id/modify_md5_new"
+                app:layout_constraintVertical_bias="0.27" />
+
             <RelativeLayout
                 android:id="@+id/modify_md5_new"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="50dp"
-                android:layout_marginRight="50dp"
+                android:layout_marginLeft="48dp"
+                android:layout_marginRight="48dp"
                 android:background="@drawable/shape_round_white"
                 android:gravity="center_vertical"
                 android:minHeight="30dp"
@@ -95,25 +108,12 @@
                     android:textSize="12.5sp" />
             </RelativeLayout>
 
-            <ImageView
-                android:id="@+id/btnRefresh"
-                android:layout_width="@dimen/mDpDimen30"
-                android:layout_height="@dimen/mDpDimen17"
-                android:layout_marginTop="4dp"
-                android:background="@null"
-                android:src="@drawable/refresh_selector"
-                app:layout_constraintBottom_toBottomOf="@+id/modify_md5_new"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/modify_md5_new"
-                app:layout_constraintTop_toTopOf="@+id/modify_md5_new"
-                app:layout_constraintVertical_bias="0.27" />
-
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="50dp"
+                android:layout_marginLeft="48dp"
                 android:layout_marginTop="10dp"
-                android:layout_marginRight="50dp"
+                android:layout_marginRight="48dp"
                 android:background="@drawable/shape_round"
                 android:gravity="center_vertical"
                 android:minHeight="30dp"

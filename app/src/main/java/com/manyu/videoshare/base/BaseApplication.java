@@ -8,7 +8,6 @@ import com.manyu.videoshare.bean.AnalysisTimeBean;
 import com.manyu.videoshare.util.Constants;
 import com.manyu.videoshare.util.Globals;
 import com.manyu.videoshare.util.HttpUtils;
-import com.manyu.videoshare.util.LoadingDialogUtil;
 import com.umeng.commonsdk.UMConfigure;
 
 import io.microshow.rxffmpeg.RxFFmpegInvoke;
@@ -18,7 +17,6 @@ public class BaseApplication extends Application {
     private static BaseApplication instance;
     private static Context mContext;
     private int userAnalysisTime = 0;//设置可保存次数
-    private LoadingDialogUtil mLoadingDialog;
 
     public static BaseApplication getInstance() {
         if (null == instance) {
@@ -31,15 +29,11 @@ public class BaseApplication extends Application {
         return mContext;
     }
 
-    public LoadingDialogUtil getLoadingDialog() {
-        return mLoadingDialog;
-    }
 
     @Override
     public void onCreate() {
         super.onCreate();
         this.mContext = this;
-        mLoadingDialog = LoadingDialogUtil.getInstance(this);
         if (Constants.LOG_Controll) {
             UMConfigure.init(this, UMConfigure.DEVICE_TYPE_PHONE, "");
         } else {

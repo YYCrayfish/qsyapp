@@ -26,7 +26,7 @@ import android.widget.TextView;
 import android.widget.VideoView;
 
 import com.google.gson.Gson;
-import com.gyf.barlibrary.ImmersionBar;
+import com.gyf.immersionbar.ImmersionBar;
 import com.jude.rollviewpager.RollPagerView;
 import com.manyu.videoshare.R;
 import com.manyu.videoshare.adapter.AskandAnswerAdapter;
