@@ -3,6 +3,7 @@ package com.manyu.videoshare.ui.function;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.RectF;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -12,8 +13,10 @@ import android.support.constraint.ConstraintLayout;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.gyf.barlibrary.ImmersionBar;
 import com.manyu.videoshare.R;
 import com.manyu.videoshare.base.BaseVideoActivity;
 import com.manyu.videoshare.util.FFmpegUtil;
@@ -63,6 +66,8 @@ public class VideoClipActivity extends BaseVideoActivity implements View.OnClick
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_clip);
+        ImmersionBar.with(this).statusBarDarkFont(false).statusBarColorInt(Color.BLACK).init();
+        setToolBarColor(Color.BLACK);
         start(this);
     }
 
@@ -167,7 +172,6 @@ public class VideoClipActivity extends BaseVideoActivity implements View.OnClick
             @Override
             public void onFinish() {
                 progressEnd();
-                Log.e("ffmpeg_result", "成功");
                 PreviewActivity.start(VideoClipActivity.this, newPath);
                 newPath = getBaseContext().getCacheDir().getAbsolutePath() + File.separator;
             }
@@ -210,7 +214,7 @@ public class VideoClipActivity extends BaseVideoActivity implements View.OnClick
                             public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
                                 videoViewH = videoViewTool.videoView.getMeasuredHeight();
                                 videoViewW = videoViewTool.videoView.getMeasuredWidth();
-                                ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) zoomView.getLayoutParams();
+                                FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) zoomView.getLayoutParams();
                                 params.height = videoViewH;
                                 params.width = videoViewW;
                                 zoomView.setLayoutParams(params);

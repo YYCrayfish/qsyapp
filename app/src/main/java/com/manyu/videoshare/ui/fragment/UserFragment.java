@@ -13,6 +13,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
+import com.gyf.barlibrary.ImmersionBar;
 import com.manyu.videoshare.R;
 import com.manyu.videoshare.base.BaseFragment;
 import com.manyu.videoshare.base.BaseSharePerence;
@@ -45,29 +46,28 @@ import okhttp3.Call;
 public class UserFragment extends BaseFragment implements View.OnClickListener {
     private View view;
     private TextView btnLogin;
-    private LinearLayout btnSetting;
-    private LinearLayout btnSafity;
-    private LinearLayout btnRecharge;
-    private LinearLayout btnFeedBack;
+    private TextView btnSetting;
+    private TextView btnSafity;
+    private TextView btnRecharge;
+    private TextView btnFeedBack;
+    private LinearLayout layoutCounts;
+    private LinearLayout layoutInvite;
+    private LinearLayout layoutHead;
+
     private UserBean userBean;
     private ImageView headIcon;
     private MainActivity activity;
     private ImageView userVip;
     private TextView userDownCount;
     private TextView userVipExpire;
-    private LinearLayout btnShare;
-    private LinearLayout layoutCounts;
-    private LinearLayout layoutInvite;
-    private LinearLayout layoutHead;
+    private TextView btnShare;
     private TextView textVipKnow;
 
     public UserFragment() {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_user, container, false);
         activity = (MainActivity) getActivity();
         initView();
@@ -81,6 +81,7 @@ public class UserFragment extends BaseFragment implements View.OnClickListener {
         btnSafity = view.findViewById(R.id.user_btn_safity);
         btnRecharge = view.findViewById(R.id.user_btn_recharge);
         btnFeedBack = view.findViewById(R.id.user_btn_feedback);
+
         headIcon = view.findViewById(R.id.head_icon);
         userVip = view.findViewById(R.id.user_img_vip);
         userDownCount = view.findViewById(R.id.user_count);
@@ -174,9 +175,11 @@ public class UserFragment extends BaseFragment implements View.OnClickListener {
         if (null != activity && activity.isShowMain()) {
             return;
         }
+
+        ImmersionBar.with(this).barColorInt(getResources().getColor(R.color.login_blue)).init();
         checkLogin();
         getUserMessage();
-        getAnalysisTime();
+//        getAnalysisTime();
     }
 
     public void checkLogin() {
@@ -189,6 +192,7 @@ public class UserFragment extends BaseFragment implements View.OnClickListener {
             userVip.setVisibility(View.GONE);
             userBean = null;
             textVipKnow.setText("会员到期时间");
+            userVipExpire.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, null, null);
             userVipExpire.setText("-");
             userDownCount.setText("-");
         }
@@ -221,7 +225,11 @@ public class UserFragment extends BaseFragment implements View.OnClickListener {
             @Override
             public void httpError(Call call, Exception e) {
                 LoadingDialog.closeLoadingDialog();
-                userDownCount.setText("0");
+                if (!BaseSharePerence.getInstance().getLoginKey().equals("0")){
+                    userDownCount.setText("-");
+                }else{
+                    userDownCount.setText("-");
+                }
             }
 
             @Override
@@ -248,14 +256,14 @@ public class UserFragment extends BaseFragment implements View.OnClickListener {
         userDownCount.setText(bean.getDatas().getParse_times() + "");
         if (null != bean.getDatas().getVip_end_time()) {
             //layoutVip.setVisibility(View.VISIBLE);
-            userVip.setImageDrawable(getResources().getDrawable(R.drawable.isvip));
+            userVipExpire.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, getResources().getDrawable(R.drawable.isvip), null);
             userVipExpire.setText(ToolUtils.dataFormate(Integer.valueOf(bean.getDatas().getVip_end_time())));
             textVipKnow.setText("会员到期时间");
         } else {
-            userVipExpire.setText("开通VIP会员");
+            userVipExpire.setText(R.string.str_buy_vip_menber);
             //layoutVip.setVisibility(View.GONE);
             textVipKnow.setText("专享无限解析次数");
-            userVip.setImageDrawable(getResources().getDrawable(R.drawable.unvip));
+            userVipExpire.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, getResources().getDrawable(R.drawable.unvip), null);
         }
     }
 }

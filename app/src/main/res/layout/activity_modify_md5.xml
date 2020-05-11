@@ -4,7 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/black"
     android:orientation="vertical"
+    android:padding="@dimen/mDpDimen15"
     tools:context=".ui.function.ModifyMD5Activity">
 
     <LinearLayout
@@ -19,136 +21,136 @@
             app:layout_constraintBottom_toTopOf="@id/bottom_toolbar"
             app:layout_constraintTop_toTopOf="parent">
 
-            <VideoView
-                android:id="@+id/vv"
+            <android.support.v7.widget.CardView
+                android:id="@+id/video_view_host"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                app:cardBackgroundColor="@color/black"
+                app:cardCornerRadius="6dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent">
 
+                <VideoView
+                    android:id="@+id/vv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="@drawable/shape_tran"
+                    android:gravity="center"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </android.support.v7.widget.CardView>
         </android.support.constraint.ConstraintLayout>
 
         <!--   md5值     -->
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_marginTop="20dp"
+        <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp">
 
-            <LinearLayout
+            <RelativeLayout
+                android:id="@+id/modify_md5_new"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="50dp"
+                android:layout_marginRight="50dp"
+                android:background="@drawable/shape_round_white"
+                android:gravity="center_vertical"
+                android:minHeight="30dp"
                 android:paddingTop="6dp"
                 android:paddingBottom="6dp"
-                android:layout_marginBottom="6dp"
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"
-                android:weightSum="1"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
-                <RelativeLayout
-                    android:id="@+id/layoutView"
-                    android:background="@drawable/shape_round_white"
-                    android:layout_weight="0.99"
-                    android:minHeight="30dp"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:background="@drawable/shape_sp_text_style02"
-                        android:layout_alignParentRight="true"
-                        android:layout_marginRight="6dp"
-                        android:gravity="center"
-                        android:text="新"
-                        android:textSize="9sp"
-                        android:layout_centerVertical="true"
-                        android:textColor="@color/white"
-                        android:layout_width="18dp"
-                        android:layout_height="18dp"/>
-
-                    <TextView
-                        android:id="@+id/txtNewMd5"
-                        android:gravity="center"
-                        android:layout_centerInParent="true"
-                        android:textColor="@color/black"
-                        android:textSize="12.5sp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-
-                </RelativeLayout>
-
-                <LinearLayout
-                    android:layout_weight="0.01"
-                    android:layout_width="30dp"
-                    android:layout_marginLeft="10dp"
+                <TextView
+                    android:id="@+id/txtNewMd5Tag"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
-                    android:layout_height="wrap_content">
+                    android:layout_marginRight="6dp"
+                    android:background="@drawable/shape_sp_text_style03"
+                    android:gravity="center"
+                    android:text="新"
+                    android:textColor="@color/white"
+                    android:textSize="9sp" />
 
-                    <ImageButton
-                        android:id="@+id/btnRefresh"
-                        android:background="@drawable/refresh_selector"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"/>
+                <TextView
+                    android:id="@+id/txtNewMd5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerInParent="true"
+                    android:layout_toLeftOf="@+id/txtNewMd5Tag"
+                    android:gravity="center"
+                    android:textColor="@color/black"
+                    android:textSize="12.5sp" />
+            </RelativeLayout>
 
-                </LinearLayout>
+            <ImageView
+                android:id="@+id/btnRefresh"
+                android:layout_width="@dimen/mDpDimen30"
+                android:layout_height="@dimen/mDpDimen17"
+                android:layout_marginTop="4dp"
+                android:background="@null"
+                android:src="@drawable/refresh_selector"
+                app:layout_constraintBottom_toBottomOf="@+id/modify_md5_new"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/modify_md5_new"
+                app:layout_constraintTop_toTopOf="@+id/modify_md5_new"
+                app:layout_constraintVertical_bias="0.27" />
 
-            </LinearLayout>
-
-            <LinearLayout
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="50dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="50dp"
+                android:background="@drawable/shape_round"
+                android:gravity="center_vertical"
+                android:minHeight="30dp"
+                android:orientation="horizontal"
                 android:paddingTop="6dp"
                 android:paddingBottom="6dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"
-                android:weightSum="1"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                app:layout_constraintLeft_toLeftOf="@+id/modify_md5_new"
+                app:layout_constraintRight_toRightOf="@+id/modify_md5_new"
+                app:layout_constraintTop_toBottomOf="@+id/modify_md5_new">
 
-                <RelativeLayout
-                    android:background="@drawable/shape_round"
-                    android:layout_weight="0.99"
-                    android:minHeight="30dp"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/txtOldMd5Tag"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="6dp"
+                    android:background="@drawable/shape_sp_text_style01"
+                    android:gravity="center"
+                    android:text="旧"
+                    android:textColor="@color/white"
+                    android:textSize="9sp" />
 
-                    <TextView
-                        android:background="@drawable/shape_sp_text_style01"
-                        android:layout_centerVertical="true"
-                        android:layout_alignParentRight="true"
-                        android:layout_marginRight="6dp"
-                        android:gravity="center"
-                        android:text="旧"
-                        android:textSize="9sp"
-                        android:textColor="@color/white"
-                        android:layout_width="18dp"
-                        android:layout_height="18dp"/>
+                <TextView
+                    android:id="@+id/txtOldMd5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:layout_toLeftOf="@+id/txtOldMd5Tag"
+                    android:gravity="center"
+                    android:textColor="@color/white"
+                    android:textSize="12.5sp" />
 
-                    <TextView
-                        android:id="@+id/txtOldMd5"
-                        android:gravity="center"
-                        android:textSize="12.5sp"
-                        android:layout_centerInParent="true"
-                        android:textColor="@color/white"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+            </RelativeLayout>
 
-                </RelativeLayout>
-
-                <View
-                    android:layout_marginLeft="10dp"
-                    android:layout_weight="0.01"
-                    android:layout_width="30dp"
-                    android:layout_height="0dp"/>
-
-            </LinearLayout>
-
-        </LinearLayout>
+        </android.support.constraint.ConstraintLayout>
 
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
@@ -162,10 +164,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
-                app:layout_constraintTop_toTopOf="parent"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                app:layout_constraintTop_toTopOf="parent">
 
-                <include layout="@layout/layout_video_seekbar"/>
+                <include layout="@layout/layout_video_seekbar" />
 
             </LinearLayout>
 

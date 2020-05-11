@@ -18,24 +18,36 @@
         <include layout="@layout/include_app_title" />
     </LinearLayout>
 
+    <com.wang.avi.AVLoadingIndicatorView
+        android:id="@+id/loading_dialog"
+        style="@style/AVLoadingIndicatorView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:indicatorName="BallPulseIndicator"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <LinearLayout
         android:id="@+id/cl_progress"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#80000000"
         android:gravity="center"
-        android:visibility="gone"
         android:orientation="vertical"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
-            android:textColor="@color/white"
-            android:text="正在处理中 ~ 请勿退出程序或锁屏"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginBottom="4dp"
             android:gravity="center"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:text="正在处理中 ~ 请勿退出程序或锁屏"
+            android:textColor="@color/white" />
 
         <com.manyu.videoshare.view.Progressbar
             android:id="@+id/progressbar"

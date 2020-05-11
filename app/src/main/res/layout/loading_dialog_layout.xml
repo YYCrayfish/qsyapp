@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/shape_loading_dialog_bg"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="@dimen/mDpDimen5">
+
+    <com.wang.avi.AVLoadingIndicatorView
+        android:id="@+id/mLoadingIndicatorView"
+        style="@style/AVLoadingIndicatorView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:padding="@dimen/mDpDimen5"
+        app:indicatorColor="@color/white"
+        app:indicatorName="LineSpinFadeLoaderIndicator" />
+
+    <TextView
+        android:id="@+id/mLoadingIndicatorTip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/mDpDimen5"
+        android:text=""
+        android:textColor="@color/white"
+        android:textSize="@dimen/text_size_12sp"
+        android:visibility="gone" />
+</LinearLayout>

@@ -26,6 +26,7 @@ import android.widget.TextView;
 import android.widget.VideoView;
 
 import com.google.gson.Gson;
+import com.gyf.barlibrary.ImmersionBar;
 import com.jude.rollviewpager.RollPagerView;
 import com.manyu.videoshare.R;
 import com.manyu.videoshare.adapter.AskandAnswerAdapter;
@@ -137,6 +138,7 @@ public class MainFragment1 extends BaseFragment implements View.OnClickListener 
     public void onResume() {
         super.onResume();
         initRoll();
+        ImmersionBar.with(this).barColorInt(getResources().getColor(R.color.main_text_ask_answerword)).init();
     }
 
     private void initView() {

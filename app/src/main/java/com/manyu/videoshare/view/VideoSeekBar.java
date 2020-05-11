@@ -26,6 +26,7 @@ import java.util.Formatter;
 import java.util.List;
 
 import static com.manyu.videoshare.util.ToolUtils.dip2px;
+import static com.manyu.videoshare.util.ToolUtils.sp2px;
 
 public class VideoSeekBar extends View {
 
@@ -55,7 +56,7 @@ public class VideoSeekBar extends View {
     private int insetsW;//图片宽 高 一样
     private Bitmap bitmap;
     private Paint textPaint;
-    private int textColor = Color.WHITE;
+    private int textColor = Color.GRAY;
     private int paddingLeft = 50;
     private int paddingTop = 20;
     private int paddingBottom = 60;
@@ -119,7 +120,7 @@ public class VideoSeekBar extends View {
 
         textPaint = new Paint();
         textPaint.setColor(textColor);
-        textPaint.setTextSize(20);
+        textPaint.setTextSize(sp2px(context, 12));
         textPaint.setAntiAlias(true);
     }
 
@@ -170,17 +171,17 @@ public class VideoSeekBar extends View {
         if (list.size() > 0) {
             for (int i = 0; i < list.size(); i++) {
                 Bitmap bitmap = list.get(i);
-                canvas.drawBitmap(ImageUtil.centerSquareScaleBitmap(bitmap,insetsW), imgX + i * insetsW, (bitmapCursor.getHeight() - insetsW) / 2 + paddingTop, bitmapPaint);
+                canvas.drawBitmap(ImageUtil.centerSquareScaleBitmap(bitmap, insetsW), imgX + i * insetsW, (bitmapCursor.getHeight() - insetsW) / 2 + paddingTop, bitmapPaint);
             }
         }
         if (bitmapCursor != null) {
             canvas.drawBitmap(bitmapCursor, cursorX, paddingTop, bitmapPaint);
         }
-        canvas.drawText(stringForTime((long) bigValue), layoutW - textPaint.measureText(stringForTime((long) bigValue)) - 20, paddingTop + imageHeight + 30, textPaint);
-        if((bigValue - currentTime) * progress + currentTime<=0){
-            canvas.drawText(stringForTime(0), cursorX - textPaint.measureText(stringForTime((long) bigValue)) / 2, paddingTop + imageHeight + 30, textPaint);
-        }else {
-            canvas.drawText(stringForTime((long) ((bigValue - currentTime) * progress + currentTime)), cursorX - textPaint.measureText(stringForTime((long) bigValue)) / 2, paddingTop + imageHeight + 30, textPaint);
+        canvas.drawText(stringForTime((long) bigValue), layoutW - textPaint.measureText(stringForTime((long) bigValue)) - 20, paddingTop + imageHeight + dip2px(14), textPaint);
+        if ((bigValue - currentTime) * progress + currentTime <= 0) {
+            canvas.drawText(stringForTime(0), cursorX - textPaint.measureText(stringForTime((long) bigValue)) / 2, paddingTop + imageHeight + dip2px(14), textPaint);
+        } else {
+            canvas.drawText(stringForTime((long) ((bigValue - currentTime) * progress + currentTime)), cursorX - textPaint.measureText(stringForTime((long) bigValue)) / 2, paddingTop + imageHeight  + dip2px(14), textPaint);
         }
     }
 
@@ -274,9 +275,9 @@ public class VideoSeekBar extends View {
         long hour = (ms - day * dd) / hh;
         long minute = (ms - day * dd - hour * hh) / mi;
         long second = (ms - day * dd - hour * hh - minute * mi) / ss;
-        long milliSecond = ms - day * dd - hour * hh - minute * mi - second * ss;
+//        long milliSecond = ms - day * dd - hour * hh - minute * mi - second * ss;
 
-        return new Formatter().format("%02d:%02d:%02d:%01d", hour, minute, second, milliSecond / 100).toString();
+        return new Formatter().format("%02d:%02d:%02d", hour, minute, second).toString();
     }
 
     /**
@@ -304,7 +305,7 @@ public class VideoSeekBar extends View {
         if (animator != null) {
             if (animator.isPaused()) {
                 animator.resume();
-            }else {
+            } else {
                 reset();
             }
         }

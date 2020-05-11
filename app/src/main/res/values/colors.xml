@@ -7,8 +7,8 @@
     <color name="lightcoral">#f08080</color>
     <color name="white">#ffffff</color>
     <color name="hint_color">#FF999999</color>
-    <color name="login_foget">#FF00C8FD</color>
-    <color name="login_blue">#FF00C8FD</color>
+    <color name="login_foget">#00C8FD</color>
+    <color name="login_blue">#00C8FD</color>
     <color name="check_box_text">#FF343434</color>
     <color name="main_text_support">#FF1F1F1F</color>
     <color name="main_text_ask_answer">#FFFF0F97</color>

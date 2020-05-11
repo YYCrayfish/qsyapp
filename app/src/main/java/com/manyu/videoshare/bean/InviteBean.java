@@ -58,13 +58,14 @@ public class InviteBean {
     }
 
     public static class DataBean {
+
         /**
-         * invite_url : https://h5.gaoeng.com/v1/invite/videowater?invite_data=ZWRlMjFEbXpkbUozR3BHQ0ppbmkyVmhDMXBnUUYvY3V0bVBKTHpRcE5ocGZsa2tSblhLak9wQQ==
+         * invite_url : https://h5.gaoeng.com/v1/invite/videowater?invite_data=OGY4M2NrQkdVZDM1cWFnNXkwd1ZhVDA2eCt2eitnNm85MzZtNnBOZmlSS2l4enhiTXd5Z3JFQQ==
          * invite_code : 00YZ
-         * invite_level : {"invite_count":0,"next_level":1,"next_msg":"再推广1人，获得[LV1]称号","next_image":"http://v.bjyzbx.com/vipconfig/level-1.png"}
+         * invite_level : {"invite_count":1,"parse_times":5,"parse_times_total":7,"current_level":"LV1","next_level":2,"next_msg":"再推广2人，获得[LV2]称号","next_image":"http://v.bjyzbx.com/vipconfig/level-2.png"}
          * new_level : {"level":"http://v.bjyzbx.com/vipconfig/level-0.png","centage":0}
-         * share_level : [{"name":"LV1","image":"http://v.bjyzbx.com/vipconfig/level-1.png","invite":1,"score":100,"search":2,"rule":"邀请1人后，每日免费搜索次数 +2"},{"name":"LV2","image":"http://v.bjyzbx.com/vipconfig/level-2.png","invite":3,"score":120,"search":5,"rule":"邀请3人后，每日免费搜索次数 +5"},{"name":"LV3","image":"http://v.bjyzbx.com/vipconfig/level-3.png","invite":10,"score":150,"search":30,"rule":"邀请10人后，每日免费搜索次数 +30"},{"name":"LV4","image":"http://v.bjyzbx.com/vipconfig/level-4.png","invite":15,"score":200,"search":50,"rule":"邀请15人后，每日免费搜索次数 +50"},{"name":"LV5","image":"http://v.bjyzbx.com/vipconfig/level-5.png","invite":30,"score":300,"search":999,"rule":"邀请50人后，每日免费搜索次数无限"}]
-         * msg : 规则说明：每邀请给1名好友成功下载App并注册时输入您的邀请码，可增加100积分。
+         * share_level : [{"name":"LV1","image":"http://v.bjyzbx.com/vipconfig/level-1.png","invite":1,"score":100,"search":2,"rule":"邀请1人后，每日免费解析次数 +2"},{"name":"LV2","image":"http://v.bjyzbx.com/vipconfig/level-2.png","invite":3,"score":120,"search":5,"rule":"邀请3人后，每日免费解析次数 +5"},{"name":"LV3","image":"http://v.bjyzbx.com/vipconfig/level-3.png","invite":10,"score":150,"search":30,"rule":"邀请10人后，每日免费解析次数 +30"},{"name":"LV4","image":"http://v.bjyzbx.com/vipconfig/level-4.png","invite":15,"score":200,"search":50,"rule":"邀请15人后，每日免费解析次数 +50"},{"name":"LV5","image":"http://v.bjyzbx.com/vipconfig/level-5.png","invite":30,"score":300,"search":999,"rule":"邀请50人后，每日免费解析次数无限"}]
+         * msg : 规则说明：每邀请给1名好友成功下载App并注册时输入您的邀请码，可增加解析次数。
          */
 
         private String invite_url;
@@ -124,30 +125,33 @@ public class InviteBean {
 
         public static class InviteLevelBean {
             /**
-             * invite_count : 0
-             * next_level : 1
-             * next_msg : 再推广1人，获得[LV1]称号
-             * next_image : http://v.bjyzbx.com/vipconfig/level-1.png
+             * invite_count : 1
+             * parse_times : 5
+             * parse_times_total : 7
+             * current_level : LV1
+             * next_level : 2
+             * next_msg : 再推广2人，获得[LV2]称号
+             * next_image : http://v.bjyzbx.com/vipconfig/level-2.png
              */
 
             private int invite_count;
-            private int next_level;
-            private String next_msg;
             private int parse_times;
             private int parse_times_total;
-            private String next_image;
             private String current_level;
+            private int next_level;
+            private String next_msg;
+            private String next_image;
+
+            public int getInvite_count() {
+                return invite_count;
+            }
+
+            public void setInvite_count(int invite_count) {
+                this.invite_count = invite_count;
+            }
 
             public int getParse_times() {
                 return parse_times;
-            }
-
-            public String getCurrent_level() {
-                return current_level;
-            }
-
-            public void setCurrent_level(String current_level) {
-                this.current_level = current_level;
             }
 
             public void setParse_times(int parse_times) {
@@ -162,12 +166,12 @@ public class InviteBean {
                 this.parse_times_total = parse_times_total;
             }
 
-            public int getInvite_count() {
-                return invite_count;
+            public String getCurrent_level() {
+                return current_level;
             }
 
-            public void setInvite_count(int invite_count) {
-                this.invite_count = invite_count;
+            public void setCurrent_level(String current_level) {
+                this.current_level = current_level;
             }
 
             public int getNext_level() {
@@ -228,7 +232,7 @@ public class InviteBean {
              * invite : 1
              * score : 100
              * search : 2
-             * rule : 邀请1人后，每日免费搜索次数 +2
+             * rule : 邀请1人后，每日免费解析次数 +2
              */
 
             private String name;

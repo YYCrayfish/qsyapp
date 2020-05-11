@@ -5,288 +5,330 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.ShareActivity">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/recharge_back"
-        android:orientation="horizontal"/>
+        android:orientation="horizontal" />
+
     <LinearLayout
         android:id="@+id/main_title"
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:background="@color/login_blue"
         android:orientation="vertical"
-        android:paddingTop="30dp"
-        android:layout_height="wrap_content">
+        android:paddingTop="30dp">
+
         <include layout="@layout/include_invite" />
 
     </LinearLayout>
+
     <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_below="@id/main_title"
         android:scaleType="fitXY"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:src="@drawable/main_title"/>
+        android:src="@drawable/main_title" />
+
     <LinearLayout
         android:id="@+id/share_user_message"
-        android:layout_marginTop="17dp"
-        android:layout_below="@id/main_title"
-        android:layout_marginRight="16dp"
-        android:layout_marginLeft="16dp"
-        android:background="@drawable/btn_white_10"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/main_title"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="17dp"
+        android:layout_marginRight="16dp"
+        android:background="@drawable/btn_white_10"
         android:orientation="vertical">
+
         <LinearLayout
-            android:paddingTop="18dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:paddingTop="18dp">
+
             <LinearLayout
-                android:layout_gravity="center_vertical"
-                android:layout_weight="1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
                 android:orientation="vertical">
+
                 <LinearLayout
 
-                    android:paddingLeft="15dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:paddingLeft="15dp">
+
                     <ImageView
 
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:src="@drawable/share_head_icon"/>
+                        android:src="@drawable/share_head_icon" />
+
                     <TextView
                         android:id="@+id/share_text_phone"
-                        android:layout_marginLeft="9dp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textStyle="bold"
-                        android:textSize="14sp"
                         android:layout_gravity="center_vertical"
+                        android:layout_marginLeft="9dp"
+                        android:text="151****6585"
                         android:textColor="@color/share_heand_color"
-                        android:text="151****6585"/>
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
                 </LinearLayout>
+
                 <LinearLayout
-                    android:paddingTop="15dp"
-                    android:paddingLeft="15dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:paddingLeft="15dp"
+                    android:paddingTop="15dp">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textStyle="bold"
-                        android:textSize="16sp"
                         android:layout_gravity="center_vertical"
+                        android:text="我的邀请码："
                         android:textColor="@color/share_heand_color"
-                        android:text="我的邀请码："/>
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
                     <TextView
                         android:id="@+id/share_text_invite"
-                        android:layout_marginLeft="9dp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textStyle="bold"
-                        android:textSize="16sp"
                         android:layout_gravity="center_vertical"
+                        android:layout_marginLeft="9dp"
+                        android:text="BAWDU"
                         android:textColor="@color/share_heand_color"
-                        android:text="BAWDU"/>
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
                 </LinearLayout>
 
             </LinearLayout>
+
             <LinearLayout
                 android:id="@+id/share_img_zxing"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
+
                 <TextView
-                    android:layout_marginRight="6dp"
-                    android:layout_gravity="center_vertical"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="14sp"
-                    android:textColor="@color/hint_color"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginRight="6dp"
+                    android:ems="1"
                     android:text="二维码"
-                    android:ems="1"/>
+                    android:textColor="@color/hint_color"
+                    android:textSize="14sp"
+                    android:visibility="gone" />
+
                 <ImageView
-                    android:layout_marginRight="16dp"
-                    android:layout_gravity="center"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
-                    android:src="@drawable/share_img_zxing"/>
+                    android:layout_gravity="center"
+                    android:layout_marginRight="16dp"
+                    android:src="@drawable/share_img_zxing"
+                    android:visibility="gone" />
             </LinearLayout>
         </LinearLayout>
 
         <LinearLayout
-            android:paddingTop="15dp"
-            android:paddingLeft="15dp"
-            android:layout_marginBottom="15dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_marginBottom="15dp"
+            android:orientation="horizontal"
+            android:paddingLeft="15dp"
+            android:paddingTop="15dp">
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="14sp"
                 android:layout_gravity="center_vertical"
+                android:text="当前等级："
                 android:textColor="@color/share_heand_color"
-                android:text="当前等级："/>
+                android:textSize="14sp" />
+
             <TextView
-                android:layout_weight="1"
                 android:id="@+id/share_text_level"
-                android:layout_marginLeft="9dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="14sp"
                 android:layout_gravity="center_vertical"
+                android:layout_marginLeft="9dp"
+                android:layout_weight="1"
+                android:text="小白"
                 android:textColor="@color/share_heand_color"
-                android:text="小白"/>
+                android:textSize="14sp" />
+
             <TextView
                 android:id="@+id/share_text_nextmsg"
-                android:layout_marginRight="16dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="14sp"
                 android:layout_gravity="center_vertical"
+                android:layout_marginRight="16dp"
+                android:text="距离下次升级还需邀请3人"
                 android:textColor="@color/share_invite_text"
-                android:text="距离下次升级还需邀请3人"/>
+                android:textSize="14sp" />
         </LinearLayout>
-        <include layout="@layout/include_line_a"/>
+
+        <include layout="@layout/include_line_a" />
+
         <LinearLayout
-            android:layout_marginBottom="16dp"
-            android:layout_marginTop="15dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="16dp"
             android:orientation="horizontal">
+
             <LinearLayout
                 android:id="@+id/share_layout_counts"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:orientation="vertical">
+
                 <LinearLayout
-                    android:layout_gravity="center_horizontal"
-                    android:gravity="center_horizontal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:gravity="center_horizontal"
                     android:orientation="horizontal">
+
                     <TextView
                         android:id="@+id/share_text_current"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
                         android:text="0"
-                        android:textColor="@color/login_blue"/>
+                        android:textColor="@color/login_blue"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
                     <TextView
 
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
                         android:text="/"
-                        android:textColor="@color/main_text_explain"/>
+                        android:textColor="@color/main_text_explain"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
                     <TextView
                         android:id="@+id/share_text_total"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
                         android:text="6"
-                        android:textColor="@color/main_text_explain"/>
+                        android:textColor="@color/main_text_explain"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
                 </LinearLayout>
+
                 <TextView
-                    android:layout_marginTop="12dp"
-                    android:layout_gravity="center_horizontal"
-                    android:gravity="center_horizontal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="12sp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="12dp"
+                    android:gravity="center_horizontal"
                     android:text="今日剩余解析次数"
-                    android:textColor="@color/share_heand_color"/>
+                    android:textColor="@color/share_heand_color"
+                    android:textSize="12sp" />
             </LinearLayout>
-            <include layout="@layout/include_line_long"/>
+
+            <include layout="@layout/include_line_long" />
+
             <LinearLayout
                 android:id="@+id/share_layout_invite"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:orientation="vertical">
-                    <TextView
-                        android:id="@+id/share_text_invite_count"
-                        android:layout_gravity="center_horizontal"
-                        android:gravity="center_horizontal"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:text="0"
-                        android:textColor="@color/login_blue"/>
+
                 <TextView
-                    android:layout_marginTop="12dp"
-                    android:layout_gravity="center_horizontal"
-                    android:gravity="center_horizontal"
+                    android:id="@+id/share_text_invite_count"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="12sp"
+                    android:layout_gravity="center_horizontal"
+                    android:gravity="center_horizontal"
+                    android:text="0"
+                    android:textColor="@color/login_blue"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="12dp"
+                    android:gravity="center_horizontal"
                     android:text="邀请人数"
-                    android:textColor="@color/share_heand_color"/>
+                    android:textColor="@color/share_heand_color"
+                    android:textSize="12sp" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
+
     <Button
-        android:layout_margin="16dp"
-        android:layout_alignParentBottom="true"
+        android:id="@+id/share_btn_invite"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/btn_blue"
-        android:textColor="@color/white"
-        android:textSize="18sp"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="16dp"
         android:layout_marginTop="18dp"
-        android:id="@+id/share_btn_invite"
-        android:text="立即邀请"/>
+        android:background="@drawable/btn_blue_4"
+        android:text="立即邀请"
+        android:textColor="@color/white"
+        android:textSize="18sp" />
+
     <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_above="@id/share_btn_invite"
+        android:layout_below="@id/share_user_message"
+        android:layout_marginLeft="16dp"
         android:layout_marginTop="17dp"
         android:layout_marginRight="16dp"
-        android:layout_marginLeft="16dp"
         android:background="@drawable/btn_white_10"
-        android:layout_below="@id/share_user_message"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:orientation="vertical">
+
         <TextView
-            android:layout_marginTop="16dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginLeft="17dp"
+            android:layout_marginTop="16dp"
             android:text="邀请任务"
-            android:textStyle="bold"
-            android:textSize="16sp"
             android:textColor="@color/login_blue"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
         <TextView
-            android:layout_marginTop="10dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
-            android:text="规则说明：邀请给好友成功下载App并打开或注册时好友填写你的邀请码，可永久增加每日解析次数"
-            android:textSize="12sp"
-            android:textColor="@color/share_heand_color"
+            android:id="@+id/share_rule_explain"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="16dp"
+            android:text="规则说明：每邀请给1名好友成功下载App并注册时输入您的邀请码，可增加解析次数。"
+            android:textColor="@color/share_heand_color"
+            android:textSize="12sp" />
+
         <android.support.v7.widget.RecyclerView
             android:id="@+id/share_recycle"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginTop="3dp"
-            android:layout_marginBottom="17dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="3dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginBottom="17dp">
 
         </android.support.v7.widget.RecyclerView>
     </LinearLayout>
+
     <ImageView
+        android:id="@+id/share_test"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/share_test"/>
+        android:layout_height="wrap_content" />
 </RelativeLayout>

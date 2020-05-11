@@ -17,6 +17,7 @@ import android.view.ViewParent;
 import android.view.animation.DecelerateInterpolator;
 
 import com.manyu.videoshare.R;
+import com.manyu.videoshare.util.ImageUtil;
 
 /**
  * <p>This is custom SeekBar with anim, support HORIZONTAL and VERTICAL.</p>
@@ -169,7 +170,7 @@ public class CustomSeekBar extends View {
 
         mTextPaint = new Paint();
         mTextPaint.setColor(getResources().getColor(R.color.white));
-        mTextPaint.setTextSize(20);
+        mTextPaint.setTextSize(ImageUtil.dp2px(context, 11));
         mTextPaint.setAntiAlias(true);
         mTextPaint.setStyle(Paint.Style.FILL);
         mTextPaint.setStrokeCap(Paint.Cap.ROUND);
@@ -395,7 +396,7 @@ public class CustomSeekBar extends View {
                     mSectionPointPaint);
             canvas.drawText(mSectionTv[i],
                     mSectionPointRect.centerX() - mTextPaint.measureText(mSectionTv[i]) / 2,
-                    mSectionPointRect.centerY() - 50,
+                    mSectionPointRect.centerY() - 60,
                     mTextPaint);
         }
         canvas.restore();
@@ -532,9 +533,9 @@ public class CustomSeekBar extends View {
      * @return progress value
      */
     private int coord2Progress(int coord) {
-        if (coord > (mProgressLength - 100) / 2 ) {
+        if (coord > (mProgressLength - 100) / 2) {
             return HORIZONTAL == mOrientation ? mMaxProgress : mMinProgress;
-        } else if (coord < -(mProgressLength - 100) / 2 ) {
+        } else if (coord < -(mProgressLength - 100) / 2) {
             return HORIZONTAL == mOrientation ? mMinProgress : mMaxProgress;
         } else {
             if (HORIZONTAL == mOrientation) {
@@ -542,7 +543,7 @@ public class CustomSeekBar extends View {
                         * (mMaxProgress - mMinProgress) / (mProgressLength - 100))
                         + mMinProgress;
             } else {
-                return Math.round((mProgressLength / 2f - coord )
+                return Math.round((mProgressLength / 2f - coord)
                         * (mMaxProgress - mMinProgress) / mProgressLength)
                         + mMinProgress;
             }

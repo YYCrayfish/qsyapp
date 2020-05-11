@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,6 +21,7 @@ import android.view.Window;
 import android.widget.RadioGroup;
 
 import com.google.gson.Gson;
+import com.gyf.barlibrary.ImmersionBar;
 import com.jaeger.library.StatusBarUtil;
 import com.manyu.videoshare.R;
 import com.manyu.videoshare.base.BaseActivity;
@@ -69,6 +71,7 @@ public class MainActivity extends BaseActivity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 //        requestPermissions();
         getAnalysisTime();
+        ImmersionBar.with(this).statusBarColorInt(Color.BLACK).init();
     }
 
 
@@ -137,7 +140,7 @@ public class MainActivity extends BaseActivity {
                         if (mainFragment == null) {
                             mainFragment = new MainFragment1();
                         }
-                        setAndroidNativeLightStatusBar(activity, false);
+//                        setAndroidNativeLightStatusBar(activity, false);
                         switchFragment(mainFragment).commit();
                         setShowMain(true);
                         if (!mainFirst) {
@@ -150,7 +153,7 @@ public class MainActivity extends BaseActivity {
                         if (userFragment == null) {
                             userFragment = new UserFragment();
                         }
-                        setAndroidNativeLightStatusBar(activity, false);
+//                        setAndroidNativeLightStatusBar(activity, false);
                         switchFragment(userFragment).commit();
                         setShowMain(false);
                         if (!userFirst) {

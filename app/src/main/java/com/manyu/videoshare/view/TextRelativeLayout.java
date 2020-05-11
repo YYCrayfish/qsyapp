@@ -11,10 +11,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
-import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.FloatMath;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -22,7 +19,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 
 import com.manyu.videoshare.R;
@@ -180,7 +176,7 @@ public class TextRelativeLayout extends RelativeLayout {
                         return false;
                     }
                 });
-                imageView.setImageDrawable(getResources().getDrawable(R.mipmap.ic_puase));
+                imageView.setImageDrawable(getResources().getDrawable(R.mipmap.ic_pause));
                 imageView.setLayoutParams(new LayoutParams(60, 60));
                 universallySetImageXY();
                 addView(imageView);

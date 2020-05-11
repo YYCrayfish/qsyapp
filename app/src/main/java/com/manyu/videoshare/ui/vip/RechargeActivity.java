@@ -251,10 +251,13 @@ public class RechargeActivity extends BaseActivity implements View.OnClickListen
 
             @Override
             public void httpResponse(String resultData) {
+                //接口返回订单信息
                 Gson gson = new Gson();
                 final OrderBean bean = gson.fromJson(resultData,OrderBean.class);
                 if(bean.getCode() == 200){
+                    //返回支付url地址
                     final String url = bean.getDatas().getPay_data().getToken();
+                    //判断支付宝还是微信
                     if(url.contains("alipay")){
                         // 必须异步调用
                         Runnable payRunnable = new Runnable() {
@@ -273,6 +276,7 @@ public class RechargeActivity extends BaseActivity implements View.OnClickListen
                         Thread payThread = new Thread(payRunnable);
                         payThread.start();
                     }else {
+                        //微信支付
                         startWebActivity(url,bean.getDatas().getOrder_id());
                     }
                 }else{

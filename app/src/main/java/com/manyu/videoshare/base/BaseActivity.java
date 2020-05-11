@@ -54,7 +54,7 @@ public abstract class BaseActivity extends FragmentActivity {
     @Override
     public void setContentView(@LayoutRes int layoutResID) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        View mBaseView = LayoutInflater.from(this).inflate(R.layout.activity_base,null,false);
+        View mBaseView = LayoutInflater.from(this).inflate(R.layout.activity_base, null, false);
         bindingView = LayoutInflater.from(this).inflate(layoutResID, null, false);
         // content
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
@@ -65,7 +65,7 @@ public abstract class BaseActivity extends FragmentActivity {
         getWindow().setContentView(mBaseView);
         refresh = mBaseView.findViewById(R.id.ll_error_refresh);
         spinLoading = mBaseView.findViewById(R.id.spin_kit);
-        StatusBarUtil.setTranslucentForImageViewInFragment(BaseActivity.this, 0,null);
+        StatusBarUtil.setTranslucentForImageViewInFragment(BaseActivity.this, 0, null);
         //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         // 点击失败布局重新加载
         /*refresh.setOnClickListener(new PerfectClickListener() {
@@ -85,7 +85,7 @@ public abstract class BaseActivity extends FragmentActivity {
     protected void setStatusBar() {
         StatusBarUtil.setColor(this, getResources().getColor(R.color.white));
 
-       //com.jaeger.library.StatusBarUtil.setTranslucent(this, com.jaeger.library.StatusBarUtil.DEFAULT_STATUS_BAR_ALPHA);
+        //com.jaeger.library.StatusBarUtil.setTranslucent(this, com.jaeger.library.StatusBarUtil.DEFAULT_STATUS_BAR_ALPHA);
     }
 
 
@@ -97,7 +97,7 @@ public abstract class BaseActivity extends FragmentActivity {
     /**
      * 失败后点击刷新 ---点击失败默认布局
      */
-    protected void onRefresh(){
+    protected void onRefresh() {
 
     }
 
@@ -106,7 +106,7 @@ public abstract class BaseActivity extends FragmentActivity {
      * 加载布局
      */
     protected void showContentView() {
-        if(spinLoading.getVisibility() ==View.VISIBLE){
+        if (spinLoading.getVisibility() == View.VISIBLE) {
             spinLoading.setVisibility(View.GONE);
         }
 
@@ -122,8 +122,8 @@ public abstract class BaseActivity extends FragmentActivity {
     /**
      * 适用于整个界面只有一个接口的情况下----覆盖整个UI
      */
-    protected void showLoading() {
-        if(spinLoading.getVisibility()!=View.VISIBLE){
+    public void showLoading() {
+        if (spinLoading.getVisibility() != View.VISIBLE) {
             spinLoading.setVisibility(View.VISIBLE);
         }
 
@@ -140,7 +140,7 @@ public abstract class BaseActivity extends FragmentActivity {
      * 适用于整个界面只有一个接口的情况下----覆盖整个UI
      */
     protected void showError() {
-        if(spinLoading.getVisibility()==View.VISIBLE){
+        if (spinLoading.getVisibility() == View.VISIBLE) {
             spinLoading.setVisibility(View.GONE);
         }
 
@@ -151,8 +151,6 @@ public abstract class BaseActivity extends FragmentActivity {
             bindingView.setVisibility(View.GONE);
         }
     }
-
-
 
 
     /**
@@ -201,7 +199,7 @@ public abstract class BaseActivity extends FragmentActivity {
     @Override
     protected void onPause() {
         super.onPause();
-       MobclickAgent.onPause(this);
+        MobclickAgent.onPause(this);
     }
 
     @Override
@@ -211,11 +209,12 @@ public abstract class BaseActivity extends FragmentActivity {
         // 必须调用该方法，防止内存泄漏
 
     }
+
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {
             Intent intent = new Intent();
-            setResult(99,intent);
+            setResult(99, intent);
         }
         return super.onKeyDown(keyCode, event);
     }

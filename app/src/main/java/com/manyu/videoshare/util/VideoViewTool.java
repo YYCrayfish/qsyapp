@@ -8,7 +8,6 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.MediaController;
@@ -48,7 +47,7 @@ public class VideoViewTool implements View.OnClickListener {
             videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mediaPlayer) {
-                    start.setImageResource(R.mipmap.ic_puase);
+                    start.setImageResource(R.mipmap.icon_video_pause);
                 }
             });
             videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
@@ -84,7 +83,7 @@ public class VideoViewTool implements View.OnClickListener {
             metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
             handler.sendEmptyMessageDelayed(1, 100);
             videoSeekBar.setBigValue(getLocalVideoDuration(videoPath));
-            start.setImageResource(R.mipmap.ic_puase);
+            start.setImageResource(R.mipmap.icon_video_pause);
             videoView.setVideoURI(uri);
             videoView.start();
         }
@@ -149,11 +148,11 @@ public class VideoViewTool implements View.OnClickListener {
                 if (videoView.isPlaying()) {
                     videoView.pause();
                     videoSeekBar.pause();
-                    start.setImageResource(R.mipmap.ic_puase);
+                    start.setImageResource(R.mipmap.icon_video_play);
                 } else {
                     videoView.start();
                     videoSeekBar.resume();
-                    start.setImageResource(R.mipmap.ic_puase);
+                    start.setImageResource(R.mipmap.icon_video_pause);
                 }
                 break;
             case R.id.reset:

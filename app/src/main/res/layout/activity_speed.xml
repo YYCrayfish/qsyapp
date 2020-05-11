@@ -4,7 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/black"
     android:orientation="vertical"
+    android:padding="@dimen/mDpDimen15"
     tools:context=".ui.function.UpendActivity">
 
     <android.support.constraint.ConstraintLayout
@@ -12,14 +14,31 @@
         android:layout_height="match_parent"
         android:layout_weight="1">
 
-        <VideoView
-            android:id="@+id/vv"
+        <android.support.v7.widget.CardView
+            android:id="@+id/video_view_host"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            app:cardBackgroundColor="@color/black"
+            app:cardCornerRadius="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <VideoView
+                android:id="@+id/vv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@drawable/shape_tran"
+                android:gravity="center"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </android.support.v7.widget.CardView>
     </android.support.constraint.ConstraintLayout>
 
     <LinearLayout
@@ -35,15 +54,16 @@
             android:layout_marginLeft="20dp"
             android:layout_marginTop="20dp"
             android:layout_marginRight="20dp"
-            app:csb_background_color="#262626"
+            android:layout_marginBottom="@dimen/mDpDimen27"
+            app:csb_background_color="@color/colorGray"
             app:csb_max_value="4"
-            app:csb_progress_color="#262626"
+            app:csb_progress_color="@color/colorGray"
             app:csb_progress_corner="7dp"
             app:csb_progress_height="7dp"
             app:csb_section_enable="true"
             app:csb_section_radius="0dp"
             app:csb_thumb_radius="10dp" />
 
-        <include layout="@layout/layout_video_seekbar"/>
+        <include layout="@layout/layout_video_seekbar" />
     </LinearLayout>
 </LinearLayout>

@@ -5,12 +5,14 @@ import android.content.pm.ActivityInfo;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.PersistableBundle;
+import android.support.annotation.ColorInt;
 import android.support.annotation.LayoutRes;
 import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -18,8 +20,10 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.jaeger.library.StatusBarUtil;
 import com.manyu.videoshare.R;
+import com.manyu.videoshare.util.LoadingDialogUtil;
 import com.manyu.videoshare.view.Progressbar;
 import com.umeng.analytics.MobclickAgent;
+import com.wang.avi.AVLoadingIndicatorView;
 
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -39,10 +43,11 @@ public abstract class BaseVideoActivity extends FragmentActivity implements View
 
     private TextView tvTitle;
     private View bindingView;
-    private TextView tvRight;
+    private Button tvRight;
     private RelativeLayout rlTitle;
     private Progressbar mProgress;
     private LinearLayout clProgress;
+    private LoadingDialogUtil mLoadingDialog;
 
     @Override
     public void onCreate(Bundle savedInstanceState, PersistableBundle persistentState) {
@@ -81,9 +86,36 @@ public abstract class BaseVideoActivity extends FragmentActivity implements View
         initData();
     }
 
+
+    public void showLoading() {
+        if (mLoadingDialog == null) {
+            mLoadingDialog = BaseApplication.getInstance().getLoadingDialog();
+        }
+        try {
+            mLoadingDialog.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void dismissLoading() {
+        if (mLoadingDialog != null) {
+            try {
+                mLoadingDialog.dismiss();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+    public void setToolBarColor(@ColorInt int bg) {
+        rlTitle.setBackgroundColor(bg);
+    }
+
     protected abstract String getTitleTv();
 
-    protected void setTitleRight(String titleRight){
+    protected void setTitleRight(String titleRight) {
         tvRight.setText(titleRight);
     }
 
@@ -91,16 +123,16 @@ public abstract class BaseVideoActivity extends FragmentActivity implements View
         StatusBarUtil.setColor(this, getResources().getColor(R.color.white));
     }
 
-    protected void setProgressBarValue(int proess){
+    protected void setProgressBarValue(int proess) {
         if (clProgress.getVisibility() == View.GONE) {
             clProgress.setVisibility(View.VISIBLE);
         }
         tvRight.setEnabled(false);
         // 最多只能到99，不允许到100
-        mProgress.setProgress(proess > 99 ? 99:proess);
+        mProgress.setProgress(proess > 99 ? 99 : proess);
     }
 
-    protected void progressEnd(){
+    protected void progressEnd() {
         tvRight.setEnabled(true);
         clProgress.setVisibility(View.GONE);
     }
@@ -111,7 +143,7 @@ public abstract class BaseVideoActivity extends FragmentActivity implements View
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.title_back:
                 finish();
                 break;

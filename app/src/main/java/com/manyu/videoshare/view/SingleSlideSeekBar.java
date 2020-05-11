@@ -100,7 +100,7 @@ public class SingleSlideSeekBar extends View {
     private int insetsW;
     private Bitmap bitmap;
     private Paint textPaint;
-    private int textColor = Color.WHITE;
+    private int textColor = Color.GRAY;
     private int textHeight;
 
     public SingleSlideSeekBar(Context context) {
@@ -141,11 +141,11 @@ public class SingleSlideSeekBar extends View {
             }
         }
         typedArray.recycle();
-        init();
+        init(context);
     }
 
     @SuppressLint("ObjectAnimatorBinding")
-    private void init() {
+    private void init(Context context) {
         /**游标的默认图*/
         list = new ArrayList<>();
         if (bitmapLow == null) {
@@ -180,7 +180,7 @@ public class SingleSlideSeekBar extends View {
 
         textPaint = new Paint();
         textPaint.setColor(textColor);
-        textPaint.setTextSize(25);
+        textPaint.setTextSize(ImageUtil.dp2px(context, 12));
         textPaint.setAntiAlias(true);
     }
 
@@ -346,7 +346,7 @@ public class SingleSlideSeekBar extends View {
         long second = (ms - day * dd - hour * hh - minute * mi) / ss;
         long milliSecond = ms - day * dd - hour * hh - minute * mi - second * ss;
 
-        return new Formatter().format("%02d:%02d:%02d:%01d", hour, minute, second, milliSecond / 100).toString();
+        return new Formatter().format("%02d:%02d:%02d", hour, minute, second).toString();
     }
 
     public void setBigValue(int bigValue) {

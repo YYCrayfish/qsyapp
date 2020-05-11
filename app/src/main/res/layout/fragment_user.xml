@@ -2,285 +2,259 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@color/dialog_share_back"
-    tools:context="com.manyu.videoshare.ui.fragment.UserFragment">
+    android:orientation="vertical"
+    tools:context="com.manyu.videoshare.ui.fragment.UserFragment"
+    tools:ignore="all">
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="160dp"
-        android:background="@color/login_blue"
-        android:orientation="vertical">
-    </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="160dp"
+            android:background="@color/login_blue"
+            android:orientation="vertical">
+
+        </LinearLayout>
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
             <LinearLayout
-                android:layout_marginTop="59dp"
                 android:layout_width="match_parent"
                 android:layout_height="165dp"
-                android:layout_marginRight="16dp"
                 android:layout_marginLeft="16dp"
+                android:layout_marginTop="59dp"
+                android:layout_marginRight="16dp"
                 android:background="@drawable/btn_white_10"
                 android:orientation="vertical">
 
             </LinearLayout>
+
             <LinearLayout
                 android:id="@+id/user_layout_head"
-                android:layout_marginTop="45dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
+                android:layout_marginTop="45dp"
                 android:orientation="vertical">
+
                 <ImageView
                     android:id="@+id/head_icon"
-                    android:layout_gravity="center_horizontal"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
-                    android:src="@drawable/user_head_default"/>
+                    android:layout_gravity="center_horizontal"
+                    android:src="@drawable/user_head_default" />
+
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingTop="12dp"
-                    android:orientation="horizontal">
-                <TextView
-                    android:id="@+id/user_btn_login"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:text="@string/user_text_login"
-                    android:textColor="@color/user_title_back"/>
-                    <ImageView
-                        android:visibility="gone"
-                        android:id="@+id/user_img_vip"
-                        android:layout_marginLeft="10dp"
-                        android:layout_gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingTop="12dp">
+
+                    <TextView
+                        android:id="@+id/user_btn_login"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:src="@drawable/unvip"/>
+                        android:layout_gravity="center_horizontal"
+                        android:text="@string/user_text_login"
+                        android:textColor="@color/user_title_back"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <ImageView
+                        android:id="@+id/user_img_vip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginLeft="10dp"
+                        android:src="@drawable/unvip"
+                        android:visibility="gone" />
                 </LinearLayout>
             </LinearLayout>
+
             <LinearLayout
-                android:layout_below="@id/user_layout_head"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="16dp"
+                android:layout_below="@id/user_layout_head"
                 android:layout_marginLeft="16dp"
                 android:layout_marginTop="12dp"
+                android:layout_marginRight="16dp"
                 android:background="@drawable/btn_white_10_half"
                 android:orientation="vertical">
-                <include layout="@layout/include_line_a"/>
+
+                <include layout="@layout/include_line_a" />
+
                 <LinearLayout
-                    android:layout_marginBottom="9dp"
-                    android:layout_marginTop="12dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="9dp"
                     android:gravity="center_horizontal"
                     android:orientation="horizontal">
+
                     <LinearLayout
                         android:id="@+id/user_layout_counts"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_weight="1"
                         android:orientation="vertical">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textSize="18sp"
-                                android:textStyle="bold"
-                                android:text="-"
-                                android:id="@+id/user_count"
-                                android:layout_gravity="center_horizontal"
-                                android:textColor="@color/login_blue"/>
+
                         <TextView
-                            android:layout_marginTop="8dp"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center_horizontal"
+                            android:id="@+id/user_count"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="12sp"
+                            android:layout_gravity="center_horizontal"
+                            android:text="0"
+                            android:textColor="@color/login_blue"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_marginTop="8dp"
+                            android:gravity="center_horizontal"
                             android:text="今日剩余解析次数"
-                            android:textColor="@color/user_title_back"/>
+                            android:textColor="@color/user_title_back"
+                            android:textSize="12sp" />
                     </LinearLayout>
-<!--                    <include layout="@layout/include_line_long"/>-->
+                    <!--                    <include layout="@layout/include_line_long"/>-->
                     <LinearLayout
                         android:id="@+id/user_layout_invite"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:visibility="gone"
+                        android:layout_weight="1"
                         android:orientation="vertical">
+
                         <TextView
                             android:id="@+id/user_expire"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center_horizontal"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:drawableRight="@drawable/unvip"
+                            android:drawablePadding="@dimen/mDpDimen5"
+                            android:gravity="center"
+                            android:text="开通VIP会员"
+                            android:textColor="@color/login_blue"
                             android:textSize="18sp"
-                            android:textStyle="bold"
-                            android:text="-"
-                            android:textColor="@color/login_blue"/>
+                            android:textStyle="bold" />
+
                         <TextView
                             android:id="@+id/user_text_vipknow"
-                            android:layout_marginTop="8dp"
-                            android:layout_gravity="center_horizontal"
-                            android:gravity="center_horizontal"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="12sp"
-                            android:text="会员到期时间"
-                            android:textColor="@color/user_title_back"/>
+                            android:layout_gravity="center_horizontal"
+                            android:layout_marginTop="8dp"
+                            android:gravity="center_horizontal"
+                            android:text="专享无限解析次数"
+                            android:textColor="@color/user_title_back"
+                            android:textSize="12sp" />
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
         </RelativeLayout>
 
     </RelativeLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:layout_marginLeft="16dp"
         android:layout_marginTop="17dp"
         android:layout_marginRight="16dp"
-        android:layout_marginLeft="16dp"
-        android:background="@drawable/btn_white_10">
-    <LinearLayout
-        android:id="@+id/user_btn_recharge"
-        android:padding="16dp"
-        android:visibility="gone"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="9dp"
-            android:layout_gravity="center_vertical"
-            android:src="@drawable/user_icon_recharge"/>
-        <TextView
-            android:layout_weight="1"
-            android:textSize="14dp"
-            android:layout_gravity="center_vertical"
-            android:textColor="@color/main_text_support"
-            android:text="会员中心"
+        android:background="@drawable/btn_white_10"
+        android:orientation="vertical">
 
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:src="@drawable/icon_right"/>
-    </LinearLayout>
-    <include layout="@layout/include_line_a"/>
-    <LinearLayout
-        android:id="@+id/user_btn_share"
-        android:padding="16dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="9dp"
-            android:layout_gravity="center_vertical"
-            android:src="@drawable/user_icon_share"/>
         <TextView
+            android:id="@+id/user_btn_recharge"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
             android:layout_weight="1"
-            android:textSize="14dp"
+            android:drawableLeft="@drawable/user_icon_recharge"
+            android:drawableRight="@drawable/icon_right"
+            android:drawablePadding="@dimen/mDpDimen9"
+            android:gravity="center_vertical"
+            android:padding="16dp"
+            android:text="会员中心"
             android:textColor="@color/main_text_support"
+            android:textSize="14dp" />
+
+
+        <TextView
+            android:id="@+id/user_btn_share"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:drawableLeft="@drawable/user_icon_share"
+            android:drawableRight="@drawable/icon_right"
+            android:drawablePadding="@dimen/mDpDimen9"
+            android:gravity="center_vertical"
+            android:padding="16dp"
             android:text="@string/user_text_share"
-            android:layout_gravity="center_vertical"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:src="@drawable/icon_right"/>
-    </LinearLayout>
-    <include layout="@layout/include_line_a"/>
-    <LinearLayout
-        android:id="@+id/user_btn_safity"
-        android:padding="16dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="9dp"
-            android:layout_gravity="center_vertical"
-            android:src="@drawable/user_icon_safty"/>
-        <TextView
-            android:layout_weight="1"
-            android:textSize="14dp"
-            android:layout_gravity="center_vertical"
             android:textColor="@color/main_text_support"
+            android:textSize="14dp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/value_1dp"
+            android:background="@color/recharge_back" />
+
+        <TextView
+            android:id="@+id/user_btn_safity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:drawableLeft="@drawable/user_icon_safty"
+            android:drawableRight="@drawable/icon_right"
+            android:drawablePadding="@dimen/mDpDimen9"
+            android:gravity="center_vertical"
+            android:padding="16dp"
             android:text="@string/user_text_safety"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:src="@drawable/icon_right"/>
-    </LinearLayout>
-    <include layout="@layout/include_line_a"/>
-    <LinearLayout
-        android:id="@+id/user_btn_feedback"
-        android:padding="16dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="9dp"
-            android:layout_gravity="center_vertical"
-            android:src="@drawable/user_icon_feedback"/>
-        <TextView
-            android:layout_weight="1"
-            android:textSize="14dp"
-            android:layout_gravity="center_vertical"
             android:textColor="@color/main_text_support"
+            android:textSize="14dp" />
+
+        <TextView
+            android:id="@+id/user_btn_feedback"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:drawableLeft="@drawable/user_icon_feedback"
+            android:drawableRight="@drawable/icon_right"
+            android:drawablePadding="@dimen/mDpDimen9"
+            android:gravity="center_vertical"
+            android:padding="16dp"
             android:text="@string/user_text_feedback"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:src="@drawable/icon_right"/>
-    </LinearLayout>
-    <include layout="@layout/include_line_a"/>
-    <LinearLayout
-        android:padding="16dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/user_btn_setting"
-        android:orientation="horizontal">
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="9dp"
-            android:layout_gravity="center_vertical"
-            android:src="@drawable/user_icon_setting"/>
-        <TextView
-            android:layout_weight="1"
-            android:textSize="14dp"
-            android:layout_gravity="center_vertical"
             android:textColor="@color/main_text_support"
-            android:text="@string/user_text_setting"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-        <ImageView
-            android:layout_width="wrap_content"
+            android:textSize="14dp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/value_1dp"
+            android:background="@color/recharge_back" />
+
+        <TextView
+            android:id="@+id/user_btn_setting"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:src="@drawable/icon_right"/>
-    </LinearLayout>
+            android:layout_weight="1"
+            android:drawableLeft="@drawable/user_icon_setting"
+            android:drawableRight="@drawable/icon_right"
+            android:drawablePadding="@dimen/mDpDimen9"
+            android:gravity="center_vertical"
+            android:padding="16dp"
+            android:text="@string/user_text_setting"
+            android:textColor="@color/main_text_support"
+            android:textSize="14dp" />
+
     </LinearLayout>
 </LinearLayout>

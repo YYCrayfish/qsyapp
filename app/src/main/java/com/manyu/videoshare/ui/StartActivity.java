@@ -13,11 +13,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.Window;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import com.gyf.barlibrary.ImmersionBar;
 import com.manyu.videoshare.R;
 import com.manyu.videoshare.base.BaseSharePerence;
 import com.manyu.videoshare.base.LoadingDialog;
@@ -48,6 +50,7 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
     private boolean starts = true;
     private ImageView launchAdImageView;
     private Context context;
+    private LinearLayout layout_launch_logo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +58,7 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);//去掉标题栏
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
+        ImmersionBar.with(this).fullScreen(true).init();
         ToolUtils.setBar(this);
         initView();
         initData();
@@ -124,6 +128,7 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
             File file = new File(name);
 
             if (!BaseSharePerence.getInstance().getFirst()) {
+                layout_launch_logo.setVisibility(View.GONE);
                 if (file.exists()) {
                     Bitmap bitmap = BitmapFactory.decodeFile(name);
                     if (null != bitmap)
@@ -133,6 +138,7 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
                 }
             } else {
                 launchAdImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                layout_launch_logo.setVisibility(View.VISIBLE);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -199,7 +205,6 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
             @Override
             public void httpResponse(String resultData) {
                 Gson gson = new Gson();
-
                 try {
                     bean = gson.fromJson(resultData, InitAppBean.class);
                 } catch (JsonSyntaxException e) {
@@ -284,7 +289,7 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
                 try {
                     if (null != bean && null != bean.getDatas() && null != bean.getDatas() && bean.getDatas().getStart_page() != null) {
                         starts = false;
-                        Intent intent = new Intent(Intent.ACTION_VIEW,Uri.parse(bean.getDatas().getStart_page().getUrl()));
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(bean.getDatas().getStart_page().getUrl()));
                         startActivity(intent);
                     }
                 } catch (Exception e) {

@@ -3,8 +3,8 @@
     android:id="@+id/rl_title"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white"
     android:layout_gravity="center_vertical"
+    android:background="@color/white"
     android:gravity="center_vertical"
     android:paddingTop="30dp">
 
@@ -36,16 +36,18 @@
             android:textSize="18sp"
             android:textStyle="bold" />
 
-        <TextView
+        <Button
             android:id="@+id/title_right"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="@dimen/mDpDimen55"
+            android:layout_height="@dimen/mDpDimen25"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:paddingRight="16dp"
-            android:text="完成"
-            android:textColor="@color/main_text_support"
-            android:textSize="14sp"
+            android:layout_marginRight="@dimen/mDpDimen16"
+            android:background="@drawable/btn_blue"
+            android:gravity="center"
+            android:text="下一步"
+            android:textColor="@color/white"
+            android:textSize="13sp"
             android:visibility="gone" />
     </RelativeLayout>
 </RelativeLayout>

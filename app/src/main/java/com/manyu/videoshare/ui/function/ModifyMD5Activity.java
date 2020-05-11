@@ -1,6 +1,7 @@
 package com.manyu.videoshare.ui.function;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -9,6 +10,7 @@ import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.VideoView;
 
+import com.gyf.barlibrary.ImmersionBar;
 import com.manyu.videoshare.R;
 import com.manyu.videoshare.base.BaseVideoActivity;
 import com.manyu.videoshare.util.MD5Utils;
@@ -55,7 +57,8 @@ public class ModifyMD5Activity extends BaseVideoActivity implements MediaPlayer.
         unbinder = ButterKnife.bind(this);
         // 加横线
         txtOldMd5.getPaint().setFlags(Paint.STRIKE_THRU_TEXT_FLAG);
-
+        ImmersionBar.with(this).statusBarDarkFont(false).statusBarColorInt(Color.BLACK).init();
+        setToolBarColor(Color.BLACK);
         // 配置跳到选择视频的系统页
         showVideoSelect();
     }
@@ -145,8 +148,8 @@ public class ModifyMD5Activity extends BaseVideoActivity implements MediaPlayer.
 
     // 下一步的点击操作
     @OnClick(R.id.title_right)
-    public void onNestClicked(){
-        if(tempVideoPath != null && !"".equals(tempVideoPath))
+    public void onNestClicked() {
+        if (tempVideoPath != null && !"".equals(tempVideoPath))
             PreviewActivity.start(ModifyMD5Activity.this, tempVideoPath);
         else
             ToastUtils.showShort(R.string.mod_tip04);
@@ -155,7 +158,7 @@ public class ModifyMD5Activity extends BaseVideoActivity implements MediaPlayer.
     //
     @OnClick(R.id.btnRefresh)
     public void onViewClicked() {
-       modifyMd5();
+        modifyMd5();
     }
 
     public int getSHOW_VIDEO() {
@@ -165,7 +168,7 @@ public class ModifyMD5Activity extends BaseVideoActivity implements MediaPlayer.
     /**
      * 修改Md5的处理代码
      */
-    private void modifyMd5(){
+    private void modifyMd5() {
         ModifyMD5Task modifyMD5Task = new ModifyMD5Task();
         modifyMD5Task.execute("");
 
@@ -196,7 +199,7 @@ public class ModifyMD5Activity extends BaseVideoActivity implements MediaPlayer.
 //        progressEnd();
     }
 
-    private class ModifyMD5Task extends AsyncTask{
+    private class ModifyMD5Task extends AsyncTask {
 
         @Override
         protected Object doInBackground(Object[] objects) {
@@ -204,16 +207,16 @@ public class ModifyMD5Activity extends BaseVideoActivity implements MediaPlayer.
             //文件
             File file = new File(videoPath);
             //切割文件
-            FileUtil.getSplitFile(file,1*1024*1024 );
+            FileUtil.getSplitFile(file, 1 * 1024 * 1024);
             publishProgress(20);
             // 合并文件 获取原文件的后缀名拼接
-            String merFileName = "tempVideo"+FileUtil.suffixName(file);//自定义合并文件名字
+            String merFileName = "tempVideo" + FileUtil.suffixName(file);//自定义合并文件名字
             publishProgress(25);
             // 创建合并文件路径
             tempVideoPath = ConfigureParameter.SYSTEM_CAMERA_PATH + merFileName;//Environment.getExternalStorageDirectory().getPath()+"/"+merFileName;
             // 把视频文件分割成临时文件包，再组合拼接成完整的视频文件，过程中随机写入一个字节，这样内容发生改变，MD5值就会改变，视频也不会因此无法正常播放
             // 再合并文件  把原视频的路径传进去，让新生成的视频文件直接覆盖掉原文件
-            FileUtil.merge(tempVideoPath,file,1*1024*1024);
+            FileUtil.merge(tempVideoPath, file, 1 * 1024 * 1024);
             publishProgress(60);
             // 这里读取的时新文件的 MD5
             String newMd5 = MD5Utils.getFileMD5(new File(tempVideoPath));
@@ -238,8 +241,8 @@ public class ModifyMD5Activity extends BaseVideoActivity implements MediaPlayer.
         protected void onProgressUpdate(Object[] values) {
             super.onProgressUpdate(values);
             int progress = (int) values[0];
-            LOG.showE("进度更新："+progress);
-            if(progress <= 100)
+            LOG.showE("进度更新：" + progress);
+            if (progress <= 100)
                 setProgressBarValue(progress);
             else
                 progressEnd();

@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
+    android:fitsSystemWindows="true"
     tools:context="com.manyu.videoshare.ui.fragment.MainFragment">
 
     <ScrollView
@@ -21,7 +22,7 @@
             <com.jude.rollviewpager.RollPagerView
                 android:id="@+id/rollPagerView"
                 android:layout_width="match_parent"
-                android:layout_height="180dp"
+                android:layout_height="@dimen/mDpDimen180"
                 android:background="@drawable/home_banner"
                 app:rollviewpager_play_delay="3000" />
 

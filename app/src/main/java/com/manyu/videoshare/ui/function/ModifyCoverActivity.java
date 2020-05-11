@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -21,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.gyf.barlibrary.ImmersionBar;
 import com.manyu.videoshare.R;
 import com.manyu.videoshare.base.BaseVideoActivity;
 import com.manyu.videoshare.util.FFmpegUtil;
@@ -39,8 +41,10 @@ import java.io.IOException;
 import io.microshow.rxffmpeg.RxFFmpegInvoke;
 import io.microshow.rxffmpeg.RxFFmpegSubscriber;
 
-/** add by xushiyong START on 2020/5/1 desc: 修改视频封面的页面 **/
-public class ModifyCoverActivity extends BaseVideoActivity implements View.OnClickListener,SingleSlideSeekBar.onRangeListener {
+/**
+ * add by xushiyong START on 2020/5/1 desc: 修改视频封面的页面
+ **/
+public class ModifyCoverActivity extends BaseVideoActivity implements View.OnClickListener, SingleSlideSeekBar.onRangeListener {
 
     private ImageView iv_cover;
     private TextView tv_img;
@@ -62,6 +66,8 @@ public class ModifyCoverActivity extends BaseVideoActivity implements View.OnCli
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_modify_cover);
+        ImmersionBar.with(this).statusBarDarkFont(false).statusBarColorInt(Color.BLACK).init();
+        setToolBarColor(Color.BLACK);
         start(this);
     }
 
@@ -119,7 +125,7 @@ public class ModifyCoverActivity extends BaseVideoActivity implements View.OnCli
             case R.id.title_back:
                 finish();
                 break;
-                // 下一步的操作
+            // 下一步的操作
             case R.id.title_right:
                 if (imagePath == null || "".equals(imagePath)) {
                     saveBitmapFile();
@@ -127,7 +133,7 @@ public class ModifyCoverActivity extends BaseVideoActivity implements View.OnCli
                 }
                 modifyCover();
                 break;
-                // 自行选择相册的图片来做封面
+            // 自行选择相册的图片来做封面
             case R.id.tv_img:
                 Intent intent = new Intent();
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
@@ -145,23 +151,23 @@ public class ModifyCoverActivity extends BaseVideoActivity implements View.OnCli
     }
 
     public void saveBitmapFile() {
-        if(bitmap == null && (imagePath == null || "".equals(imagePath))) return;
+        if (bitmap == null && (imagePath == null || "".equals(imagePath))) return;
 
         FileOutputStream fileOutputStream = null;
 
         try {
             Bitmap bitmap;
-            if(selectImageMode == 0)
+            if (selectImageMode == 0)
                 bitmap = this.bitmap;
             else
-                bitmap = FileUtil.loadBitmap(imagePath,true);
-            LOG.showE("加载新的位图："+bitmap);
+                bitmap = FileUtil.loadBitmap(imagePath, true);
+            LOG.showE("加载新的位图：" + bitmap);
             // 这里需要处理下，可能相机中的旋转角度问题 导致了合成图片时，根据第一张图的水平
             fileOutputStream = new FileOutputStream(newPath + "cover_1.jpg");
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
             fileOutputStream.flush();
             fileOutputStream.close();
-        }catch (Exception e){
+        } catch (Exception e) {
 
         }
 //
@@ -177,16 +183,16 @@ public class ModifyCoverActivity extends BaseVideoActivity implements View.OnCli
     }
 
     // 统一设置进度值，这里方便统一更改，如果后面想改用其他方式显示进度的话
-    private void setProgressBar(int progress, long time){
+    private void setProgressBar(int progress, long time) {
         setProgressBarValue(progress);
     }
 
     // 第一步：分离音频
-    private void modifyStep1(){
+    private void modifyStep1() {
         File file = new File(filePath);
-        if(!file.exists())
+        if (!file.exists())
             file.mkdirs();
-        String[] commands = FFmpegUtil.disVoice(videoPath,filePath+"copy.mp3");
+        String[] commands = FFmpegUtil.disVoice(videoPath, filePath + "copy.mp3");
         RxFFmpegInvoke.getInstance().runCommandRxJava(commands).subscribe(new RxFFmpegSubscriber() {
             @Override
             public void onFinish() {
@@ -197,7 +203,7 @@ public class ModifyCoverActivity extends BaseVideoActivity implements View.OnCli
 
             @Override
             public void onProgress(int progress, long progressTime) {
-                setProgressBar(progress,progressTime);
+                setProgressBar(progress, progressTime);
                 LOG.showE("合成分离音频进程：" + progress + "  " + progressTime);
             }
 
@@ -214,15 +220,15 @@ public class ModifyCoverActivity extends BaseVideoActivity implements View.OnCli
     }
 
     // 第二步: 分解图片序列帧
-    private void modifyStep2(){
-        String pagesPath = filePath+"pages"+File.separator;
+    private void modifyStep2() {
+        String pagesPath = filePath + "pages" + File.separator;
         File file = new File(pagesPath);
         // 如果不存在路径就创建  如果已存在就删除  清空这个文件夹，避免合成视频时把其他图片也添加进去合成了
         FileUtil.deleteFolder(pagesPath);
-        if(!file.exists())
+        if (!file.exists())
             file.mkdirs();
 
-        String[] commands = FFmpegUtil.disVideoPage(videoPath,pagesPath);
+        String[] commands = FFmpegUtil.disVideoPage(videoPath, pagesPath);
         RxFFmpegInvoke.getInstance().runCommandRxJava(commands).subscribe(new RxFFmpegSubscriber() {
             @Override
             public void onFinish() {
@@ -233,8 +239,8 @@ public class ModifyCoverActivity extends BaseVideoActivity implements View.OnCli
 
             @Override
             public void onProgress(int progress, long progressTime) {
-                setProgressBar(progress,progressTime);
-                LOG.showE("合成分解图片进程："+progress+"  "+progressTime);
+                setProgressBar(progress, progressTime);
+                LOG.showE("合成分解图片进程：" + progress + "  " + progressTime);
             }
 
             @Override
@@ -244,33 +250,33 @@ public class ModifyCoverActivity extends BaseVideoActivity implements View.OnCli
 
             @Override
             public void onError(String message) {
-                LOG.showE("合成分解图片错误："+message);
+                LOG.showE("合成分解图片错误：" + message);
             }
         });
     }
 
     // 第三步：替换第一帧图片
-    private void modifyStep3(){
-        FileUtil.fileCopy(imagePath,filePath+"pages"+File.separator+"0001.jpg",filePath+"pages"+File.separator+"0002.jpg");
+    private void modifyStep3() {
+        FileUtil.fileCopy(imagePath, filePath + "pages" + File.separator + "0001.jpg", filePath + "pages" + File.separator + "0002.jpg");
         modifyStep4();
         LOG.showE("合成封面文件替换完成");
     }
 
     // 第四步：合成视频  音频 + 图片序列
-    private void modifyStep4(){
-        String[] commands = FFmpegUtil.buildFullVideo(filePath+"pages"+File.separator,filePath+"copy.mp3",filePath+"xushiyong.mp4");
+    private void modifyStep4() {
+        String[] commands = FFmpegUtil.buildFullVideo(filePath + "pages" + File.separator, filePath + "copy.mp3", filePath + "xushiyong.mp4");
         RxFFmpegInvoke.getInstance().runCommandRxJava(commands).subscribe(new RxFFmpegSubscriber() {
             @Override
             public void onFinish() {
-                PreviewActivity.start(ModifyCoverActivity.this, filePath+"xushiyong.mp4");
+                PreviewActivity.start(ModifyCoverActivity.this, filePath + "xushiyong.mp4");
                 progressEnd();
                 LOG.showE("合成视频成功");
             }
 
             @Override
             public void onProgress(int progress, long progressTime) {
-                setProgressBar(progress,progressTime);
-                LOG.showE("合成视频进度:"+progress);
+                setProgressBar(progress, progressTime);
+                LOG.showE("合成视频进度:" + progress);
             }
 
             @Override
@@ -325,7 +331,6 @@ public class ModifyCoverActivity extends BaseVideoActivity implements View.OnCli
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == 0) {
-            finish();
             return;
         } else if (resultCode == RESULT_OK) {
             // 选择图片
@@ -355,7 +360,6 @@ public class ModifyCoverActivity extends BaseVideoActivity implements View.OnCli
                 handler.sendEmptyMessageDelayed(1, 100);
             }
         } else if (resultCode == 100) {
-            finish();
         }
     }
 
@@ -376,15 +380,15 @@ public class ModifyCoverActivity extends BaseVideoActivity implements View.OnCli
                 //解析出数字格式id
                 String id = docId.split(":")[1];
                 String selection = MediaStore.Images.Media._ID + "=" + id;
-                imagePath = FileUtil.getImagePath(this,MediaStore.Images.Media.EXTERNAL_CONTENT_URI, selection);
+                imagePath = FileUtil.getImagePath(this, MediaStore.Images.Media.EXTERNAL_CONTENT_URI, selection);
             } else if ("com.android.providers.downloads.documents".equals(uri.getAuthority())) {
                 Uri contentUri = ContentUris.withAppendedId(Uri.parse("" +
                         "content://downloads/public_downloads"), Long.valueOf(docId));
-                imagePath = FileUtil.getImagePath(this,contentUri, null);
+                imagePath = FileUtil.getImagePath(this, contentUri, null);
             }
         } else if ("content".equals(uri.getScheme())) {
             //如果不是document类型的uri，则使用普通的方式处理
-            imagePath = FileUtil.getImagePath(this,uri, null);
+            imagePath = FileUtil.getImagePath(this, uri, null);
         }
         displayImage(imagePath);
     }
@@ -396,14 +400,14 @@ public class ModifyCoverActivity extends BaseVideoActivity implements View.OnCli
      */
     private void handleImageBeforeKitKat(Intent data) {
         Uri uri = data.getData();
-        String imagePath = FileUtil.getImagePath(this,uri, null);
+        String imagePath = FileUtil.getImagePath(this, uri, null);
         this.imagePath = imagePath;
         displayImage(imagePath);
     }
 
     private void displayImage(String imagePath) {
         if (imagePath != null) {
-            bitmap = FileUtil.loadBitmap(imagePath,true);
+            bitmap = FileUtil.loadBitmap(imagePath, true);
             iv_cover.setImageBitmap(bitmap);
         } else {
             Toast.makeText(this, "图片获取失败", Toast.LENGTH_SHORT).show();
@@ -412,7 +416,7 @@ public class ModifyCoverActivity extends BaseVideoActivity implements View.OnCli
 
     @Override
     public void onDestroy() {
-        if(metadataRetriever != null)
+        if (metadataRetriever != null)
             metadataRetriever.release();
         super.onDestroy();
     }

@@ -1,12 +1,10 @@
 package com.manyu.videoshare.ui.function;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -18,23 +16,25 @@ import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import com.gyf.barlibrary.ImmersionBar;
 import com.manyu.videoshare.R;
 import com.manyu.videoshare.base.BaseFragment;
 import com.manyu.videoshare.base.BaseVideoActivity;
@@ -131,11 +131,18 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
                 PermissionUtils.ResultCode1);
     }
 
+    private CardView mVideoViewHost;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_water);
         unbinder = ButterKnife.bind(this);
+        mVideoViewHost = findViewById(R.id.video_view_host);
+        mVideoViewHost.setCardBackgroundColor(Color.TRANSPARENT);
+        mVideoViewHost.setRadius(ImageUtil.dp2px(this, 12));
+        ImmersionBar.with(this).statusBarDarkFont(false).statusBarColorInt(Color.BLACK).init();
+        setToolBarColor(Color.BLACK);
         start(this);
     }
 
@@ -300,17 +307,17 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
                     handleImageBeforeKitKat(data);
                 }
             } else if (requestCode == 2) {
+                showLoading();
                 Uri uri = data.getData();
                 videoPath = UriToPathUtil.getRealFilePath(this, uri);
                 videoViewTool.init(AddWaterActivity.this, null, uri);
                 setHandW();
                 final VideoView videoView = videoViewTool.videoView;
                 final View videoCover = findViewById(R.id.vv_cover);
-                final ConstraintLayout.LayoutParams lp = (ConstraintLayout.LayoutParams) videoView.getLayoutParams();
+                final FrameLayout.LayoutParams mLayoutWaterMarkParams = (FrameLayout.LayoutParams) layoutWaterMark.getLayoutParams();
                 videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                     @Override
                     public void onPrepared(MediaPlayer mp) {
-                        videoViewTool.videoSeekBar.reset();
                         mp.setOnVideoSizeChangedListener(new MediaPlayer.OnVideoSizeChangedListener() {
                             @Override
                             public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
@@ -318,13 +325,18 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
                                 videoW = mp.getVideoWidth();
                                 //FixMe 获取视频资源的高度
                                 videoH = mp.getVideoHeight();
-                                if (videoW > videoH) {
-                                    lp.dimensionRatio = "h," + videoW + ":" + videoH;
-                                } else {
-                                    lp.dimensionRatio = "w," + videoW + ":" + videoH;
-                                }
-                                videoView.setLayoutParams(lp);
+
+                                Log.e("Logger", "videoH = " + videoH + ", videoW = " + videoW);
+                                videoViewTool.setVideoH(videoH);
+                                videoViewTool.setVideoW(videoW);
+                                mLayoutWaterMarkParams.height = videoH;
+
+                                mLayoutWaterMarkParams.width = videoW;
+
+                                layoutWaterMark.setLayoutParams(mLayoutWaterMarkParams);
                                 videoCover.setVisibility(View.GONE);
+                                videoViewTool.videoSeekBar.reset();
+                                dismissLoading();
                             }
                         });
                     }
@@ -524,6 +536,7 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
                 break;
             case R.id.title_right:
                 if (type == 0) {
+                    Toast.makeText(this, "请添加水印后再次点击", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 if (!layoutWaterMark.hasMark()) {

@@ -42,5 +42,6 @@
     <string name="mod_tip02" translatable="false">没有合适的?</string>
     <string name="mod_tip03" translatable="false">从相册中选择</string>
     <string name="mod_tip04" translatable="false">并没有进行操作更改</string>
+    <string name="str_buy_vip_menber">开通VIP会员</string>
     <!--  translatable|false 就是代表不管系统是什么语言，都直接显示标签内容 本项目为了去除报红而添加 end -->
 </resources>
