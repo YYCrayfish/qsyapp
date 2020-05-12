@@ -27,6 +27,7 @@ import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -314,35 +315,34 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
                 setHandW();
                 final VideoView videoView = videoViewTool.videoView;
                 final View videoCover = findViewById(R.id.vv_cover);
-                final FrameLayout.LayoutParams mLayoutWaterMarkParams = (FrameLayout.LayoutParams) layoutWaterMark.getLayoutParams();
-//                final ConstraintLayout.LayoutParams mLayoutHostParams = (ConstraintLayout.LayoutParams) mVideoViewHost.getLayoutParams();
                 videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                     @Override
                     public void onPrepared(MediaPlayer mp) {
                         mp.setOnVideoSizeChangedListener(new MediaPlayer.OnVideoSizeChangedListener() {
                             @Override
                             public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
-                                //FixMe 获取视频资源的宽度
+                                //获取视频资源的宽度
                                 videoW = mp.getVideoWidth();
-                                //FixMe 获取视频资源的高度
+                                //获取视频资源的高度
                                 videoH = mp.getVideoHeight();
-//                                if (videoH > videoW) {
-//                                    //竖屏
-//                                } else {
-//                                    //横屏
-//                                }
-//                                videoViewTool.setVideoH(videoH);
-//                                videoViewTool.setVideoW(videoW);
-                                mLayoutWaterMarkParams.height = videoH;
-                                mLayoutWaterMarkParams.width = videoW;
+                                View parent = (View) mVideoViewHost.getParent();
 
-//                                mLayoutHostParams.width = videoW;
-//                                mLayoutHostParams.height = videoH;
-
-//                                mVideoViewHost.setLayoutParams(mLayoutHostParams);
-                                layoutWaterMark.setLayoutParams(mLayoutWaterMarkParams);
-                                videoCover.setVisibility(View.GONE);
+                                // 按原视频的比例，缩放至视频的最长边和容器的最短边相等
+                                ConstraintLayout.LayoutParams videoLp = (ConstraintLayout.LayoutParams) mVideoViewHost.getLayoutParams();
+                                if ((1f * videoW / videoH) > (1f * parent.getWidth() / parent.getHeight())) {
+                                    videoLp.dimensionRatio = "h," + videoW + ":" + videoH;
+                                } else {
+                                    videoLp.dimensionRatio = "w," + videoW + ":" + videoH;
+                                }
+                                mVideoViewHost.setLayoutParams(videoLp);
                                 videoViewTool.videoSeekBar.reset();
+
+                                videoCover.postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        videoCover.setVisibility(View.GONE);
+                                    }
+                                }, 500);
                             }
                         });
                     }
