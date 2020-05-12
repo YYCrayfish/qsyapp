@@ -107,7 +107,7 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
             final String name = path + md5;
             //TODO 生成文件
             File file = new File(name);
-            //TODO 判断APP是否第一次启动  我觉得没屌用 就注释了
+            //TODO 判断APP是否第一次启动,我寻思没屌用 就注释了
 //            if (!BaseSharePerence.getInstance().getFirst()) {
 //                //TODO 若广告图片存在 则加载显示广告
 //                if (file.exists()) {
@@ -231,6 +231,8 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
                         }
                         if (bean.getDatas().getStart_page() != null && !TextUtils.isEmpty(bean.getDatas().getStart_page().getImage())){
                             Glide.with(StartActivity.this).load(bean.getDatas().getStart_page().getImage()).into(launchAdImageView);
+                        }else{
+                            toggleLogoInfo(true);
                         }
                         okHttpDownLoadApk(bean.getDatas().getStart_page().getImage());
                     }
@@ -283,9 +285,11 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
         switch (v.getId()) {
             case R.id.start_progress:
             case R.id.launch_layout_start_progress:
+                //跳过
                 starts();
                 break;
             case R.id.start_img:
+                //点击了广告图
                 try {
                     if (null != bean && null != bean.getDatas() && null != bean.getDatas() && bean.getDatas().getStart_page() != null) {
                         starts = false;
