@@ -11,6 +11,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.CardView;
@@ -178,8 +179,8 @@ public class RemoveWatermarkActivity extends BaseVideoActivity implements View.O
             if (list.get(i).top < 0) {
                 list.get(i).top = 0;
             }
-            if (list.get(i).right > videoW ) {
-                list.get(i).right = videoW ;
+            if (list.get(i).right > videoW - 1) {
+                list.get(i).right = videoW - 1;
             }
             if (list.get(i).bottom > videoH ) {
                 list.get(i).bottom = videoH ;

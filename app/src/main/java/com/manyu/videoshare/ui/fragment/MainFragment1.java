@@ -261,10 +261,12 @@ public class MainFragment1 extends BaseFragment implements View.OnClickListener 
         ToolUtils.havingIntent(getActivity());
         switch (v.getId()) {
             case R.id.video_extract:
+                if (!requestPermissions()) return;
                 startActivity(new Intent(getContext(), VideoExtractActivity.class));
                 break;
 
             case R.id.remove_watermark:
+                if (!requestPermissions()) return;
                 startActivity(new Intent(getContext(), RemoveWatermarkActivity.class));
                 break;
         }
