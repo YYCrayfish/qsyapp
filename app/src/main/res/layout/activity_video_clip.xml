@@ -59,6 +59,7 @@
         android:orientation="vertical">
 
         <RadioGroup
+            android:id="@+id/video_clip_ratio_type_group"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -86,7 +87,6 @@
                 android:layout_marginRight="20dp"
                 android:background="@drawable/select_toggle_gray_white"
                 android:button="@null"
-                android:checked="true"
                 android:gravity="center"
                 android:text="1:1"
                 android:textColor="@color/color_toggle_black_white"
@@ -99,7 +99,6 @@
                 android:layout_marginRight="20dp"
                 android:background="@drawable/select_toggle_gray_white"
                 android:button="@null"
-                android:checked="true"
                 android:gravity="center"
                 android:text="4:3"
                 android:textColor="@color/color_toggle_black_white"
@@ -112,7 +111,6 @@
                 android:layout_height="37dp"
                 android:background="@drawable/select_toggle_gray_white"
                 android:button="@null"
-                android:checked="true"
                 android:gravity="center"
                 android:text="3:4"
                 android:textColor="@color/color_toggle_black_white"

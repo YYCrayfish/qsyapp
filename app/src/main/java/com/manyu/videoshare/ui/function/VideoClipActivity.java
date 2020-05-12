@@ -14,6 +14,8 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.gyf.immersionbar.ImmersionBar;
@@ -38,10 +40,11 @@ import io.microshow.rxffmpeg.RxFFmpegSubscriber;
 public class VideoClipActivity extends BaseVideoActivity implements View.OnClickListener {
 
     private MCustomZoomView zoomView;
-    private TextView ratioFree;
-    private TextView ratio1;
-    private TextView ratio43;
-    private TextView ratio34;
+    private RadioGroup mRatioTypeGroup;
+    private RadioButton ratioFree;
+    private RadioButton ratio1;
+    private RadioButton ratio43;
+    private RadioButton ratio34;
     private String videoPath;
     private int videoW;
     private int videoH;
@@ -80,15 +83,33 @@ public class VideoClipActivity extends BaseVideoActivity implements View.OnClick
     public void initView() {
         ToolUtils.setBar(this);
         zoomView = findViewById(R.id.mczv);
+        mRatioTypeGroup = findViewById(R.id.video_clip_ratio_type_group);
         ratioFree = findViewById(R.id.free);
         ratio1 = findViewById(R.id.ratio1);
         ratio43 = findViewById(R.id.ratio43);
         ratio34 = findViewById(R.id.ratio34);
-        ratioFree.setOnClickListener(this);
-        ratio1.setOnClickListener(this);
-        ratio43.setOnClickListener(this);
-        ratio34.setOnClickListener(this);
         zoomView.setISDrawMapLine(true);
+
+        mRatioTypeGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int id) {
+                switch (id) {
+                    case R.id.ratio1:
+                        zoomView.setRatioType(2);
+                        break;
+                    case R.id.ratio43:
+                        zoomView.setRatioType(3);
+                        break;
+                    case R.id.ratio34:
+                        zoomView.setRatioType(4);
+                        break;
+                    default:
+                        //自由比率
+                        zoomView.setRatioType(1);
+                        break;
+                }
+            }
+        });
         zoomView.setOnTransformListener(new MCustomZoomView.onTransformListener() {
             @Override
             public void onTransform(float left, float top, float right, float bottom) {

@@ -61,6 +61,11 @@ public class MCustomZoomView extends View {
     /*是否绘制测绘线*/private boolean mISDrawMapLine;
     /*是否开启动画*/private boolean mIsOpenAnima;
 
+    //矩形边的长度
+    private float mHeight, mWidth;
+
+    private int mRatioType;
+
     public MCustomZoomView(Context context) {
         super(context);
         this.mContext = context;
@@ -93,6 +98,10 @@ public class MCustomZoomView extends View {
         mViewWidth = getWidth();
         mViewHeight = getHeight();
         mRectLength = mViewWidth / 2;
+//        mLeftTop = ;
+//        mLeftBottom = ;
+//        mRightTop = ;
+//        mRightBottom = ;
         /*初始化矩形四边角坐标*/
         mRect_FourCorner_coordinate = new float[][]{
                 {(mViewWidth - mRectLength) / 2, (mViewHeight - mRectLength) / 2},//左上角
@@ -100,6 +109,7 @@ public class MCustomZoomView extends View {
                 {(mViewWidth + mRectLength) / 2, (mViewHeight - mRectLength) / 2},//右上角
                 {(mViewWidth + mRectLength) / 2, (mViewHeight + mRectLength) / 2},//右下角
         };
+
         onTransformListener.onTransform((mViewWidth - mRectLength) / 2,
                 (mViewHeight - mRectLength) / 2,
                 (mViewWidth + mRectLength) / 2,
@@ -117,7 +127,7 @@ public class MCustomZoomView extends View {
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onDraw(Canvas canvas) {
-
+        initRect();
         /*绘制边框*/
         canvas.drawRect(mRect_FourCorner_coordinate[0][0], mRect_FourCorner_coordinate[0][1]
                 , mRect_FourCorner_coordinate[3][0], mRect_FourCorner_coordinate[3][1], mRectPaint);
@@ -220,10 +230,10 @@ public class MCustomZoomView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-
         switch (event.getAction()) {
             /*按下*/
             case MotionEvent.ACTION_DOWN:
+                Log.e("Logger", "MotionEvent.ACTION_DOWN");
                 /**当前按下的X坐标*/float mPressX = event.getX();
                 /**当前按下的Y坐标*/float mPressY = event.getY();
 
@@ -245,6 +255,7 @@ public class MCustomZoomView extends View {
                 break;
             /*移动*/
             case MotionEvent.ACTION_MOVE:
+                Log.e("Logger", "MotionEvent.ACTION_MOVE");
                 /*移动-改变矩形四个点坐标*/
                 if (mOperatingStatus == 1) {
                     mRect_FourCorner_coordinate[0][0] += event.getX() - mLastPressX;
@@ -286,7 +297,12 @@ public class MCustomZoomView extends View {
                 }
                 /*边角缩放*/
                 else if (mOperatingStatus == 2) {
+
+//                    mHeight = mRect_FourCorner_coordinate[1][1] - mRect_FourCorner_coordinate[0][1];
+//                    mWidth = mRect_FourCorner_coordinate[2][0] - mRect_FourCorner_coordinate[0][0];
+//                    Log.e("Logger", "mWidth / mHeight = " + (mWidth / mHeight));
                     /*是否继续缩放*/
+                    initRect();
                     if (toolCornerIsTouch(event.getX(), event.getY(), mLastPressX, mLastPressY)) {
                         return true;
                     }
@@ -440,6 +456,40 @@ public class MCustomZoomView extends View {
                 break;
         }
         return true;
+    }
+
+    private void initRect() {
+        if (mRatioType == 2) {
+            /**
+             * 比例 1:1
+             * （右上-左上）=左下-左上
+             * */
+            float tempWidth = mRect_FourCorner_coordinate[1][1] - mRect_FourCorner_coordinate[0][1];
+            //右上X坐标
+            mRect_FourCorner_coordinate[2][0] = mRect_FourCorner_coordinate[0][0] + tempWidth;
+            //右下的X坐标
+            mRect_FourCorner_coordinate[3][0] = mRect_FourCorner_coordinate[1][0] + tempWidth;
+        } else if (mRatioType == 3) {
+            //4:3
+            float tempWidth = mRect_FourCorner_coordinate[1][1] - mRect_FourCorner_coordinate[0][1];
+            float tempHeight = mRect_FourCorner_coordinate[0][1] - mRect_FourCorner_coordinate[1][1];
+            float tempRatio = (float) (tempWidth * 0.75);
+            mRect_FourCorner_coordinate[2][0] = mRect_FourCorner_coordinate[0][0] + (tempRatio);
+            mRect_FourCorner_coordinate[3][0] = mRect_FourCorner_coordinate[1][0] + (tempRatio);
+        } else if (mRatioType == 4) {
+            //3:4
+            float tempWidth = mRect_FourCorner_coordinate[1][1] - mRect_FourCorner_coordinate[0][1];
+            float tempHeight = mRect_FourCorner_coordinate[0][1] - mRect_FourCorner_coordinate[1][1];
+            float tempRatio = (float) (tempWidth * 1.3333);
+            mRect_FourCorner_coordinate[2][0] = mRect_FourCorner_coordinate[0][0] + (tempRatio);
+            mRect_FourCorner_coordinate[3][0] = mRect_FourCorner_coordinate[1][0] + (tempRatio);
+        }
+    }
+
+    public void setRatioType(int mRatioType) {
+        this.mRatioType = mRatioType;
+        initRect();
+        invalidate();
     }
 
     /**
