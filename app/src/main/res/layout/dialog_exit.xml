@@ -2,13 +2,16 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/dialog_clip"
+    android:background="@color/tran"
     android:gravity="center"
     android:orientation="vertical">
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="280dp"
         android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:paddingLeft="15dp"
+        android:paddingRight="@dimen/mDpDimen15"
         android:layout_gravity="center"
         android:layout_marginLeft="48dp"
         android:layout_marginRight="48dp"
@@ -24,7 +27,7 @@
             android:gravity="center"
             android:text="温馨提示"
             android:textColor="@color/main_text_support"
-            android:textSize="17sp"
+            android:textSize="18sp"
             android:textStyle="bold" />
 
         <TextView

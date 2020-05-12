@@ -16,7 +16,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
-import com.gyf.barlibrary.ImmersionBar;
+import com.gyf.immersionbar.ImmersionBar;
 import com.manyu.videoshare.R;
 import com.manyu.videoshare.base.BaseVideoActivity;
 import com.manyu.videoshare.util.FFmpegUtil;

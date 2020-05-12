@@ -30,7 +30,7 @@
     <string name="main_text_explain">视频归平台及作者所有，本应用不储存任何视频或图片</string>
     <string name="user_text_login">点击登录</string>
     <string name="user_text_recharge">我要充值</string>
-    <string name="user_text_share">邀请有礼</string>
+    <string name="user_text_share">分享有礼</string>
     <string name="user_text_safety">账号安全</string>
     <string name="user_text_feedback">意见反馈</string>
     <string name="user_text_setting">设置</string>
@@ -38,7 +38,7 @@
     <string name="text_view_limit_int_idcard">1234567890Xx</string>
 
     <!--  translatable|false 就是代表不管系统是什么语言，都直接显示标签内容 本项目为了去除报红而添加 start -->
-    <string name="mod_tip01" translatable="false">拖拉下方白色分割线选择封面</string>
+    <string name="mod_tip01" translatable="false">拖动选择当前域作为封面</string>
     <string name="mod_tip02" translatable="false">没有合适的?</string>
     <string name="mod_tip03" translatable="false">从相册中选择</string>
     <string name="mod_tip04" translatable="false">并没有进行操作更改</string>

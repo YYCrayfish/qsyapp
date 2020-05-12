@@ -20,10 +20,8 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.jaeger.library.StatusBarUtil;
 import com.manyu.videoshare.R;
-import com.manyu.videoshare.util.LoadingDialogUtil;
 import com.manyu.videoshare.view.Progressbar;
 import com.umeng.analytics.MobclickAgent;
-import com.wang.avi.AVLoadingIndicatorView;
 
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -47,7 +45,6 @@ public abstract class BaseVideoActivity extends FragmentActivity implements View
     private RelativeLayout rlTitle;
     private Progressbar mProgress;
     private LinearLayout clProgress;
-    private LoadingDialogUtil mLoadingDialog;
 
     @Override
     public void onCreate(Bundle savedInstanceState, PersistableBundle persistentState) {
@@ -84,28 +81,6 @@ public abstract class BaseVideoActivity extends FragmentActivity implements View
         setStatusBar();
         initView();
         initData();
-    }
-
-
-    public void showLoading() {
-        if (mLoadingDialog == null) {
-            mLoadingDialog = BaseApplication.getInstance().getLoadingDialog();
-        }
-        try {
-            mLoadingDialog.show();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void dismissLoading() {
-        if (mLoadingDialog != null) {
-            try {
-                mLoadingDialog.dismiss();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
     }
 
 

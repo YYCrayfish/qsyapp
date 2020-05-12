@@ -1,5 +1,6 @@
 package com.manyu.videoshare.ui.function;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.ContentUris;
 import android.content.Context;
@@ -17,14 +18,21 @@ import android.os.Message;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.gyf.barlibrary.ImmersionBar;
+import com.gyf.immersionbar.ImmersionBar;
 import com.manyu.videoshare.R;
 import com.manyu.videoshare.base.BaseVideoActivity;
+import com.manyu.videoshare.permission.PermissionUtils;
+import com.manyu.videoshare.permission.request.IRequestPermissions;
+import com.manyu.videoshare.permission.request.RequestPermissions;
+import com.manyu.videoshare.permission.requestresult.IRequestPermissionsResult;
+import com.manyu.videoshare.permission.requestresult.RequestPermissionsResultSetApp;
+import com.manyu.videoshare.ui.user.UserMessageActivity;
 import com.manyu.videoshare.util.FFmpegUtil;
 import com.manyu.videoshare.util.ToastUtils;
 import com.manyu.videoshare.util.ToolUtils;
@@ -119,6 +127,37 @@ public class ModifyCoverActivity extends BaseVideoActivity implements View.OnCli
         //newPath = getBaseContext().getCacheDir().getAbsolutePath() + File.separator;
     }
 
+    private IRequestPermissions requestPermissions = RequestPermissions.getInstance();//动态权限请求
+
+    private IRequestPermissionsResult requestPermissionsResult = RequestPermissionsResultSetApp.getInstance();//动态权限请求结果处理
+
+    //请求权限
+    private boolean requestPermissions() {
+        //需要请求的权限
+        String[] permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA};
+        //开始请求权限
+        return requestPermissions.requestPermissions(
+                this,
+                permissions,
+                PermissionUtils.ResultCode1);
+    }
+
+    //用户授权操作结果（可能授权了，也可能未授权）
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        //用户给APP授权的结果
+        //判断grantResults是否已全部授权，如果是，执行相应操作，如果否，提醒开启权限
+        if (requestPermissionsResult.doRequestPermissionsResult(this, permissions, grantResults)) {
+            //请求的权限全部授权成功，此处可以做自己想做的事了
+            //输出授权结果
+            Toast.makeText(ModifyCoverActivity.this, "授权成功，请重新点击刚才的操作！", Toast.LENGTH_LONG).show();
+        } else {
+            //输出授权结果
+            Toast.makeText(ModifyCoverActivity.this, "请给APP授权，否则功能无法正常使用！", Toast.LENGTH_LONG).show();
+        }
+    }
+
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
@@ -131,7 +170,9 @@ public class ModifyCoverActivity extends BaseVideoActivity implements View.OnCli
                     saveBitmapFile();
                     imagePath = newPath + "cover_1.jpg";
                 }
-                modifyCover();
+                if (requestPermissions()) {
+                    modifyCover();
+                }
                 break;
             // 自行选择相册的图片来做封面
             case R.id.tv_img:
@@ -331,6 +372,7 @@ public class ModifyCoverActivity extends BaseVideoActivity implements View.OnCli
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == 0) {
+            finish();
             return;
         } else if (resultCode == RESULT_OK) {
             // 选择图片

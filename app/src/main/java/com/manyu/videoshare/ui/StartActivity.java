@@ -1,6 +1,5 @@
 package com.manyu.videoshare.ui;
 
-import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -10,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.Window;
 import android.widget.ImageView;
@@ -18,15 +18,12 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-import com.gyf.barlibrary.ImmersionBar;
+import com.gyf.immersionbar.ImmersionBar;
 import com.manyu.videoshare.R;
 import com.manyu.videoshare.base.BaseSharePerence;
 import com.manyu.videoshare.base.LoadingDialog;
 import com.manyu.videoshare.base.RoundProgressBar;
 import com.manyu.videoshare.bean.InitAppBean;
-import com.manyu.videoshare.permission.PermissionUtils;
-import com.manyu.videoshare.permission.request.IRequestPermissions;
-import com.manyu.videoshare.permission.request.RequestPermissions;
 import com.manyu.videoshare.util.Constants;
 import com.manyu.videoshare.util.GlideUtils;
 import com.manyu.videoshare.util.Globals;
@@ -42,20 +39,20 @@ import java.io.File;
 import okhttp3.Call;
 
 public class StartActivity extends AppCompatActivity implements View.OnClickListener {
-    private TextView version;
-    private RoundProgressBar bar;
+    //    private TextView version;
+    private RoundProgressBar mCounterBar;
     private InitAppBean bean = null;
     private int progress = 0;
     private boolean starts = true;
     private ImageView launchAdImageView;
+    private TextView launchLogoText;
     private Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-//        hideSystemBar();
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);//去掉标题栏
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_start);
+        setContentView(R.layout.activity_launch);
         ImmersionBar.with(this).fullScreen(true).init();
         ToolUtils.setBar(this);
         initView();
@@ -77,21 +74,8 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
-    private void setActivity() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(3000);
-                    starts();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
 
-    }
-
+    //TODO 前往首页
     public void starts() {
         if (starts) {
             starts = false;
@@ -102,18 +86,16 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
 
     public void initView() {
         context = this;
-//        View decor = this.getWindow().getDecorView();
-//        decor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-//        decor.setSystemUiVisibility(View.INVISIBLE);
-        //setActivity();
-        version = findViewById(R.id.about_version);
-        bar = findViewById(R.id.start_progress);
-        launchAdImageView = findViewById(R.id.start_img);
+//        version = findViewById(R.id.about_version);
+        mCounterBar = findViewById(R.id.launch_layout_start_progress);
+        launchAdImageView = findViewById(R.id.launch_layout_advert_image);
+        launchLogoText = findViewById(R.id.launch_layout_logo_txt);
 
-        String versionName = ToolUtils.getVersionName(StartActivity.this);
-        version.setText("V" + versionName);
-        bar.setOnClickListener(this);
+//        String versionName = ToolUtils.getVersionName(StartActivity.this);
+//        version.setText("V" + versionName);
+        mCounterBar.setOnClickListener(this);
         launchAdImageView.setOnClickListener(this);
+        //TODO 加载广告图片
         try {
             String destFileDir = Environment.getExternalStorageDirectory() + "/manyu/";
             File dir = new File(destFileDir);
@@ -123,23 +105,37 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
             final String path = Environment.getExternalStorageDirectory() + "/manyu/";
             String md5 = "start.png";
             final String name = path + md5;
+            //TODO 生成文件
             File file = new File(name);
-
-            if (!BaseSharePerence.getInstance().getFirst()) {
-                if (file.exists()) {
-                    Bitmap bitmap = BitmapFactory.decodeFile(name);
-                    if (null != bitmap)
-                        launchAdImageView.setImageBitmap(bitmap);
-                } else {
-                    launchAdImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                }
-            } else {
-                launchAdImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            }
+            //TODO 判断APP是否第一次启动  我觉得没屌用 就注释了
+//            if (!BaseSharePerence.getInstance().getFirst()) {
+//                //TODO 若广告图片存在 则加载显示广告
+//                if (file.exists()) {
+//                    Bitmap bitmap = BitmapFactory.decodeFile(name);
+//                    if (null != bitmap) {
+//                        launchAdImageView.setImageBitmap(bitmap);
+//                        toggleLogoInfo(false);
+//                    }
+//                } else {
+//                    launchAdImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+//                }
+//            } else {
+//                launchAdImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+//            }
         } catch (Exception e) {
             e.printStackTrace();
+            toggleLogoInfo(true);
         }
 
+    }
+
+    //TODO LOGO和广告图互斥
+    private void toggleLogoInfo(boolean toggle) {
+        if (toggle) {
+            launchLogoText.setVisibility(View.VISIBLE);
+        } else {
+            launchLogoText.setVisibility(View.GONE);
+        }
     }
 
     private Thread runs;
@@ -156,7 +152,7 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
                         progress = 100;
                     }
                     System.out.println(progress);
-                    bar.setProgress(progress);
+                    mCounterBar.setProgress(progress);
                     try {
                         Thread.sleep(100);
                     } catch (InterruptedException e) {
@@ -173,7 +169,7 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
     @Override
     protected void onResume() {
         super.onResume();
-        getAgreement();
+        initApplication();
         if (null != bean) {
             starts = true;
             startTime(bean.getDatas().getAd_step());
@@ -181,20 +177,22 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
     }
 
     public void initData() {
-        bar.setCircleColor(getResources().getColor(R.color.hint_color));//设置圆环的颜色
-        bar.setCircleProgressColor(getResources().getColor(R.color.start_bar));//设置圆环进度的颜色
-        bar.setTextColor(getResources().getColor(R.color.start_jump));//设置中间进度百分比的字符串的颜色
-        bar.setRoundWidth(ToolUtils.dip2px(2));//设置圆环的宽度
-        bar.setTextSize(ToolUtils.dip2px(12));
+        mCounterBar.setCircleColor(getResources().getColor(R.color.hint_color));//设置圆环的颜色
+        mCounterBar.setCircleProgressColor(getResources().getColor(R.color.start_bar));//设置圆环进度的颜色
+        mCounterBar.setTextColor(getResources().getColor(R.color.start_jump));//设置中间进度百分比的字符串的颜色
+        mCounterBar.setRoundWidth(ToolUtils.dip2px(2));//设置圆环的宽度
+        mCounterBar.setTextSize(ToolUtils.dip2px(12));
     }
 
 
-    private void getAgreement() {
+    //TODO 初始化操作
+    private void initApplication() {
         HttpUtils.httpString(Constants.INITAPP, null, new HttpUtils.HttpCallback() {
             @Override
             public void httpError(Call call, Exception e) {
                 LoadingDialog.closeLoadingDialog();
                 ToastUtils.showShort("APP初始化失败，连接不到服务器");
+                toggleLogoInfo(true);
                 startTime(3);
             }
 
@@ -222,13 +220,18 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
                         BaseSharePerence.getInstance().setFirst(false);
                         launchAdImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
                     } else if (bean.getDatas().getStart_page() != null) {
-                        bar.setVisibility(View.VISIBLE);
+                        mCounterBar.setVisibility(View.VISIBLE);
                         final String path = Environment.getExternalStorageDirectory() + "/manyu/";
                         String md5 = "start.png";
                         final String name = path + md5;
                         File file = new File(name);
-                        if (!file.exists())
+                        toggleLogoInfo(false);
+                        if (!file.exists()) {
                             GlideUtils.loadImgWithout(context, bean.getDatas().getStart_page().getUrl(), launchAdImageView);
+                        }
+                        if (bean.getDatas().getStart_page() != null && !TextUtils.isEmpty(bean.getDatas().getStart_page().getImage())){
+                            Glide.with(StartActivity.this).load(bean.getDatas().getStart_page().getImage()).into(launchAdImageView);
+                        }
                         okHttpDownLoadApk(bean.getDatas().getStart_page().getImage());
                     }
                     //
@@ -279,6 +282,7 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
         ToolUtils.havingIntent(this);
         switch (v.getId()) {
             case R.id.start_progress:
+            case R.id.launch_layout_start_progress:
                 starts();
                 break;
             case R.id.start_img:

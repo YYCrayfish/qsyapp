@@ -185,6 +185,10 @@
             android:textColor="@color/main_text_support"
             android:textSize="14dp" />
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/value_1dp"
+            android:background="@color/recharge_back" />
 
         <TextView
             android:id="@+id/user_btn_share"
@@ -221,6 +225,10 @@
             android:textColor="@color/main_text_support"
             android:textSize="14dp" />
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/value_1dp"
+            android:background="@color/recharge_back" />
         <TextView
             android:id="@+id/user_btn_feedback"
             android:layout_width="match_parent"

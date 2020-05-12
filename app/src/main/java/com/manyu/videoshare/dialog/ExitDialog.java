@@ -13,7 +13,7 @@ public class ExitDialog extends Dialog {
     private Context mContext;
 
     public ExitDialog(Context context,String text,AnalysisUrlListener  analysisUrlListener) {
-        super(context, R.style.dialog_clip);
+        super(context, R.style.dialog);
         this.mContext = context;
         this.analysisUrlListener = analysisUrlListener;
         initView(text);
