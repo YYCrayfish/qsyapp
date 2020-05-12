@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.media.MediaMetadataRetriever;
@@ -32,19 +31,15 @@ import com.manyu.videoshare.permission.request.IRequestPermissions;
 import com.manyu.videoshare.permission.request.RequestPermissions;
 import com.manyu.videoshare.permission.requestresult.IRequestPermissionsResult;
 import com.manyu.videoshare.permission.requestresult.RequestPermissionsResultSetApp;
-import com.manyu.videoshare.ui.user.UserMessageActivity;
 import com.manyu.videoshare.util.FFmpegUtil;
-import com.manyu.videoshare.util.ToastUtils;
 import com.manyu.videoshare.util.ToolUtils;
 import com.manyu.videoshare.util.UriToPathUtil;
 import com.manyu.videoshare.util.universally.FileUtil;
 import com.manyu.videoshare.util.universally.LOG;
 import com.manyu.videoshare.view.SingleSlideSeekBar;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 
 import io.microshow.rxffmpeg.RxFFmpegInvoke;
 import io.microshow.rxffmpeg.RxFFmpegSubscriber;
@@ -62,13 +57,15 @@ public class ModifyCoverActivity extends BaseVideoActivity implements View.OnCli
     private String newPath = Environment.getExternalStorageDirectory()
             + File.separator + Environment.DIRECTORY_DCIM
             + File.separator + "Camera" + File.separator;
-    private String filePath = Environment.getExternalStorageDirectory()
+    public static String FILE_PATH = Environment.getExternalStorageDirectory()
             + File.separator + Environment.DIRECTORY_DCIM
             + File.separator + "Camera" + File.separator;
     private MediaMetadataRetriever metadataRetriever;
     private Bitmap bitmap;
     // 选择图片的模式  0|缩略图里选  1|相册中选
     private int selectImageMode = 0;
+
+    private String pagesPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +74,11 @@ public class ModifyCoverActivity extends BaseVideoActivity implements View.OnCli
         ImmersionBar.with(this).statusBarDarkFont(false).statusBarColorInt(Color.BLACK).init();
         setToolBarColor(Color.BLACK);
         start(this);
+        pagesPath = FILE_PATH + "pages";
+        //开始清空pages下的图片
+        deleteFile(new File(FILE_PATH + "pages"));
     }
+
 
     public void start(Context context) {
         Intent intent = new Intent();
@@ -158,6 +159,20 @@ public class ModifyCoverActivity extends BaseVideoActivity implements View.OnCli
         }
     }
 
+    //flie：要删除的文件夹的所在位置
+    private void deleteFile(File file) {
+        if (file.isDirectory()) {
+            File[] files = file.listFiles();
+            for (int i = 0; i < files.length; i++) {
+                File f = files[i];
+                deleteFile(f);
+            }
+            file.delete();//如要保留文件夹，只删除文件，请注释这行
+        } else if (file.exists()) {
+            file.delete();
+        }
+    }
+
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
@@ -171,6 +186,7 @@ public class ModifyCoverActivity extends BaseVideoActivity implements View.OnCli
                     imagePath = newPath + "cover_1.jpg";
                 }
                 if (requestPermissions()) {
+                    deleteFile(new File(FILE_PATH + "pages"));
                     modifyCover();
                 }
                 break;
@@ -230,10 +246,10 @@ public class ModifyCoverActivity extends BaseVideoActivity implements View.OnCli
 
     // 第一步：分离音频
     private void modifyStep1() {
-        File file = new File(filePath);
+        File file = new File(FILE_PATH);
         if (!file.exists())
             file.mkdirs();
-        String[] commands = FFmpegUtil.disVoice(videoPath, filePath + "copy.mp3");
+        String[] commands = FFmpegUtil.disVoice(videoPath, FILE_PATH + "copy.mp3");
         RxFFmpegInvoke.getInstance().runCommandRxJava(commands).subscribe(new RxFFmpegSubscriber() {
             @Override
             public void onFinish() {
@@ -262,7 +278,7 @@ public class ModifyCoverActivity extends BaseVideoActivity implements View.OnCli
 
     // 第二步: 分解图片序列帧
     private void modifyStep2() {
-        String pagesPath = filePath + "pages" + File.separator;
+        String pagesPath = FILE_PATH + "pages" + File.separator;
         File file = new File(pagesPath);
         // 如果不存在路径就创建  如果已存在就删除  清空这个文件夹，避免合成视频时把其他图片也添加进去合成了
         FileUtil.deleteFolder(pagesPath);
@@ -298,18 +314,19 @@ public class ModifyCoverActivity extends BaseVideoActivity implements View.OnCli
 
     // 第三步：替换第一帧图片
     private void modifyStep3() {
-        FileUtil.fileCopy(imagePath, filePath + "pages" + File.separator + "0001.jpg", filePath + "pages" + File.separator + "0002.jpg");
+        FileUtil.fileCopy(imagePath, FILE_PATH + "pages" + File.separator + "0001.jpg", FILE_PATH + "pages" + File.separator + "0002.jpg");
         modifyStep4();
         LOG.showE("合成封面文件替换完成");
     }
 
     // 第四步：合成视频  音频 + 图片序列
     private void modifyStep4() {
-        String[] commands = FFmpegUtil.buildFullVideo(filePath + "pages" + File.separator, filePath + "copy.mp3", filePath + "xushiyong.mp4");
+        String[] commands = FFmpegUtil.buildFullVideo(FILE_PATH + "pages" + File.separator, FILE_PATH + "copy.mp3", FILE_PATH + "xushiyong.mp4");
         RxFFmpegInvoke.getInstance().runCommandRxJava(commands).subscribe(new RxFFmpegSubscriber() {
             @Override
             public void onFinish() {
-                PreviewActivity.start(ModifyCoverActivity.this, filePath + "xushiyong.mp4");
+                PreviewActivity.start(ModifyCoverActivity.this, FILE_PATH + "xushiyong.mp4");
+                deleteFile(new File(FILE_PATH + "pages"));//删掉pages的文件夹
                 progressEnd();
                 LOG.showE("合成视频成功");
             }

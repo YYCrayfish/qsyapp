@@ -19,6 +19,8 @@ import com.manyu.videoshare.R;
 import com.manyu.videoshare.base.BaseApplication;
 import com.manyu.videoshare.base.BaseVideoActivity;
 import com.manyu.videoshare.base.LoadingDialog;
+import com.manyu.videoshare.dialog.ExitDialog;
+import com.manyu.videoshare.ui.MainActivity;
 import com.manyu.videoshare.util.Constants;
 import com.manyu.videoshare.util.DialogIncomeTipUtil;
 import com.manyu.videoshare.util.HttpUtils;
@@ -35,6 +37,7 @@ import java.io.FileOutputStream;
 
 import okhttp3.Call;
 
+import static com.manyu.videoshare.ui.function.ModifyCoverActivity.FILE_PATH;
 import static com.manyu.videoshare.util.SystemProgramUtils.REQUEST_CODE_MOVE_WATER_MARK;
 
 /**
@@ -109,8 +112,19 @@ public class PreviewActivity extends BaseVideoActivity implements View.OnClickLi
                 finish();
                 break;
             case R.id.title_right:
-                setResult(100);
-                finish();
+                new ExitDialog(this, "当前视频还未保存,是否确定返回首页", new ExitDialog.AnalysisUrlListener() {
+                    @Override
+                    public void analysis() {
+                        setResult(100);
+                        startActivity(new Intent(PreviewActivity.this, MainActivity.class));
+                        finish();
+                    }
+
+                    @Override
+                    public void clean() {
+
+                    }
+                }).show();
                 break;
             case R.id.save:
                 if (type == REQUEST_CODE_MOVE_WATER_MARK) {
@@ -133,6 +147,7 @@ public class PreviewActivity extends BaseVideoActivity implements View.OnClickLi
                 break;
         }
     }
+
 
     private void succeedRemoveWaterMark() {
         HttpUtils.httpString(Constants.SUCCEED_REMOVE_WATER_MARK, null, new HttpUtils.HttpCallback() {

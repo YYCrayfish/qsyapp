@@ -43,6 +43,7 @@ import com.manyu.videoshare.util.HttpUtils;
 import com.manyu.videoshare.util.ToastUtils;
 import com.manyu.videoshare.util.ToolUtils;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
@@ -292,7 +293,6 @@ public class MainActivity extends BaseActivity {
             this.startActivity(localIntent);
         }
     }
-
     /**
      * 获取通知权限
      *

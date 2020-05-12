@@ -26,7 +26,10 @@
         <activity android:name=".ui.function.AddWaterActivity" />
         <activity android:name=".ui.account.RealNameStyleActivity" />
         <activity android:name=".ui.account.AutonymActivity" />
-        <activity android:name=".ui.MainActivity" />
+        <!--首页用singleTask模式 这样在视频保存到相册后点击右上角回到首页直接用startActivity即可-->
+        <activity
+            android:name=".ui.MainActivity"
+            android:launchMode="singleTask" />
         <activity
             android:name=".ui.StartActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
@@ -95,6 +98,7 @@
     <meta-data
         android:name="android.max_aspect"
         android:value="2.4" />
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -102,6 +106,7 @@
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WRITE_MEDIA_STORAGE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" /> <!-- 全面屏适配 5ccfaa760cafb2fdaa001206 -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 

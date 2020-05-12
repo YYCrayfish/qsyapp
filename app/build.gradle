@@ -44,8 +44,6 @@ android {
     buildTypes {
         release {
             signingConfig signingConfigs.keyAlias
-
-
             def isHx = project.hasProperty("isHx") ? project.getProperty("isHx") : "0"
             matchingFallbacks = ['release', 'debug']
             //开启断点调试
@@ -81,6 +79,7 @@ android {
     }*/
     packagingOptions {//加上这写代码
         pickFirst 'META-INF/*'
+        exclude 'META-INF/com.android.support_recyclerview-v7.version'
     }
     project.configurations.all {
         resolutionStrategy.eachDependency { details ->

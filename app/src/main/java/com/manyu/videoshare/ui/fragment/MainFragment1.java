@@ -183,15 +183,15 @@ public class MainFragment1 extends BaseFragment implements View.OnClickListener 
         adapter.setOnItemClickListener(new MultiItemTypeAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, RecyclerView.ViewHolder holder, int position) {
-                if (!checkPermissionREAD_EXTERNAL_STORAGE(getActivity())) {
-                    return;
-                }
+//                if (!checkPermissionREAD_EXTERNAL_STORAGE(getActivity())) {
+//                    return;
+//                }
+                if (!requestPermissions()) return;
                 switch (position) {
                     //添加水印
                     case 0:
                         startActivity(new Intent(getContext(), AddWaterActivity.class));
                         break;
-
                     //调整画布
                     case 1:
                         startActivity(new Intent(getContext(), VideoClipActivity.class));
@@ -241,17 +241,10 @@ public class MainFragment1 extends BaseFragment implements View.OnClickListener 
             final Context context) {
         int currentAPIVersion = Build.VERSION.SDK_INT;
         if (currentAPIVersion >= android.os.Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(context,
-                    Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                if (ActivityCompat.shouldShowRequestPermissionRationale(
-                        (Activity) context,
-                        Manifest.permission.READ_EXTERNAL_STORAGE)) {
+            if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                if (ActivityCompat.shouldShowRequestPermissionRationale((Activity) context, Manifest.permission.READ_EXTERNAL_STORAGE)) {
                 } else {
-                    ActivityCompat
-                            .requestPermissions(
-                                    (Activity) context,
-                                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                                    MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+                    ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
                 }
                 return false;
             } else {

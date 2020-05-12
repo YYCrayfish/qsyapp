@@ -12,7 +12,7 @@ import com.manyu.videoshare.R;
 public class ExitDialog extends Dialog {
     private Context mContext;
 
-    public ExitDialog(Context context,String text,AnalysisUrlListener  analysisUrlListener) {
+    public ExitDialog(Context context, String text, AnalysisUrlListener analysisUrlListener) {
         super(context, R.style.dialog);
         this.mContext = context;
         this.analysisUrlListener = analysisUrlListener;
@@ -20,20 +20,20 @@ public class ExitDialog extends Dialog {
     }
 
 
-    private void initView(String text)  {
+    private void initView(String text) {
         View view = LayoutInflater.from(mContext).inflate(R.layout.dialog_exit, null);
         setContentView(view);
         setCancelable(false);
         TextView textView = view.findViewById(R.id.dialog_clip_text);
         TextView cancle = view.findViewById(R.id.dialog_clip_cancle);
         TextView analysis = view.findViewById(R.id.dialog_clip_analysis);
-        if(text != null) {
+        if (text != null) {
             textView.setText(text);
         }
         cancle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (analysisUrlListener !=null){
+                if (analysisUrlListener != null) {
                     analysisUrlListener.clean();
                 }
                 dismiss();
@@ -43,7 +43,7 @@ public class ExitDialog extends Dialog {
         analysis.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (analysisUrlListener !=null){
+                if (analysisUrlListener != null) {
                     analysisUrlListener.analysis();
                 }
                 dismiss();
@@ -51,11 +51,12 @@ public class ExitDialog extends Dialog {
         });
     }
 
-    private AnalysisUrlListener  analysisUrlListener;
+    private AnalysisUrlListener analysisUrlListener;
 
 
-    public interface AnalysisUrlListener{
+    public interface AnalysisUrlListener {
         void analysis();
+
         void clean();
     }
 
