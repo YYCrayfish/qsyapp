@@ -19,6 +19,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.gyf.immersionbar.ImmersionBar;
 import com.jaeger.library.StatusBarUtil;
 import com.manyu.videoshare.R;
 import com.manyu.videoshare.view.Progressbar;
@@ -51,6 +52,7 @@ public abstract class BaseVideoActivity extends FragmentActivity implements View
     public void onCreate(Bundle savedInstanceState, PersistableBundle persistentState) {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         super.onCreate(savedInstanceState, persistentState);
+        ImmersionBar.with(this).statusBarDarkFont(false).statusBarColorInt(Color.BLACK).init();
         setToolBarColor(Color.BLACK);
     }
 

@@ -182,8 +182,8 @@ public class RemoveWatermarkActivity extends BaseVideoActivity implements View.O
             if (list.get(i).right > videoW - 1) {
                 list.get(i).right = videoW - 1;
             }
-            if (list.get(i).bottom > videoH ) {
-                list.get(i).bottom = videoH ;
+            if (list.get(i).bottom > videoH) {
+                list.get(i).bottom = videoH;
             }
         }
         newPath = newPath + "jq_" + (int) rect.left + "_" + (int) rect.top + "_" + UriToPathUtil.getFileNameByPath(path);
@@ -236,7 +236,7 @@ public class RemoveWatermarkActivity extends BaseVideoActivity implements View.O
                     public void onPrepared(MediaPlayer mp) {
                         mp.setOnVideoSizeChangedListener(new MediaPlayer.OnVideoSizeChangedListener() {
                             @Override
-                            public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
+                            public void onVideoSizeChanged(final MediaPlayer mp, int width, int height) {
                                 //获取视频资源的宽度
                                 videoW = mp.getVideoWidth();
                                 //获取视频资源的高度
@@ -253,6 +253,18 @@ public class RemoveWatermarkActivity extends BaseVideoActivity implements View.O
                                 }
                                 mVideoViewHost.setLayoutParams(videoLp);
                                 videoViewTool.videoSeekBar.reset();
+                                //TODO 这里正在对视频控件的宽高做处理，没经过测量和布局是拿不到宽度的
+                                new Handler().post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        videoViewH = videoViewTool.videoView.getMeasuredHeight();
+                                        videoViewW = videoViewTool.videoView.getMeasuredWidth();
+                                        //FixMe 获取视频资源的宽度
+                                        videoW = mp.getVideoWidth();
+                                        videoH = mp.getVideoHeight();
+                                        scale = (float) videoW / (float) videoViewW;
+                                    }
+                                });
                             }
                         });
                     }

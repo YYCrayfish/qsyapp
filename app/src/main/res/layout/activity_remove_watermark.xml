@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -9,25 +9,36 @@
     android:padding="@dimen/mDpDimen15"
     tools:context=".ui.function.UpendActivity">
 
+    <LinearLayout
+        android:id="@+id/remove_watermark_bottom_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:gravity="center"
+        android:minHeight="150dp"
+        android:orientation="vertical">
 
-        <android.support.constraint.ConstraintLayout
-            android:layout_width="match_parent"
+        <include layout="@layout/layout_video_seekbar" />
+    </LinearLayout>
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/remove_watermark_bottom_layout">
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/remove_watermark_host_view"
+            android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_weight="6">
-
-            <android.support.v7.widget.CardView
-                android:id="@+id/remove_watermark_host_view"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_gravity="center"
-                android:gravity="center"
-                app:cardBackgroundColor="#fff"
-                app:cardCornerRadius="8dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:layout_constraintDimensionRatio="w,1:2">
+            android:layout_gravity="center"
+            android:gravity="center"
+            app:cardBackgroundColor="#000"
+            app:cardCornerRadius="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:layout_constraintDimensionRatio="w,1:2">
 
             <VideoView
                 android:id="@+id/vv"
@@ -39,19 +50,7 @@
             <com.manyu.videoshare.view.ScreenShotZoomView
                 android:id="@+id/sszv"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
-
-            </android.support.v7.widget.CardView>
-        </android.support.constraint.ConstraintLayout>
-
-    <LinearLayout
-        android:id="@+id/remove_watermark_bottom_layout"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="4"
-        android:gravity="center"
-        android:orientation="vertical">
-
-        <include layout="@layout/layout_video_seekbar" />
-    </LinearLayout>
-</LinearLayout>
+                android:layout_height="match_parent" />
+        </android.support.v7.widget.CardView>
+    </android.support.constraint.ConstraintLayout>
+</RelativeLayout>
