@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.graphics.RectF;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -12,6 +13,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.constraint.ConstraintLayout;
+import android.support.v7.widget.CardView;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -71,12 +73,14 @@ public class RemoveWatermarkActivity extends BaseVideoActivity implements View.O
         intent.setType("video/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
         ((Activity) context).startActivityForResult(intent, 1);
+        setToolBarColor(Color.BLACK);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_remove_watermark);
+        mVideoViewHost = findViewById(R.id.video_view_host);
         start(this);
     }
 
@@ -212,6 +216,7 @@ public class RemoveWatermarkActivity extends BaseVideoActivity implements View.O
     }
 
 
+    private CardView mVideoViewHost;
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -226,22 +231,24 @@ public class RemoveWatermarkActivity extends BaseVideoActivity implements View.O
                 videoViewTool.videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                     @Override
                     public void onPrepared(MediaPlayer mp) {
-                        videoViewTool.videoSeekBar.reset();
                         mp.setOnVideoSizeChangedListener(new MediaPlayer.OnVideoSizeChangedListener() {
                             @Override
                             public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
-                                videoViewH = videoViewTool.videoView.getMeasuredHeight();
-                                videoViewW = videoViewTool.videoView.getMeasuredWidth();
-                                ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) zoomView.getLayoutParams();
-                                params.height = videoViewH;
-                                params.width = videoViewW;
-                                zoomView.setLayoutParams(params);
-                                //FixMe 获取视频资源的宽度
+                                //获取视频资源的宽度
                                 videoW = mp.getVideoWidth();
-                                //FixMe 获取视频资源的高度
+                                //获取视频资源的高度
                                 videoH = mp.getVideoHeight();
-                                scale = (float) videoW / (float) videoViewW;
-//                        refreshPortraitScreen(showVideoHeight == 0 ? DensityUtil.dip2px(context, 300) : showVideoHeight);
+                                View parent = (View) mVideoViewHost.getParent();
+
+                                // 按原视频的比例，缩放至视频的最长边和容器的最短边相等
+                                ConstraintLayout.LayoutParams videoLp = (ConstraintLayout.LayoutParams) mVideoViewHost.getLayoutParams();
+                                if ((1f * videoW / videoH) > (1f * parent.getWidth() / parent.getHeight())) {
+                                    videoLp.dimensionRatio = "h," + videoW + ":" + videoH;
+                                } else {
+                                    videoLp.dimensionRatio = "w," + videoW + ":" + videoH;
+                                }
+                                mVideoViewHost.setLayoutParams(videoLp);
+                                videoViewTool.videoSeekBar.reset();
                             }
                         });
                     }

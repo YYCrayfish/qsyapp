@@ -2,6 +2,7 @@
 package com.manyu.videoshare.base;
 
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.PersistableBundle;
@@ -50,6 +51,7 @@ public abstract class BaseVideoActivity extends FragmentActivity implements View
     public void onCreate(Bundle savedInstanceState, PersistableBundle persistentState) {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         super.onCreate(savedInstanceState, persistentState);
+        setToolBarColor(Color.BLACK);
     }
 
     @Override

@@ -7,6 +7,9 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
+import android.support.v7.widget.CardView;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.VideoView;
 
@@ -50,10 +53,13 @@ public class ModifyMD5Activity extends BaseVideoActivity implements MediaPlayer.
     private String tempVideoPath;
     private VideoViewTool videoViewTool = new VideoViewTool();
 
+    private CardView mVideoViewHost;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_modify_md5);
+        mVideoViewHost = findViewById(R.id.video_view_host);
         unbinder = ButterKnife.bind(this);
         // 加横线
         txtOldMd5.getPaint().setFlags(Paint.STRIKE_THRU_TEXT_FLAG);
@@ -113,14 +119,33 @@ public class ModifyMD5Activity extends BaseVideoActivity implements MediaPlayer.
         txtOldMd5.setText(md5);
     }
 
+    private int videoW;
+    private int videoH;
+
     @Override
     public void onPrepared(MediaPlayer mp) {
         videoViewTool.videoSeekBar.reset();
-//        mp.setOnVideoSizeChangedListener(new MediaPlayer.OnVideoSizeChangedListener() {
-//            @Override
-//            public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
-//            }
-//        });
+        mp.setOnVideoSizeChangedListener(new MediaPlayer.OnVideoSizeChangedListener() {
+            @Override
+            public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
+                //获取视频资源的宽度
+                videoW = mp.getVideoWidth();
+                //获取视频资源的高度
+                videoH = mp.getVideoHeight();
+                View parent = (View) mVideoViewHost.getParent();
+
+                // 按原视频的比例，缩放至视频的最长边和容器的最短边相等
+                ConstraintLayout.LayoutParams videoLp = (ConstraintLayout.LayoutParams) mVideoViewHost.getLayoutParams();
+                if ((1f * videoW / videoH) > (1f * parent.getWidth() / parent.getHeight())) {
+                    videoLp.dimensionRatio = "h," + videoW + ":" + videoH;
+                } else {
+                    videoLp.dimensionRatio = "w," + videoW + ":" + videoH;
+                }
+                mVideoViewHost.setLayoutParams(videoLp);
+                videoViewTool.videoSeekBar.reset();
+
+            }
+        });
     }
 
     @Override

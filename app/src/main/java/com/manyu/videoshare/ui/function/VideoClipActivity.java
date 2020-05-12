@@ -10,9 +10,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.constraint.ConstraintLayout;
+import android.support.v7.widget.CardView;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -69,6 +71,7 @@ public class VideoClipActivity extends BaseVideoActivity implements View.OnClick
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_clip);
+        mVideoViewHost = findViewById(R.id.video_view_host);
         ImmersionBar.with(this).statusBarDarkFont(false).statusBarColorInt(Color.BLACK).init();
         setToolBarColor(Color.BLACK);
         start(this);
@@ -215,6 +218,8 @@ public class VideoClipActivity extends BaseVideoActivity implements View.OnClick
         });
     }
 
+    private ConstraintLayout mVideoViewHost;
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -229,21 +234,29 @@ public class VideoClipActivity extends BaseVideoActivity implements View.OnClick
                 videoViewTool.videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                     @Override
                     public void onPrepared(MediaPlayer mp) {
-                        videoViewTool.videoSeekBar.reset();
                         mp.setOnVideoSizeChangedListener(new MediaPlayer.OnVideoSizeChangedListener() {
                             @Override
                             public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
-                                videoViewH = videoViewTool.videoView.getMeasuredHeight();
-                                videoViewW = videoViewTool.videoView.getMeasuredWidth();
-                                FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) zoomView.getLayoutParams();
-                                params.height = videoViewH;
-                                params.width = videoViewW;
-                                zoomView.setLayoutParams(params);
-                                //FixMe 获取视频资源的宽度
+                                //获取视频资源的宽度
                                 videoW = mp.getVideoWidth();
-                                //FixMe 获取视频资源的高度
+                                //获取视频资源的高度
                                 videoH = mp.getVideoHeight();
-                                scale = (float) videoW / (float) videoViewW;
+                                View parent = (View) videoViewTool.videoView.getParent();
+                                // 按原视频的比例，缩放至视频的最长边和容器的最短边相等
+                                ConstraintLayout.LayoutParams videoLp = (ConstraintLayout.LayoutParams) videoViewTool.videoView.getLayoutParams();
+                                Log.e("Logger", "videoLp.width = " + videoLp.width + "， videoLp.height = " + videoLp.height);
+                                if ((1f * videoW / videoH) > (1f * parent.getWidth() / parent.getHeight())) {
+                                    videoLp.dimensionRatio = "h," + videoW + ":" + videoH;
+                                } else {
+                                    videoLp.dimensionRatio = "w," + videoW + ":" + videoH;
+                                }
+                                videoViewTool.videoView.setLayoutParams(videoLp);
+                                Log.e("Logger", "videoLp.width = " + videoViewTool.videoView.getWidth() + "， videoLp.height = " + videoViewTool.videoView.getHeight());
+                                ViewGroup.LayoutParams layoutParams = zoomView.getLayoutParams();
+                                layoutParams.width = videoViewTool.videoView.getWidth();
+                                layoutParams.height = videoViewTool.videoView.getHeight();
+                                zoomView.setLayoutParams(layoutParams);
+                                videoViewTool.videoSeekBar.reset();
                             }
                         });
                     }

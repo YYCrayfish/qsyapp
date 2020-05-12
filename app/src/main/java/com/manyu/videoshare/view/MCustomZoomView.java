@@ -233,7 +233,6 @@ public class MCustomZoomView extends View {
         switch (event.getAction()) {
             /*按下*/
             case MotionEvent.ACTION_DOWN:
-                Log.e("Logger", "MotionEvent.ACTION_DOWN");
                 /**当前按下的X坐标*/float mPressX = event.getX();
                 /**当前按下的Y坐标*/float mPressY = event.getY();
 
@@ -255,7 +254,6 @@ public class MCustomZoomView extends View {
                 break;
             /*移动*/
             case MotionEvent.ACTION_MOVE:
-                Log.e("Logger", "MotionEvent.ACTION_MOVE");
                 /*移动-改变矩形四个点坐标*/
                 if (mOperatingStatus == 1) {
                     mRect_FourCorner_coordinate[0][0] += event.getX() - mLastPressX;

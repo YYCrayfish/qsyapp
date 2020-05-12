@@ -3,13 +3,18 @@ package com.manyu.videoshare.ui.function;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.Bundle;
 
+import android.support.constraint.ConstraintLayout;
+import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.View;
 import android.widget.MediaController;
+
 import com.manyu.videoshare.R;
 import com.manyu.videoshare.base.BaseVideoActivity;
 import com.manyu.videoshare.util.FFmpegUtil;
@@ -48,6 +53,8 @@ public class SpeedActivity extends BaseVideoActivity implements View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_speed);
+        mVideoViewHost = findViewById(R.id.video_view_host);
+        setToolBarColor(Color.BLACK);
         start(this);
     }
 
@@ -150,6 +157,10 @@ public class SpeedActivity extends BaseVideoActivity implements View.OnClickList
         super.onDestroy();
     }
 
+    private int videoW;
+    private int videoH;
+    private CardView mVideoViewHost;
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -161,6 +172,31 @@ public class SpeedActivity extends BaseVideoActivity implements View.OnClickList
                 Uri uri = data.getData();
                 videoPath = UriToPathUtil.getRealFilePath(this, uri);
                 videoViewTool.init(this, null, uri);
+                videoViewTool.videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                    @Override
+                    public void onPrepared(MediaPlayer mp) {
+                        mp.setOnVideoSizeChangedListener(new MediaPlayer.OnVideoSizeChangedListener() {
+                            @Override
+                            public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
+                                //获取视频资源的宽度
+                                videoW = mp.getVideoWidth();
+                                //获取视频资源的高度
+                                videoH = mp.getVideoHeight();
+                                View parent = (View) mVideoViewHost.getParent();
+
+                                // 按原视频的比例，缩放至视频的最长边和容器的最短边相等
+                                ConstraintLayout.LayoutParams videoLp = (ConstraintLayout.LayoutParams) mVideoViewHost.getLayoutParams();
+                                if ((1f * videoW / videoH) > (1f * parent.getWidth() / parent.getHeight())) {
+                                    videoLp.dimensionRatio = "h," + videoW + ":" + videoH;
+                                } else {
+                                    videoLp.dimensionRatio = "w," + videoW + ":" + videoH;
+                                }
+                                mVideoViewHost.setLayoutParams(videoLp);
+                                videoViewTool.videoSeekBar.reset();
+                            }
+                        });
+                    }
+                });
             }
         } else if (resultCode == 100) {
             finish();
