@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.animation.LinearInterpolator;
 
 import com.manyu.videoshare.R;
+import com.manyu.videoshare.util.ImageUtil;
 
 /**
  * 自定义缩放、移动框
