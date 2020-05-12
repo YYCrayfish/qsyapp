@@ -418,3 +418,7 @@
 -keep public class [com.app.wakuang].R$*{
 public static final int *;
 }
+
+# loading框
+-keep class com.wang.avi.** { *; }
+-keep class com.wang.avi.indicators.** { *; }
