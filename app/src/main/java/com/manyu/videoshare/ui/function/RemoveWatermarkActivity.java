@@ -43,6 +43,7 @@ import com.manyu.videoshare.view.ScreenShotZoomView;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import io.microshow.rxffmpeg.RxFFmpegInvoke;
 import io.microshow.rxffmpeg.RxFFmpegSubscriber;
@@ -80,7 +81,7 @@ public class RemoveWatermarkActivity extends BaseVideoActivity implements View.O
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_remove_watermark);
-        mVideoViewHost = findViewById(R.id.video_view_host);
+        mVideoViewHost = findViewById(R.id.remove_watermark_host_view);
         start(this);
     }
 
@@ -177,11 +178,11 @@ public class RemoveWatermarkActivity extends BaseVideoActivity implements View.O
             if (list.get(i).top < 0) {
                 list.get(i).top = 0;
             }
-            if (list.get(i).right > videoW - 1) {
-                list.get(i).right = videoW - 1;
+            if (list.get(i).right > videoW ) {
+                list.get(i).right = videoW ;
             }
-            if (list.get(i).bottom > videoH - 1) {
-                list.get(i).bottom = videoH - 1;
+            if (list.get(i).bottom > videoH ) {
+                list.get(i).bottom = videoH ;
             }
         }
         newPath = newPath + "jq_" + (int) rect.left + "_" + (int) rect.top + "_" + UriToPathUtil.getFileNameByPath(path);
@@ -192,7 +193,7 @@ public class RemoveWatermarkActivity extends BaseVideoActivity implements View.O
             public void onFinish() {
                 progressEnd();
                 Log.e("ffmpeg_result", "成功");
-                PreviewActivity.start(RemoveWatermarkActivity.this, newPath,REQUEST_CODE_MOVE_WATER_MARK);
+                PreviewActivity.start(RemoveWatermarkActivity.this, newPath, REQUEST_CODE_MOVE_WATER_MARK);
                 list.clear();
                 newPath = getBaseContext().getCacheDir().getAbsolutePath() + File.separator;
             }
@@ -217,6 +218,7 @@ public class RemoveWatermarkActivity extends BaseVideoActivity implements View.O
 
 
     private CardView mVideoViewHost;
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -239,12 +241,13 @@ public class RemoveWatermarkActivity extends BaseVideoActivity implements View.O
                                 //获取视频资源的高度
                                 videoH = mp.getVideoHeight();
                                 View parent = (View) mVideoViewHost.getParent();
-
                                 // 按原视频的比例，缩放至视频的最长边和容器的最短边相等
                                 ConstraintLayout.LayoutParams videoLp = (ConstraintLayout.LayoutParams) mVideoViewHost.getLayoutParams();
                                 if ((1f * videoW / videoH) > (1f * parent.getWidth() / parent.getHeight())) {
+                                    //横屏
                                     videoLp.dimensionRatio = "h," + videoW + ":" + videoH;
                                 } else {
+                                    //竖屏
                                     videoLp.dimensionRatio = "w," + videoW + ":" + videoH;
                                 }
                                 mVideoViewHost.setLayoutParams(videoLp);
