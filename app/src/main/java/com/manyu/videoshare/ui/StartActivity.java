@@ -4,11 +4,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DrawableUtils;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.Window;
@@ -31,6 +33,7 @@ import com.manyu.videoshare.util.HttpUtils;
 import com.manyu.videoshare.util.IntentUtils;
 import com.manyu.videoshare.util.ToastUtils;
 import com.manyu.videoshare.util.ToolUtils;
+import com.manyu.videoshare.util.universally.LOG;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.FileCallBack;
 
@@ -95,37 +98,37 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
 //        version.setText("V" + versionName);
         mCounterBar.setOnClickListener(this);
         launchAdImageView.setOnClickListener(this);
-        //TODO 加载广告图片
-        try {
-            String destFileDir = Environment.getExternalStorageDirectory() + "/manyu/";
-            File dir = new File(destFileDir);
-            if (!dir.exists()) {
-                dir.mkdirs();
-            }
-            final String path = Environment.getExternalStorageDirectory() + "/manyu/";
-            String md5 = "start.png";
-            final String name = path + md5;
-            //TODO 生成文件
-            File file = new File(name);
-            //TODO 判断APP是否第一次启动,我寻思没屌用 就注释了
-//            if (!BaseSharePerence.getInstance().getFirst()) {
-//                //TODO 若广告图片存在 则加载显示广告
-//                if (file.exists()) {
-//                    Bitmap bitmap = BitmapFactory.decodeFile(name);
-//                    if (null != bitmap) {
-//                        launchAdImageView.setImageBitmap(bitmap);
-//                        toggleLogoInfo(false);
-//                    }
-//                } else {
-//                    launchAdImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-//                }
-//            } else {
-//                launchAdImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+//        //TODO 加载广告图片
+//        try {
+//            String destFileDir = Environment.getExternalStorageDirectory() + "/manyu/";
+//            File dir = new File(destFileDir);
+//            if (!dir.exists()) {
+//                dir.mkdirs();
 //            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            toggleLogoInfo(true);
-        }
+//            final String path = Environment.getExternalStorageDirectory() + "/manyu/";
+//            String md5 = "start.png";
+//            final String name = path + md5;
+//            //TODO 生成文件
+//            File file = new File(name);
+//            //TODO 判断APP是否第一次启动
+////            if (!BaseSharePerence.getInstance().getFirst()) {
+////                //TODO 若广告图片存在 则加载显示广告
+////                if (file.exists()) {
+////                    Bitmap bitmap = BitmapFactory.decodeFile(name);
+////                    if (null != bitmap) {
+////                        launchAdImageView.setImageBitmap(bitmap);
+////                        toggleLogoInfo(false);
+////                    }
+////                } else {
+////                    launchAdImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+////                }
+////            } else {
+////                launchAdImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+////            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            toggleLogoInfo(true);
+//        }
 
     }
 
@@ -216,7 +219,6 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
                     }
                     startTime(bean.getDatas().getAd_step());
                     if (BaseSharePerence.getInstance().getFirst()) {
-                        //btnAd.setImageDrawable(getResources().getDrawable(R.drawable.start));
                         BaseSharePerence.getInstance().setFirst(false);
                         launchAdImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
                     } else if (bean.getDatas().getStart_page() != null) {
@@ -226,9 +228,7 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
                         final String name = path + md5;
                         File file = new File(name);
                         toggleLogoInfo(false);
-                        if (!file.exists()) {
-                            GlideUtils.loadImgWithout(context, bean.getDatas().getStart_page().getUrl(), launchAdImageView);
-                        }
+                        GlideUtils.loadImgWithout(context, bean.getDatas().getStart_page().getUrl(), launchAdImageView);
                         if (bean.getDatas().getStart_page() != null && !TextUtils.isEmpty(bean.getDatas().getStart_page().getImage())){
                             Glide.with(StartActivity.this).load(bean.getDatas().getStart_page().getImage()).into(launchAdImageView);
                         }else{
@@ -236,10 +236,8 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
                         }
                         okHttpDownLoadApk(bean.getDatas().getStart_page().getImage());
                     }
-                    //
                 }
                 LoadingDialog.closeLoadingDialog();
-                //ToastUtils.showShort(bean.getMsg());
             }
         });
     }
@@ -252,8 +250,8 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
         }
         final String path = Environment.getExternalStorageDirectory() + "/manyu/";
         String md5 = "start.png";
-        final String name = path + md5;
-        File file = new File(name);
+//        final String name = path + md5;
+//        File file = new File(name);
 
         /*File myCaptureFile = new File(path, md5);
         try {
@@ -269,7 +267,7 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
 
                     @Override
                     public void onResponse(File response, int id) {
-
+                        LOG.showE("图片加载完成："+response.getAbsolutePath());
                     }
 
                     @Override

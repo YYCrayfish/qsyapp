@@ -164,7 +164,7 @@ public class FileUtil {
         try {
             File newFile = new File(newPath$Name);
             if (newFile.exists()) {
-                ToastUtils.showShort("视频已经存在，无需再次保存。");
+                ToastUtils.showShort("视频已经存在，无需重复保存(可在相册中查找)。");
                 return false;
             }
             File file = new File(oldPath$Name);
