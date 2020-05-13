@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.google.gson.Gson;
 import com.manyu.videoshare.R;
 import com.manyu.videoshare.base.BaseActivity;
+import com.manyu.videoshare.base.BaseApplication;
 import com.manyu.videoshare.base.BaseSharePerence;
 import com.manyu.videoshare.base.LoadingDialog;
 import com.manyu.videoshare.bean.RegisterBean;
@@ -155,6 +156,8 @@ public class LoginAcitivty extends BaseActivity implements View.OnClickListener 
                     }else{
                         BaseSharePerence.getInstance().setLoginPwd("");
                     }
+                    //TODO 登录成功后去请求一次解析次数
+                    BaseApplication.getInstance().getAnalysisTime();
                     finish();
                 }else{
                     ToastUtils.showShort(bean.getMsg());
