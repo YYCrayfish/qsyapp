@@ -178,8 +178,9 @@ public class PreviewActivity extends BaseVideoActivity implements View.OnClickLi
                 //TODO 首先判断是不是去水印功能下保存视频
                 if (type == REQUEST_CODE_MOVE_WATER_MARK) {
                     //TODO 判断剩余解析次数，onCreate中更新一次此次数
-                    if (BaseApplication.getInstance().getUserAnalysisTime() > 0) {
+                    if (BaseApplication.getInstance().getUserAnalysisTime() > 0 && FileUtil.copyFileOnly(path, newPath)) {
                         isSave = true;
+                        saveSucceed();
                         //TODO 上报水印去除成功
                         succeedRemoveWaterMark();
                         BaseApplication.getInstance().getAnalysisTime();
@@ -190,14 +191,18 @@ public class PreviewActivity extends BaseVideoActivity implements View.OnClickLi
                 } else if (FileUtil.copyFileOnly(path, newPath)) {
                     //TODO 不是去水印功能下保存视频 直接保存
                     isSave = true;
-                    ToastUtils.showShort("视频已经成功保存到相册中");
-                    Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-                    Uri uri = Uri.fromFile(new File(newPath));
-                    intent.setData(uri);
-                    sendBroadcast(intent);
+                    saveSucceed();
                 }
                 break;
         }
+    }
+
+    private void saveSucceed(){
+        ToastUtils.showShort("视频已经成功保存到相册中");
+        Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        Uri uri = Uri.fromFile(new File(newPath));
+        intent.setData(uri);
+        sendBroadcast(intent);
     }
 
 
@@ -229,13 +234,17 @@ public class PreviewActivity extends BaseVideoActivity implements View.OnClickLi
     public void onPause() {
         super.onPause();
         videoView.pause();
+        if (!isSave) {
+            LOG.showE("未保存直接删除");
+            UriToPathUtil.deleteSingleFile(path);
+        }
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         videoView.pause();
-        if (type == 0) {
+        if (type == 0 || !isSave) {
             UriToPathUtil.deleteSingleFile(path);
         }
     }
