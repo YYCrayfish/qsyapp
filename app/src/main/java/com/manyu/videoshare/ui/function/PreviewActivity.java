@@ -22,15 +22,18 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.VideoView;
 
+import com.google.gson.Gson;
 import com.gyf.immersionbar.ImmersionBar;
 import com.manyu.videoshare.R;
 import com.manyu.videoshare.base.BaseApplication;
 import com.manyu.videoshare.base.BaseVideoActivity;
 import com.manyu.videoshare.base.LoadingDialog;
+import com.manyu.videoshare.bean.AnalysisTimeBean;
 import com.manyu.videoshare.dialog.ExitDialog;
 import com.manyu.videoshare.ui.MainActivity;
 import com.manyu.videoshare.util.Constants;
 import com.manyu.videoshare.util.DialogIncomeTipUtil;
+import com.manyu.videoshare.util.Globals;
 import com.manyu.videoshare.util.HttpUtils;
 import com.manyu.videoshare.util.ToastUtils;
 import com.manyu.videoshare.util.ToolUtils;
@@ -67,6 +70,7 @@ public class PreviewActivity extends BaseVideoActivity implements View.OnClickLi
     private int videoViewW;//视频控件宽度
     private int videoViewH;//视频控件高度
     private CardView mVideoViewHost;
+    private boolean isConsume = false;
 
     public static void start(Context context, String path) {
         ((Activity) context).startActivityForResult(new Intent(context, PreviewActivity.class).putExtra("path", path), 100);
@@ -175,22 +179,85 @@ public class PreviewActivity extends BaseVideoActivity implements View.OnClickLi
                 }
                 break;
             case R.id.save:
-                //TODO 首先判断是不是去水印功能下保存视频
-                if (type == REQUEST_CODE_MOVE_WATER_MARK) {
-                    //TODO 判断剩余解析次数，onCreate中更新一次此次数
-                    if (BaseApplication.getInstance().getUserAnalysisTime() > 0 && FileUtil.copyFileOnly(path, newPath)) {
-                        isSave = true;
-                        saveSucceed();
-                        //TODO 上报水印去除成功
-                        succeedRemoveWaterMark();
-                        BaseApplication.getInstance().getAnalysisTime();
-                    } else {
-                        new DialogIncomeTipUtil(this, "可用次数不足，无法保存。").show();
+
+                // 去水印
+                if (type == REQUEST_CODE_MOVE_WATER_MARK)
+                {
+                    if(isConsume)
                         return;
-                    }
-                } else if (FileUtil.copyFileOnly(path, newPath)) {
-                    //TODO 不是去水印功能下保存视频 直接保存
+
+                    isConsume = true;
+
+                    // 因为还有Vip的关系，所以这里app只判断是否能够扣除成功，能成功的话就保存
+                    LoadingDialog.showLoadingDialog(PreviewActivity.this);
+                    HttpUtils.httpString(Constants.SUCCEED_REMOVE_WATER_MARK, null, new HttpUtils.HttpCallback() {
+                        @Override
+                        public void httpError(Call call, Exception e) {
+                            //TODO 上报水印去除 --请求失败
+                            LoadingDialog.closeLoadingDialog();
+                            ToastUtils.showShort("服务器异常~");
+                            isConsume = false;
+                        }
+
+                        @Override
+                        public void httpResponse(String resultData) {
+                            Gson gson = new Gson();
+                            AnalysisTimeBean timeBean = gson.fromJson(resultData, AnalysisTimeBean.class);
+                            LoadingDialog.closeLoadingDialog();
+
+                            if(timeBean.getCode() == 200){
+                                isSave = true;
+                                BaseApplication.getInstance().updateUserAnalysisTime();
+                                boolean isExist = FileUtil.copyFileOnly(path, newPath);
+                                if(isExist || !isConsume){
+                                    isConsume = true;
+                                    saveSucceed();
+                                }
+                            }else{
+                                new DialogIncomeTipUtil(PreviewActivity.this, "可用次数不足，无法保存。").show();
+                                return;
+                            }
+                        }
+                    });
+
+//                    HttpUtils.httpString(Constants.ANALYTIC, null, new HttpUtils.HttpCallback() {
+//                        @Override
+//                        public void httpError(Call call, Exception e) {
+//                            LoadingDialog.closeLoadingDialog();
+//                            ToastUtils.showShort("服务器异常~");
+//                        }
+//
+//                        @Override
+//                        public void httpResponse(String resultData) {
+//                            Gson gson = new Gson();
+//                            Globals.log(resultData);
+//                            AnalysisTimeBean timeBean = gson.fromJson(resultData, AnalysisTimeBean.class);
+//                            LoadingDialog.closeLoadingDialog();
+//                            BaseApplication.getInstance().setUserAnalysisTime(timeBean.getData());
+//                            if(timeBean.getData() > 0){
+//                                isSave = true;
+//                                BaseApplication.getInstance().updateUserAnalysisTime();
+//                                boolean isExist = FileUtil.copyFileOnly(path, newPath);
+//                                LOG.showE("新地址："+"  isExist="+isExist+"  "+isConsume);
+//                                if(isExist || !isConsume){
+//                                    LOG.showE("接口请求到可用次数："+timeBean.getData());
+//                                    isConsume = true;
+//                                    // 上报水印去除成功
+//                                    succeedRemoveWaterMark();
+//                                    saveSucceed();
+//                                }
+//                            }else{
+//                                new DialogIncomeTipUtil(PreviewActivity.this, "可用次数不足，无法保存。").show();
+//                                return;
+//                            }
+//                        }
+//                    });
+                }
+                // 其他操作 直接保存
+                else
+                {
                     isSave = true;
+                    FileUtil.copyFileOnly(path, newPath);
                     saveSucceed();
                 }
                 break;
@@ -217,6 +284,7 @@ public class PreviewActivity extends BaseVideoActivity implements View.OnClickLi
             @Override
             public void httpResponse(String resultData) {
                 Log.e("Logger", "上报水印去除成功");
+                isConsume = true;
             }
         });
     }
@@ -235,7 +303,6 @@ public class PreviewActivity extends BaseVideoActivity implements View.OnClickLi
         super.onPause();
         videoView.pause();
         if (!isSave) {
-            LOG.showE("未保存直接删除");
             UriToPathUtil.deleteSingleFile(path);
         }
     }
@@ -243,6 +310,7 @@ public class PreviewActivity extends BaseVideoActivity implements View.OnClickLi
     @Override
     public void onDestroy() {
         super.onDestroy();
+        isConsume = false;
         videoView.pause();
         if (type == 0 || !isSave) {
             UriToPathUtil.deleteSingleFile(path);

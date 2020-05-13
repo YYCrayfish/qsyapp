@@ -74,4 +74,10 @@ public class BaseApplication extends Application {
     public void setUserAnalysisTime(int userAnalysisTime) {
         this.userAnalysisTime = userAnalysisTime;
     }
+
+    // 更新次数
+    public void updateUserAnalysisTime(){
+        this.userAnalysisTime -= 1;
+        getAnalysisTime();
+    }
 }
