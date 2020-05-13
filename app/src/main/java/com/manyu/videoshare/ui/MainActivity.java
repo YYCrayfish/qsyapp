@@ -71,10 +71,14 @@ public class MainActivity extends BaseActivity {
         StatusBarUtil.setTranslucentForImageViewInFragment(MainActivity.this, 0, null);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 //        requestPermissions();
-        getAnalysisTime();
         ImmersionBar.with(this).statusBarColorInt(Color.BLACK).init();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getAnalysisTime();
+    }
 
     private void getAnalysisTime() {
         HttpUtils.httpString(Constants.ANALYTIC, null, new HttpUtils.HttpCallback() {
