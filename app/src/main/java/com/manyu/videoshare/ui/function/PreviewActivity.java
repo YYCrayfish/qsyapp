@@ -1,8 +1,10 @@
 package com.manyu.videoshare.ui.function;
 
 import android.app.Activity;
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,6 +14,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.MediaController;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.VideoView;
 
@@ -51,6 +54,8 @@ public class PreviewActivity extends BaseVideoActivity implements View.OnClickLi
     private VideoView videoView;
     private int type;
     private String newPath = ConfigureParameter.SYSTEM_CAMERA_PATH;
+    private boolean isSave = false;
+    private SeekBar mSeekBar;
 
     public static void start(Context context, String path) {
         ((Activity) context).startActivityForResult(new Intent(context, PreviewActivity.class).putExtra("path", path), 100);
@@ -64,6 +69,7 @@ public class PreviewActivity extends BaseVideoActivity implements View.OnClickLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_preview);
+        mSeekBar = findViewById(R.id.video_seek_bar);
         type = getIntent().getIntExtra("type", -1);
     }
 
@@ -112,24 +118,31 @@ public class PreviewActivity extends BaseVideoActivity implements View.OnClickLi
                 finish();
                 break;
             case R.id.title_right:
-                new ExitDialog(this, "当前视频还未保存,是否确定返回首页", new ExitDialog.AnalysisUrlListener() {
-                    @Override
-                    public void analysis() {
-                        setResult(100);
-                        startActivity(new Intent(PreviewActivity.this, MainActivity.class));
-                        finish();
-                    }
+                if (!isSave) {
+                    new ExitDialog(this, "当前视频还未保存,是否确定返回首页", new ExitDialog.AnalysisUrlListener() {
+                        @Override
+                        public void analysis() {
+                            setResult(100);
+                            startActivity(new Intent(PreviewActivity.this, MainActivity.class));
+                            finish();
+                        }
 
-                    @Override
-                    public void clean() {
+                        @Override
+                        public void clean() {
 
-                    }
-                }).show();
+                        }
+                    }).show();
+                } else {
+                    setResult(100);
+                    startActivity(new Intent(PreviewActivity.this, MainActivity.class));
+                    finish();
+                }
                 break;
             case R.id.save:
                 if (type == REQUEST_CODE_MOVE_WATER_MARK) {
                     if (BaseApplication.getInstance().getUserAnalysisTime() > 0) {
                         //TODO 上报水印去除成功
+                        isSave = true;
                         succeedRemoveWaterMark();
                         BaseApplication.getInstance().setUserAnalysisTime(BaseApplication.getInstance().getUserAnalysisTime() - 1);
                     } else {
@@ -138,6 +151,7 @@ public class PreviewActivity extends BaseVideoActivity implements View.OnClickLi
                     }
                 }
                 if (FileUtil.copyFileOnly(path, newPath)) {
+                    isSave = true;
                     ToastUtils.showShort("视频已经成功保存到相册中");
                     Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
                     Uri uri = Uri.fromFile(new File(newPath));

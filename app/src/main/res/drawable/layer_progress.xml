@@ -1,0 +1,28 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>----对背景的控制，没有进度时
+        <shape>
+            <corners android:radius="2dp" />
+            --圆角
+            <solid android:color="#ffffff" />
+            --颜色
+        </shape>
+    </item>
+    <item>--- 这个目前来说不知道什么用，也可以去掉这一部分
+        <clip>
+            <shape>
+                <corners android:radius="2dp" />
+                <solid android:color="#ffffff" />
+            </shape>
+        </clip>
+    </item>
+    <item>--- 对进度条的控制
+        <clip>
+            <shape>
+                <corners android:radius="2dp" />
+                --圆角
+                <solid android:color="#4084ff" />
+                --颜色
+            </shape>
+        </clip>
+    </item>
+</layer-list>
