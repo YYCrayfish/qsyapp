@@ -85,6 +85,8 @@ public class PreviewActivity extends BaseVideoActivity implements View.OnClickLi
         mVideoViewHost = findViewById(R.id.video_view_host);
         ImmersionBar.with(this).statusBarDarkFont(false).statusBarColorInt(Color.BLACK).init();
         type = getIntent().getIntExtra("type", -1);
+        //TODO 更新一下剩余次数
+        BaseApplication.getInstance().getAnalysisTime();
     }
 
     @Override
@@ -173,18 +175,20 @@ public class PreviewActivity extends BaseVideoActivity implements View.OnClickLi
                 }
                 break;
             case R.id.save:
+                //TODO 首先判断是不是去水印功能下保存视频
                 if (type == REQUEST_CODE_MOVE_WATER_MARK) {
+                    //TODO 判断剩余解析次数，onCreate中更新一次此次数
                     if (BaseApplication.getInstance().getUserAnalysisTime() > 0) {
-                        //TODO 上报水印去除成功
                         isSave = true;
+                        //TODO 上报水印去除成功
                         succeedRemoveWaterMark();
-                        BaseApplication.getInstance().setUserAnalysisTime(BaseApplication.getInstance().getUserAnalysisTime() - 1);
+                        BaseApplication.getInstance().getAnalysisTime();
                     } else {
                         new DialogIncomeTipUtil(this, "可用次数不足，无法保存。").show();
                         return;
                     }
-                }
-                if (FileUtil.copyFileOnly(path, newPath)) {
+                } else if (FileUtil.copyFileOnly(path, newPath)) {
+                    //TODO 不是去水印功能下保存视频 直接保存
                     isSave = true;
                     ToastUtils.showShort("视频已经成功保存到相册中");
                     Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);

@@ -43,6 +43,7 @@ public class BaseApplication extends Application {
         getAnalysisTime();
     }
 
+    //TODO 查询次数
     public void getAnalysisTime() {
         HttpUtils.httpString(Constants.ANALYTIC, null, new HttpUtils.HttpCallback() {
             @Override
