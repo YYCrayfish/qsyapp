@@ -33,6 +33,7 @@ import com.manyu.videoshare.adapter.AskandAnswerAdapter;
 import com.manyu.videoshare.adapter.HomeToolsAdapter;
 import com.manyu.videoshare.adapter.RollPagerAdapter;
 import com.manyu.videoshare.adapter.SupportAdapter;
+import com.manyu.videoshare.base.BaseApplication;
 import com.manyu.videoshare.base.BaseFragment;
 import com.manyu.videoshare.base.LoadingDialog;
 import com.manyu.videoshare.bean.HomeItemBean;
@@ -138,6 +139,7 @@ public class MainFragment1 extends BaseFragment implements View.OnClickListener 
     public void onResume() {
         super.onResume();
         initRoll();
+        BaseApplication.getInstance().getAnalysisTime();
         ImmersionBar.with(this).barColorInt(getResources().getColor(R.color.main_text_ask_answerword)).init();
     }
 
