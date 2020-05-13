@@ -448,7 +448,7 @@ public class DoubleSlideSeekBar extends View {
                 textPaint);
         textPaint.setTextSize(ImageUtil.dp2px(context, 12));
 //        canvas.drawText(stringForTime((long) smallRange), slideLowX - bitmapWidth / 2 - textPaint.measureText(stringForTime((long) smallRange)) / 2, textHeight, textPaint);
-        canvas.drawText(stringForTime((long) bigRange), slideBigX - bitmapWidth / 2 - textPaint.measureText(stringForTime((long) bigRange)) / 2, lineY + insetsW + 15, textPaint);
+        canvas.drawText(stringForTime((long) bigRange), slideBigX - bitmapWidth / 2 - textPaint.measureText(stringForTime((long) bigRange)) / 2, lineY + insetsW + 4, textPaint);
     }
 
     @Override

@@ -14,7 +14,7 @@
         android:gravity="center"
         android:padding="4dp"
         android:background="@drawable/shape_water_border"
-        tools:text="都会死的还是就看" />
+        tools:text="" />
 
     <!--水印图片-->
     <ImageView
