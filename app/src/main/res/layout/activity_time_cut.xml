@@ -12,7 +12,7 @@
     <LinearLayout
         android:id="@+id/time_cut_bottom_layout"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="240dp"
         android:layout_alignParentBottom="true"
         android:gravity="center"
         android:orientation="vertical">
@@ -22,10 +22,25 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="播放"
+            android:text="暂停"
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:background="@drawable/shape_play_pause_btn"
             android:textColor="@color/white"
-            android:textSize="20sp"
+            android:textSize="15sp"
             android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_marginTop="5dp"
+            android:text="拖动左右两端箭头选择裁减区域"
+            android:textColor="@color/colorGray"
+            android:textSize="10sp"
+            />
 
         <com.manyu.videoshare.view.DoubleSlideSeekBar
             android:id="@+id/doubleSeekBar"
@@ -33,12 +48,11 @@
             android:layout_height="wrap_content"
             app:hasRule="false"
             app:imageheight="40dp"
-            app:imagewidth="20dp"
+            app:imagewidth="18dp"
             app:lineHeight="30dp"
             app:outColor="@color/white"
             app:textColor="@color/white"
-            app:textSize="16sp"
-
+            app:textSize="14sp"
             />
     </LinearLayout>
 

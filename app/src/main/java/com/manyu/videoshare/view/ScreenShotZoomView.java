@@ -575,32 +575,64 @@ public class ScreenShotZoomView extends View {
      */
     private boolean toolPointIsInCorner(float x, float y) {
         if (x > mRect_FourCorner_coordinate[0][0]
-                && x < mRect_FourCorner_coordinate[0][0] + mCornerLength / 2
+                && x < mRect_FourCorner_coordinate[0][0] + mCornerLength
                 && y > mRect_FourCorner_coordinate[0][1]
-                && y < mRect_FourCorner_coordinate[0][1] + mCornerLength / 2) {
+                && y < mRect_FourCorner_coordinate[0][1] + mCornerLength ) {
             mCornerStatus = 0;
             return true;
         } else if (x > mRect_FourCorner_coordinate[0][0]
-                && x < mRect_FourCorner_coordinate[0][0] + mCornerLength / 2
-                && y > mRect_FourCorner_coordinate[1][1] - mCornerLength / 2
+                && x < mRect_FourCorner_coordinate[0][0] + mCornerLength
+                && y > mRect_FourCorner_coordinate[1][1] - mCornerLength
                 && y < mRect_FourCorner_coordinate[1][1]) {
             mCornerStatus = 1;
             return true;
-        } else if (x > mRect_FourCorner_coordinate[2][0] - mCornerLength / 2
+        } else if (x > mRect_FourCorner_coordinate[2][0] - mCornerLength
                 && x < mRect_FourCorner_coordinate[2][0]
                 && y > mRect_FourCorner_coordinate[2][1]
-                && y < mRect_FourCorner_coordinate[2][1] + mCornerLength / 2) {
+                && y < mRect_FourCorner_coordinate[2][1] + mCornerLength ) {
             mCornerStatus = 2;
             return true;
-        } else if (x > mRect_FourCorner_coordinate[3][0] - mCornerLength / 2
+        } else if (x > mRect_FourCorner_coordinate[3][0] - mCornerLength
                 && x < mRect_FourCorner_coordinate[3][0]
-                && y > mRect_FourCorner_coordinate[3][1] - mCornerLength / 2
+                && y > mRect_FourCorner_coordinate[3][1] - mCornerLength
                 && y < mRect_FourCorner_coordinate[3][1]) {
             mCornerStatus = 3;
             return true;
         }
         return false;
     }
+
+//    /**
+//     * 判断按下的点是否在边角范围内
+//     */
+//    private boolean toolPointIsInCorner(float x, float y) {
+//        if (x > mRect_FourCorner_coordinate[0][0]
+//                && x < mRect_FourCorner_coordinate[0][0] + mCornerLength / 2
+//                && y > mRect_FourCorner_coordinate[0][1]
+//                && y < mRect_FourCorner_coordinate[0][1] + mCornerLength / 2) {
+//            mCornerStatus = 0;
+//            return true;
+//        } else if (x > mRect_FourCorner_coordinate[0][0]
+//                && x < mRect_FourCorner_coordinate[0][0] + mCornerLength / 2
+//                && y > mRect_FourCorner_coordinate[1][1] - mCornerLength / 2
+//                && y < mRect_FourCorner_coordinate[1][1]) {
+//            mCornerStatus = 1;
+//            return true;
+//        } else if (x > mRect_FourCorner_coordinate[2][0] - mCornerLength / 2
+//                && x < mRect_FourCorner_coordinate[2][0]
+//                && y > mRect_FourCorner_coordinate[2][1]
+//                && y < mRect_FourCorner_coordinate[2][1] + mCornerLength / 2) {
+//            mCornerStatus = 2;
+//            return true;
+//        } else if (x > mRect_FourCorner_coordinate[3][0] - mCornerLength / 2
+//                && x < mRect_FourCorner_coordinate[3][0]
+//                && y > mRect_FourCorner_coordinate[3][1] - mCornerLength / 2
+//                && y < mRect_FourCorner_coordinate[3][1]) {
+//            mCornerStatus = 3;
+//            return true;
+//        }
+//        return false;
+//    }
 
     /**
      * 判断按下的点是否在边框线范围内
