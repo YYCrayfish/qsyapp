@@ -56,7 +56,7 @@ public class TextViewBorder extends FrameLayout {
     private void initTextView(TextView tv) {
         tv.setGravity(Gravity.CENTER);
         tv.setSingleLine(true);
-        tv.setTextSize(15);
+        tv.setTextSize(22);
     }
 
     @Override
