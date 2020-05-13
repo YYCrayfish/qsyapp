@@ -4,6 +4,8 @@ import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -161,6 +163,10 @@ public class ScreenShotZoomView extends View {
             canvas.drawLine(mRect_FourCorner_coordinate[3][0], mRect_FourCorner_coordinate[3][1] - mCornerLength
                     , mRect_FourCorner_coordinate[3][0], mRect_FourCorner_coordinate[3][1] + mCornerOffset, mCornerPaint);
 
+//            // 绘制删除按钮
+//            Bitmap bitmap = BitmapFactory.decodeResource(getResources(),R.drawable.icon_delete);
+//            canvas.drawBitmap(bitmap,mRect_FourCorner_coordinate[2][0] - bitmap.getWidth()/2,mRect_FourCorner_coordinate[2][1] - bitmap.getHeight()/2,new Paint());
+
             if (mIsDrawPonit) {
                 /*绘制坐标*/
                 toolDrawPoint(canvas);
@@ -241,16 +247,17 @@ public class ScreenShotZoomView extends View {
                 /**当前按下的Y坐标*/float mPressY = event.getY();
                 LOG.showE("按下的坐标x="+mPressX+"  y="+mPressY);
                 if (isShot) {
-                    /*判断按下的点是都在边界线上*/
-                    if (toolPointIsInBorderline(mPressX, mPressY)) {
-                        mOperatingStatus = 3;
-                    }
                     /*判断按下的点是否在边角上*/
-                    else if (toolPointIsInCorner(mPressX, mPressY)) {
+                    if (toolPointIsInCorner(mPressX, mPressY)) {
                         mOperatingStatus = 2;//边角的范围是一个长宽等于边角线长的矩形范围内
-                        if (mCornerStatus == 2) {
-                            isShot = false;
-                        }
+                        // 点击右上角不隐藏删除 add by xushiyong
+//                        if (mCornerStatus == 2) {
+//                            isShot = false;
+//                        }
+                    }
+                    /*判断按下的点是都在边界线上*/
+                    else if (toolPointIsInBorderline(mPressX, mPressY)) {
+                        mOperatingStatus = 3;
                     }
                     /*判断按下的点是否在矩形内*/
                     else if (toolPointIsInRect(mPressX, mPressY)) {
@@ -279,7 +286,7 @@ public class ScreenShotZoomView extends View {
                 break;
             /*移动*/
             case MotionEvent.ACTION_MOVE:
-                LOG.showE("移动的坐标x=  操作："+mOperatingStatus);
+                LOG.showE("移动的坐标x="+event.getX()+"  y="+event.getY()+"  操作："+mOperatingStatus+"  角="+mCornerStatus);
 
                 // add by xushiyong START
                 // 如果左上角和右下角坐标一样，代表两个角是重叠状态的，这个时候需要可以拖拉
@@ -402,7 +409,23 @@ public class ScreenShotZoomView extends View {
                     }
                     /*点击了右上角*/
                     else if (mCornerStatus == 2) {
+                        /*左上角坐标变化*/
+                        mRect_FourCorner_coordinate[2][0] += event.getX() - mLastPressX;
+                        mRect_FourCorner_coordinate[2][1] += event.getY() - mLastPressY;
 
+                        /*右上角坐标变化-不影响矩形位置-影响边角线位置*/
+                        mRect_FourCorner_coordinate[0][1] += event.getY() - mLastPressY;
+
+                        /*左下角-同上*/
+                        mRect_FourCorner_coordinate[3][0] += event.getX() - mLastPressX;
+                        if (mRect_FourCorner_coordinate[2][0] < 0) {
+                            mRect_FourCorner_coordinate[2][0] = 0;
+                            mRect_FourCorner_coordinate[3][0] = 0;
+                        }
+                        if (mRect_FourCorner_coordinate[2][1] < 0) {
+                            mRect_FourCorner_coordinate[2][1] = 0;
+                            mRect_FourCorner_coordinate[3][1] = 0;
+                        }
                     }
                     /*点击了右下角*/
                     else if (mCornerStatus == 3) {
@@ -591,28 +614,39 @@ public class ScreenShotZoomView extends View {
      * 判断按下的点是否在边角范围内
      */
     private boolean toolPointIsInCorner(float x, float y) {
-        if (x > mRect_FourCorner_coordinate[0][0]
+        LOG.showE("擎天坐标:  x="+x+"  y="+y+"  mCornerLength="+mCornerLength);
+        LOG.showE("擎天第一坐标:  x="+mRect_FourCorner_coordinate[0][0]+"  y="+mRect_FourCorner_coordinate[0][1]);
+        LOG.showE("擎天第二坐标:  x="+mRect_FourCorner_coordinate[1][0]+"  y="+mRect_FourCorner_coordinate[1][1]);
+        LOG.showE("擎天第三坐标:  x="+mRect_FourCorner_coordinate[2][0]+"  y="+mRect_FourCorner_coordinate[2][1]);
+        LOG.showE("擎天第四坐标:  x="+mRect_FourCorner_coordinate[3][0]+"  y="+mRect_FourCorner_coordinate[3][1]);
+
+        LOG.showE("擎天条件1="+(x > mRect_FourCorner_coordinate[1][0] - mCornerLength
+                && x < mRect_FourCorner_coordinate[1][0] + mCornerLength)+" 擎天条件2="+( y > mRect_FourCorner_coordinate[1][1] - mCornerLength
+                && y < mRect_FourCorner_coordinate[1][1] - mCornerLength));
+
+        // 左上角  左下角  右上角  右下角
+        if (x >= mRect_FourCorner_coordinate[0][0] - mCornerLength
                 && x < mRect_FourCorner_coordinate[0][0] + mCornerLength
-                && y > mRect_FourCorner_coordinate[0][1]
+                && y > mRect_FourCorner_coordinate[0][1] - mCornerLength
                 && y < mRect_FourCorner_coordinate[0][1] + mCornerLength ) {
             mCornerStatus = 0;
             return true;
-        } else if (x > mRect_FourCorner_coordinate[0][0]
-                && x < mRect_FourCorner_coordinate[0][0] + mCornerLength
+        } else if (x > mRect_FourCorner_coordinate[1][0] - mCornerLength
+                && x < mRect_FourCorner_coordinate[1][0] + mCornerLength
                 && y > mRect_FourCorner_coordinate[1][1] - mCornerLength
-                && y < mRect_FourCorner_coordinate[1][1]) {
+                && y < mRect_FourCorner_coordinate[1][1] + mCornerLength) {
             mCornerStatus = 1;
             return true;
         } else if (x > mRect_FourCorner_coordinate[2][0] - mCornerLength
-                && x < mRect_FourCorner_coordinate[2][0]
-                && y > mRect_FourCorner_coordinate[2][1]
+                && x < mRect_FourCorner_coordinate[2][0] + mCornerLength
+                && y > mRect_FourCorner_coordinate[2][1] - mCornerLength
                 && y < mRect_FourCorner_coordinate[2][1] + mCornerLength ) {
             mCornerStatus = 2;
             return true;
         } else if (x > mRect_FourCorner_coordinate[3][0] - mCornerLength
-                && x < mRect_FourCorner_coordinate[3][0]
+                && x < mRect_FourCorner_coordinate[3][0] + mCornerLength
                 && y > mRect_FourCorner_coordinate[3][1] - mCornerLength
-                && y < mRect_FourCorner_coordinate[3][1]) {
+                && y < mRect_FourCorner_coordinate[3][1] + mCornerLength) {
             mCornerStatus = 3;
             return true;
         }
