@@ -22,6 +22,7 @@ import android.view.View;
 import android.view.animation.LinearInterpolator;
 
 import com.manyu.videoshare.R;
+import com.manyu.videoshare.util.ImageUtil;
 
 import java.util.ArrayList;
 import java.util.Formatter;
@@ -178,13 +179,16 @@ public class DoubleSlideSeekBar extends View {
     private List<Bitmap> list;
     private int insetsW;
     private Bitmap bitmap;
+    private Context context;
 
     public DoubleSlideSeekBar(Context context) {
         this(context, null);
+        this.context = context;
     }
 
     public DoubleSlideSeekBar(Context context, @Nullable AttributeSet attrs) {
         this(context, attrs, 0);
+        this.context = context;
     }
 
     public DoubleSlideSeekBar(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
@@ -431,7 +435,7 @@ public class DoubleSlideSeekBar extends View {
             textPaint = new Paint();
         }
         textPaint.setColor(textColor);
-        textPaint.setTextSize(25);
+        textPaint.setTextSize(ImageUtil.dp2px(context, 10));
         textPaint.setAntiAlias(true);
         if (bigRange == 0) {
             bigRange = bigValue;
@@ -442,7 +446,7 @@ public class DoubleSlideSeekBar extends View {
                 slideLowX - textPaint.measureText(stringForTime((long) ((bigRange - smallRange) * progress))) / 2 + (slideBigX - slideLowX) * progress,
                 textHeight - 15,
                 textPaint);
-        textPaint.setTextSize(30);
+        textPaint.setTextSize(ImageUtil.dp2px(context, 12));
 //        canvas.drawText(stringForTime((long) smallRange), slideLowX - bitmapWidth / 2 - textPaint.measureText(stringForTime((long) smallRange)) / 2, textHeight, textPaint);
         canvas.drawText(stringForTime((long) bigRange), slideBigX - bitmapWidth / 2 - textPaint.measureText(stringForTime((long) bigRange)) / 2, lineY + insetsW + 15, textPaint);
     }

@@ -8,6 +8,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.MediaController;
@@ -35,6 +36,7 @@ public class VideoViewTool implements View.OnClickListener {
         } else {
             metadataRetriever = new MediaMetadataRetriever();
             videoView = ((Activity) context).findViewById(R.id.vv);
+            Log.e("Logger", "videoView == null ? " + (videoView == null));
             videoSeekBar = ((Activity) context).findViewById(R.id.videoSeekBar);
             start = ((Activity) context).findViewById(R.id.start);
             reset = ((Activity) context).findViewById(R.id.reset);

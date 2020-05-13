@@ -4,20 +4,25 @@ import android.app.Activity;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.media.AudioManager;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.support.constraint.ConstraintLayout;
+import android.support.v7.widget.CardView;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.MediaController;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.VideoView;
 
+import com.gyf.immersionbar.ImmersionBar;
 import com.manyu.videoshare.R;
 import com.manyu.videoshare.base.BaseApplication;
 import com.manyu.videoshare.base.BaseVideoActivity;
@@ -57,6 +62,12 @@ public class PreviewActivity extends BaseVideoActivity implements View.OnClickLi
     private boolean isSave = false;
     private SeekBar mSeekBar;
 
+    private int videoW;
+    private int videoH;
+    private int videoViewW;//视频控件宽度
+    private int videoViewH;//视频控件高度
+    private CardView mVideoViewHost;
+
     public static void start(Context context, String path) {
         ((Activity) context).startActivityForResult(new Intent(context, PreviewActivity.class).putExtra("path", path), 100);
     }
@@ -69,7 +80,10 @@ public class PreviewActivity extends BaseVideoActivity implements View.OnClickLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_preview);
-        mSeekBar = findViewById(R.id.video_seek_bar);
+//        mSeekBar = findViewById(R.id.video_seek_bar);
+        setToolBarColor(Color.BLACK);
+        mVideoViewHost = findViewById(R.id.video_view_host);
+        ImmersionBar.with(this).statusBarDarkFont(false).statusBarColorInt(Color.BLACK).init();
         type = getIntent().getIntExtra("type", -1);
     }
 
@@ -87,10 +101,30 @@ public class PreviewActivity extends BaseVideoActivity implements View.OnClickLi
         videoView = findViewById(R.id.vv);
         MediaController mediaController = new MediaController(this);
         videoView.setMediaController(mediaController);
-        videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+        videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
-            public void onCompletion(MediaPlayer mediaPlayer) {
+            public void onPrepared(MediaPlayer mp) {
+                mp.setOnVideoSizeChangedListener(new MediaPlayer.OnVideoSizeChangedListener() {
+                    @Override
+                    public void onVideoSizeChanged(final MediaPlayer mp, int width, int height) {
 
+                        //获取视频资源的宽度
+                        videoW = mp.getVideoWidth();
+                        //获取视频资源的高度
+                        videoH = mp.getVideoHeight();
+                        View parent = (View) mVideoViewHost.getParent();
+                        // 按原视频的比例，缩放至视频的最长边和容器的最短边相等
+                        ConstraintLayout.LayoutParams videoLp = (ConstraintLayout.LayoutParams) mVideoViewHost.getLayoutParams();
+                        if ((1f * videoW / videoH) > (1f * parent.getWidth() / parent.getHeight())) {
+                            //横屏
+                            videoLp.dimensionRatio = "h," + videoW + ":" + videoH;
+                        } else {
+                            //竖屏
+                            videoLp.dimensionRatio = "w," + videoW + ":" + videoH;
+                        }
+                        mVideoViewHost.setLayoutParams(videoLp);
+                    }
+                });
             }
         });
     }

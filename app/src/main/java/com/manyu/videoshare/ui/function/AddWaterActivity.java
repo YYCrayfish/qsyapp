@@ -13,6 +13,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
@@ -32,6 +33,7 @@ import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
@@ -315,12 +317,13 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
                 setHandW();
                 final VideoView videoView = videoViewTool.videoView;
                 final View videoCover = findViewById(R.id.vv_cover);
+                final FrameLayout.LayoutParams mLayoutWaterMarkParams = (FrameLayout.LayoutParams) layoutWaterMark.getLayoutParams();
                 videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                     @Override
                     public void onPrepared(MediaPlayer mp) {
                         mp.setOnVideoSizeChangedListener(new MediaPlayer.OnVideoSizeChangedListener() {
                             @Override
-                            public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
+                            public void onVideoSizeChanged(final MediaPlayer mp, int width, int height) {
                                 //获取视频资源的宽度
                                 videoW = mp.getVideoWidth();
                                 //获取视频资源的高度
@@ -335,8 +338,13 @@ public class AddWaterActivity extends BaseVideoActivity implements View.OnClickL
                                     videoLp.dimensionRatio = "w," + videoW + ":" + videoH;
                                 }
                                 mVideoViewHost.setLayoutParams(videoLp);
-                                videoViewTool.videoSeekBar.reset();
 
+                                ViewGroup.LayoutParams layoutParams = layoutWaterMark.getLayoutParams();
+                                layoutParams.width = videoViewTool.videoView.getWidth();
+                                layoutParams.height = videoViewTool.videoView.getHeight();
+                                layoutWaterMark.setLayoutParams(layoutParams);
+
+                                videoViewTool.videoSeekBar.reset();
                                 videoCover.postDelayed(new Runnable() {
                                     @Override
                                     public void run() {

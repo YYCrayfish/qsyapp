@@ -53,10 +53,12 @@
                 android:layout_gravity="center_vertical"
                 android:src="@drawable/icon_right"/>
         </LinearLayout>
-        <include layout="@layout/include_line_a"/>
+        <include layout="@layout/include_line_a"
+            android:visibility="gone"/>
         <LinearLayout
             android:id="@+id/safity_btn_autonym"
             android:padding="16dp"
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
