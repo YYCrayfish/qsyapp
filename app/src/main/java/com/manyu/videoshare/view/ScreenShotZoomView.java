@@ -20,6 +20,7 @@ import android.view.animation.LinearInterpolator;
 
 import com.manyu.videoshare.R;
 import com.manyu.videoshare.util.ImageUtil;
+import com.manyu.videoshare.util.universally.LOG;
 
 /**
  * 自定义缩放、移动框
@@ -238,6 +239,7 @@ public class ScreenShotZoomView extends View {
             case MotionEvent.ACTION_DOWN:
                 /**当前按下的X坐标*/float mPressX = event.getX();
                 /**当前按下的Y坐标*/float mPressY = event.getY();
+                LOG.showE("按下的坐标x="+mPressX+"  y="+mPressY);
                 if (isShot) {
                     /*判断按下的点是都在边界线上*/
                     if (toolPointIsInBorderline(mPressX, mPressY)) {
@@ -256,22 +258,37 @@ public class ScreenShotZoomView extends View {
                     }
                 } else {
                     mOperatingStatus = 4;
+                    // 矩形四个边角坐标
+                    // 左上角
                     mRect_FourCorner_coordinate[0][0] = mPressX;
                     mRect_FourCorner_coordinate[0][1] = mPressY;
+                    // 左下角
                     mRect_FourCorner_coordinate[1][0] = mPressX;
                     mRect_FourCorner_coordinate[1][1] = mPressY;
+                    // 右上角
                     mRect_FourCorner_coordinate[2][0] = mPressX;
                     mRect_FourCorner_coordinate[2][1] = mPressY;
+                    // 右下角
                     mRect_FourCorner_coordinate[3][0] = mPressX;
                     mRect_FourCorner_coordinate[3][1] = mPressY;
                     isShot = true;
                 }
                 mLastPressX = mPressX;
                 mLastPressY = mPressY;
-                Log.e("aaaaa", mPressX + "   " + mPressY);
+                LOG.showE("按下的坐标x="+mPressX+"  y="+mPressY+"  操作："+mOperatingStatus);
                 break;
             /*移动*/
             case MotionEvent.ACTION_MOVE:
+                LOG.showE("移动的坐标x=  操作："+mOperatingStatus);
+
+                // add by xushiyong START
+                // 如果左上角和右下角坐标一样，代表两个角是重叠状态的，这个时候需要可以拖拉
+                // 之前会出现因为用户只是点了一下屏幕，导致无法再拖拉缩放出矩形选择框
+                if(mRect_FourCorner_coordinate[0][0] == mRect_FourCorner_coordinate[1][0] && mRect_FourCorner_coordinate[0][1] == mRect_FourCorner_coordinate[1][1])
+                {
+                    mOperatingStatus = 4;
+                }
+                // add by xushiyong END
 
                 if (mOperatingStatus == 4) {
                     mRect_FourCorner_coordinate[3][0] += event.getX() - mLastPressX;
