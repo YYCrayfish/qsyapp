@@ -1,20 +1,18 @@
 package com.manyu.videoshare.view;
 
-import android.animation.Animator;
-import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.PointF;
+import android.graphics.RectF;
 import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.LinearInterpolator;
 
 import com.manyu.videoshare.R;
 
@@ -26,18 +24,14 @@ public class MCustomZoomView extends View {
 
     /*屏幕像素密度*/private float mDensity = getContext().getResources().getDisplayMetrics().density;
 
-    /*控件宽*/private float mViewWidth;
-    /*控件高*/private float mViewHeight;
-    private float h;
-    private float w;
-
+    // 宽高比
     private float ratio = 0;
 
     /*上下文*/private Context mContext;
 
-    /*自定框相关*/
-    /*矩形边长*/private float mRectLength = 100f * mDensity;
-    /*矩形四个边角坐标*/private float[][] mRect_FourCorner_coordinate;
+    /*矩形四个边角坐标*/private RectF zoomContainerRect = new RectF();
+    /*矩形四个边角坐标(拖动确认前缓存)*/private RectF cacheZoomContainerRect = new RectF();
+    /*矩形四个边角坐标*/private RectF cacheRect = new RectF();
     /*边角线长度*/private float mCornerLength = 30f * mDensity;
 
     /*边角线偏移值*/private float mCornerOffset = mDensity;
@@ -45,31 +39,33 @@ public class MCustomZoomView extends View {
     /*画笔*/
     /*边框画笔*/private Paint mRectPaint;
     /*边角线画笔*/private Paint mCornerPaint;
-    /*文字画笔*/private Paint mTextPaint;
     /*测绘线画笔*/private Paint mMappingLinePaint;
 
-    /*0-不动 1-拖动 2-边角缩放 3-边框缩放*/
-    /*矩形操作状态*/private int mOperatingStatus = 0;
+    /**
+     * 矩形操作状态 0-不动 1-拖动 2-边角缩放 3-边框缩放
+     */
+    private int mOperatingStatus = 0;
 
-    /*0-左 1-上 2-右 3-下*/
-    /*边框线点击-操作状态*/private int mBorderlineStatus = -1;
+    /**
+     * 边框线点击-操作状态 0-左 1-上 2-右 3-下
+     */
+    private int mBorderlineStatus = -1;
+    /**
+     * 拖动的角 0-左上 1-左下 2-右上 3-右下
+     */
+    private int touchCorner;
 
-    /*0-左上角 1-左下角 2-右上角 3-右下角*/
-    /*边角点击-操作状态*/private int mCornerStatus = -1;
-
-    /*是否绘制坐标点*/private boolean mIsDrawPonit;
     /*是否绘制测绘线*/private boolean mISDrawMapLine;
-    /*是否开启动画*/private boolean mIsOpenAnima;
 
-    //矩形边的长度
-    private float mHeight, mWidth;
+    /* 上一次按下的点 */
+    private PointF lastPressPoint = new PointF();
+    /* 第一次按下的点 */
+    private PointF startPressPoint = new PointF();
 
-    private int mRatioType;
+    private int mRatioType = 0;
 
     public MCustomZoomView(Context context) {
-        super(context);
-        this.mContext = context;
-        initPaint();
+        this(context, null);
     }
 
     public MCustomZoomView(Context context, @Nullable AttributeSet attrs) {
@@ -78,90 +74,65 @@ public class MCustomZoomView extends View {
         this.setFocusable(true);
         this.setFocusableInTouchMode(true);//触摸获取焦点
         initPaint();
-        toolLoadRotateAnimation();
+        setRatioType(0);
     }
-
 
     /**
      * 获取控件宽、高
-     *
-     * @param w
-     * @param h
-     * @param oldw
-     * @param oldh
      */
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-
-        /*获取控件宽高*/
-        mViewWidth = getWidth();
-        mViewHeight = getHeight();
-        mRectLength = mViewWidth / 2;
-//        mLeftTop = ;
-//        mLeftBottom = ;
-//        mRightTop = ;
-//        mRightBottom = ;
+        /*自定框相关*/
+        /*矩形边长*/
+        float mRectLength = Math.min(w, h) / 2f;
         /*初始化矩形四边角坐标*/
-        mRect_FourCorner_coordinate = new float[][]{
-                {(mViewWidth - mRectLength) / 2, (mViewHeight - mRectLength) / 2},//左上角
-                {(mViewWidth - mRectLength) / 2, (mViewHeight + mRectLength) / 2},//左下角
-                {(mViewWidth + mRectLength) / 2, (mViewHeight - mRectLength) / 2},//右上角
-                {(mViewWidth + mRectLength) / 2, (mViewHeight + mRectLength) / 2},//右下角
-        };
+        zoomContainerRect.set(
+                (w - mRectLength) / 2, (h - mRectLength) / 2,
+                (w + mRectLength) / 2, (h + mRectLength) / 2
+        );
 
-        onTransformListener.onTransform((mViewWidth - mRectLength) / 2,
-                (mViewHeight - mRectLength) / 2,
-                (mViewWidth + mRectLength) / 2,
-                (mViewHeight + mRectLength) / 2);
-        this.w = mRect_FourCorner_coordinate[2][0] - mRect_FourCorner_coordinate[0][0];
-        this.h = mRect_FourCorner_coordinate[1][1] - mRect_FourCorner_coordinate[0][1];
+        onTransformListener.onTransform(
+                (w - mRectLength) / 2, (h - mRectLength) / 2,
+                (w + mRectLength) / 2, (h + mRectLength) / 2
+        );
 
     }
 
     /**
      * 绘制框相关元素
-     *
-     * @param canvas
      */
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onDraw(Canvas canvas) {
-        initRect();
         /*绘制边框*/
-        canvas.drawRect(mRect_FourCorner_coordinate[0][0], mRect_FourCorner_coordinate[0][1]
-                , mRect_FourCorner_coordinate[3][0], mRect_FourCorner_coordinate[3][1], mRectPaint);
+        canvas.drawRect(zoomContainerRect, mRectPaint);
 
         /*绘制边角*/
         /*左上-横*/
-        canvas.drawLine(mRect_FourCorner_coordinate[0][0] - mCornerOffset, mRect_FourCorner_coordinate[0][1]
-                , mRect_FourCorner_coordinate[0][0] + mCornerLength, mRect_FourCorner_coordinate[0][1], mCornerPaint);
+        canvas.drawLine(zoomContainerRect.left - mCornerOffset, zoomContainerRect.top,
+                zoomContainerRect.left + mCornerLength, zoomContainerRect.top, mCornerPaint);
         /*左上-竖*/
-        canvas.drawLine(mRect_FourCorner_coordinate[0][0], mRect_FourCorner_coordinate[0][1] - mCornerOffset
-                , mRect_FourCorner_coordinate[0][0], mRect_FourCorner_coordinate[0][1] + mCornerLength, mCornerPaint);
+        canvas.drawLine(zoomContainerRect.left, zoomContainerRect.top - mCornerOffset
+                , zoomContainerRect.left, zoomContainerRect.top + mCornerLength, mCornerPaint);
         /*左下-横*/
-        canvas.drawLine(mRect_FourCorner_coordinate[1][0] - mCornerOffset, mRect_FourCorner_coordinate[1][1]
-                , mRect_FourCorner_coordinate[1][0] + mCornerLength, mRect_FourCorner_coordinate[1][1], mCornerPaint);
-        /*左上下-竖*/
-        canvas.drawLine(mRect_FourCorner_coordinate[1][0], mRect_FourCorner_coordinate[1][1] - mCornerLength
-                , mRect_FourCorner_coordinate[1][0], mRect_FourCorner_coordinate[1][1] + mCornerOffset, mCornerPaint);
+        canvas.drawLine(zoomContainerRect.left - mCornerOffset, zoomContainerRect.bottom
+                , zoomContainerRect.left + mCornerLength, zoomContainerRect.bottom, mCornerPaint);
+        /*左下-竖*/
+        canvas.drawLine(zoomContainerRect.left, zoomContainerRect.bottom - mCornerLength
+                , zoomContainerRect.left, zoomContainerRect.bottom + mCornerOffset, mCornerPaint);
         /*右上-横*/
-        canvas.drawLine(mRect_FourCorner_coordinate[2][0] - mCornerLength, mRect_FourCorner_coordinate[2][1]
-                , mRect_FourCorner_coordinate[2][0] + mCornerOffset, mRect_FourCorner_coordinate[2][1], mCornerPaint);
+        canvas.drawLine(zoomContainerRect.right - mCornerLength, zoomContainerRect.top
+                , zoomContainerRect.right + mCornerOffset, zoomContainerRect.top, mCornerPaint);
         /*右上-竖*/
-        canvas.drawLine(mRect_FourCorner_coordinate[2][0], mRect_FourCorner_coordinate[2][1] - mCornerOffset
-                , mRect_FourCorner_coordinate[2][0], mRect_FourCorner_coordinate[2][1] + mCornerLength, mCornerPaint);
+        canvas.drawLine(zoomContainerRect.right, zoomContainerRect.top - mCornerOffset
+                , zoomContainerRect.right, zoomContainerRect.top + mCornerLength, mCornerPaint);
         /*右下-横*/
-        canvas.drawLine(mRect_FourCorner_coordinate[3][0] - mCornerLength, mRect_FourCorner_coordinate[3][1]
-                , mRect_FourCorner_coordinate[3][0] + mCornerOffset, mRect_FourCorner_coordinate[3][1], mCornerPaint);
+        canvas.drawLine(zoomContainerRect.right - mCornerLength, zoomContainerRect.bottom
+                , zoomContainerRect.right + mCornerOffset, zoomContainerRect.bottom, mCornerPaint);
         /*右下-竖*/
-        canvas.drawLine(mRect_FourCorner_coordinate[3][0], mRect_FourCorner_coordinate[3][1] - mCornerLength
-                , mRect_FourCorner_coordinate[3][0], mRect_FourCorner_coordinate[3][1] + mCornerOffset, mCornerPaint);
-
-        if (mIsDrawPonit) {
-            /*绘制坐标*/
-            toolDrawPoint(canvas);
-        }
+        canvas.drawLine(zoomContainerRect.right, zoomContainerRect.bottom - mCornerLength
+                , zoomContainerRect.right, zoomContainerRect.bottom + mCornerOffset, mCornerPaint);
 
         if (mISDrawMapLine) {
             toolDrawMapLine(canvas);
@@ -173,281 +144,144 @@ public class MCustomZoomView extends View {
      */
     private void initPaint() {
         /*边框画笔*/
-        /**初始化*/mRectPaint = new Paint();
-        /**设置画笔颜色*/mRectPaint.setColor(ContextCompat.getColor(mContext, R.color.white));
-        /**设置画笔样式*/mRectPaint.setStyle(Paint.Style.STROKE);
-        /**设置画笔粗细*/mRectPaint.setStrokeWidth(1 * mDensity);
-        /**使用抗锯齿*/mRectPaint.setAntiAlias(true);
-        /**使用防抖动*/mRectPaint.setDither(true);
-        /**设置笔触样式-圆*/mRectPaint.setStrokeCap(Paint.Cap.ROUND);
-        /**设置结合处为圆弧*/mRectPaint.setStrokeJoin(Paint.Join.ROUND);
+        /*初始化*/
+        mRectPaint = new Paint();
+        /*设置画笔颜色*/
+        mRectPaint.setColor(ContextCompat.getColor(mContext, R.color.white));
+        /*设置画笔样式*/
+        mRectPaint.setStyle(Paint.Style.STROKE);
+        /*设置画笔粗细*/
+        mRectPaint.setStrokeWidth(1 * mDensity);
+        /*使用抗锯齿*/
+        mRectPaint.setAntiAlias(true);
+        /*使用防抖动*/
+        mRectPaint.setDither(true);
+        /*设置笔触样式-圆*/
+        mRectPaint.setStrokeCap(Paint.Cap.ROUND);
+        /*设置结合处为圆弧*/
+        mRectPaint.setStrokeJoin(Paint.Join.ROUND);
 
         /*边角画笔*/
-        /**初始化*/mCornerPaint = new Paint();
-        /**设置画笔颜色*/mCornerPaint.setColor(ContextCompat.getColor(mContext, R.color.white));
-        /**设置画笔样式*/mCornerPaint.setStyle(Paint.Style.FILL);
-        /**设置画笔粗细*/mCornerPaint.setStrokeWidth(3 * mDensity);
-        /**使用抗锯齿*/mCornerPaint.setAntiAlias(true);
-        /**使用防抖动*/mCornerPaint.setDither(true);
-        /**设置笔触样式-圆*/mRectPaint.setStrokeCap(Paint.Cap.ROUND);
-        /**设置结合处为圆弧*/mRectPaint.setStrokeJoin(Paint.Join.ROUND);
-
-        /*文字画笔*/
-        /**初始化*/mTextPaint = new Paint();
-        /**设置画笔颜色*/mTextPaint.setColor(ContextCompat.getColor(mContext, R.color.white));
-        /**设置画笔样式*/mTextPaint.setStyle(Paint.Style.FILL);
-        /**设置画笔粗细*/mTextPaint.setStrokeWidth(5 * mDensity);
-        /**使用抗锯齿*/mTextPaint.setAntiAlias(true);
-        /**使用防抖动*/mTextPaint.setDither(true);
-        /**字体大小*/mTextPaint.setTextSize(30);
-        /**设置笔触样式-圆*/mRectPaint.setStrokeCap(Paint.Cap.ROUND);
-        /**设置结合处为圆弧*/mRectPaint.setStrokeJoin(Paint.Join.ROUND);
+        /*初始化*/
+        mCornerPaint = new Paint();
+        /*设置画笔颜色*/
+        mCornerPaint.setColor(ContextCompat.getColor(mContext, R.color.white));
+        /*设置画笔样式*/
+        mCornerPaint.setStyle(Paint.Style.FILL);
+        /*设置画笔粗细*/
+        mCornerPaint.setStrokeWidth(3 * mDensity);
+        /*使用抗锯齿*/
+        mCornerPaint.setAntiAlias(true);
+        /*使用防抖动*/
+        mCornerPaint.setDither(true);
+        /*设置笔触样式-圆*/
+        mRectPaint.setStrokeCap(Paint.Cap.ROUND);
+        /*设置结合处为圆弧*/
+        mRectPaint.setStrokeJoin(Paint.Join.ROUND);
 
         /*测绘线画笔*/
-        /**初始化*/mMappingLinePaint = new Paint();
-        /**设置画笔颜色*/mMappingLinePaint.setColor(ContextCompat.getColor(mContext, R.color.white));
-        /**设置画笔样式*/mMappingLinePaint.setStyle(Paint.Style.FILL);
-        /**设置画笔粗细*/mMappingLinePaint.setStrokeWidth(1 * mDensity);
-        /**使用抗锯齿*/mMappingLinePaint.setAntiAlias(true);
-        /**使用防抖动*/mMappingLinePaint.setDither(true);
-        /**设置笔触样式-圆*/mMappingLinePaint.setStrokeCap(Paint.Cap.ROUND);
-        /**设置结合处为圆弧*/mMappingLinePaint.setStrokeJoin(Paint.Join.ROUND);
-    }
-
-
-    /*上一次按下的X坐标*/ float mLastPressX;
-
-    /*上一次按下的Y坐标*/ float mLastPressY;
-
-    public float getRatio() {
-        return ratio;
+        /*初始化*/
+        mMappingLinePaint = new Paint();
+        /*设置画笔颜色*/
+        mMappingLinePaint.setColor(ContextCompat.getColor(mContext, R.color.white));
+        /*设置画笔样式*/
+        mMappingLinePaint.setStyle(Paint.Style.FILL);
+        /*设置画笔粗细*/
+        mMappingLinePaint.setStrokeWidth(1 * mDensity);
+        /*使用抗锯齿*/
+        mMappingLinePaint.setAntiAlias(true);
+        /*使用防抖动*/
+        mMappingLinePaint.setDither(true);
+        /*设置笔触样式-圆*/
+        mMappingLinePaint.setStrokeCap(Paint.Cap.ROUND);
+        /*设置结合处为圆弧*/
+        mMappingLinePaint.setStrokeJoin(Paint.Join.ROUND);
     }
 
     public void setRatio(float ratio) {
+        this.mRatioType = -1;
         this.ratio = ratio;
+        if (zoomContainerRect.isEmpty()) {
+            return;
+        }
+        float centerX = zoomContainerRect.centerX();
+        float centerY = zoomContainerRect.centerY();
+        float width = zoomContainerRect.width();
+        float height = zoomContainerRect.height();
+        if (width / height == ratio) {
+            // 比例是对的，直接返回
+            return;
+        }
+        // 宽度保持不变，调整高度
+        height = width / ratio;
+        // 判断高是否超出控件高度
+        int maxHeight = getHeight() - getPaddingTop() - getPaddingBottom();
+        if (height > maxHeight) {
+            height = maxHeight;
+            // 超过高度，重新设置宽度
+            width = height * ratio;
+        }
+        zoomContainerRect.set(centerX - width / 2, centerY - height / 2, centerX + width / 2, centerY + height / 2);
+        // fix框的位置
+        autoFixRectByTransform(zoomContainerRect);
         invalidate();
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        /*当前按下的X坐标*/
+        float touchX = event.getX();
+        /*当前按下的Y坐标*/
+        float touchY = event.getY();
         switch (event.getAction()) {
             /*按下*/
             case MotionEvent.ACTION_DOWN:
-                /**当前按下的X坐标*/float mPressX = event.getX();
-                /**当前按下的Y坐标*/float mPressY = event.getY();
-
-                /*判断按下的点是都在边界线上*/
-                if (toolPointIsInBorderline(mPressX, mPressY)) {
-                    mOperatingStatus = 3;
-                }
                 /*判断按下的点是否在边角上*/
-                else if (toolPointIsInCorner(mPressX, mPressY)) {
+                if (toolPointIsInCorner(touchX, touchY)) {
                     mOperatingStatus = 2;//边角的范围是一个长宽等于边角线长的矩形范围内
                 }
+                /*判断按下的点是都在边界线上*/
+                else if (toolPointIsInBorderline(touchX, touchY)) {
+                    mOperatingStatus = 3;
+                }
                 /*判断按下的点是否在矩形内*/
-                else if (toolPointIsInRect(mPressX, mPressY)) {
+                else if (toolPointIsInRect(touchX, touchY)) {
                     mOperatingStatus = 1;
                 }
-
-                mLastPressX = mPressX;
-                mLastPressY = mPressY;
+                lastPressPoint.set(touchX, touchY);
+                startPressPoint.set(touchX, touchY);
                 break;
             /*移动*/
             case MotionEvent.ACTION_MOVE:
                 /*移动-改变矩形四个点坐标*/
                 if (mOperatingStatus == 1) {
-                    mRect_FourCorner_coordinate[0][0] += event.getX() - mLastPressX;
-                    mRect_FourCorner_coordinate[0][1] += event.getY() - mLastPressY;
-
-                    mRect_FourCorner_coordinate[1][0] += event.getX() - mLastPressX;
-                    mRect_FourCorner_coordinate[1][1] += event.getY() - mLastPressY;
-
-                    mRect_FourCorner_coordinate[2][0] += event.getX() - mLastPressX;
-                    mRect_FourCorner_coordinate[2][1] += event.getY() - mLastPressY;
-
-                    mRect_FourCorner_coordinate[3][0] += event.getX() - mLastPressX;
-                    mRect_FourCorner_coordinate[3][1] += event.getY() - mLastPressY;
-                    if (mRect_FourCorner_coordinate[0][1] - 1 * mDensity / 2 < 0) {//上
-                        mRect_FourCorner_coordinate[0][1] = 1 * mDensity / 2;
-                        mRect_FourCorner_coordinate[2][1] = 1 * mDensity / 2;
-                        mRect_FourCorner_coordinate[1][1] = h + 1 * mDensity / 2;
-                        mRect_FourCorner_coordinate[3][1] = h + 1 * mDensity / 2;
-                    }
-                    if (mRect_FourCorner_coordinate[0][0] <= 0) {//左
-                        mRect_FourCorner_coordinate[0][0] = 0;
-                        mRect_FourCorner_coordinate[1][0] = 0;
-                        mRect_FourCorner_coordinate[2][0] = w;
-                        mRect_FourCorner_coordinate[3][0] = w;
-                    }
-                    if (mRect_FourCorner_coordinate[2][0] >= mViewWidth) {//右
-                        mRect_FourCorner_coordinate[2][0] = mViewWidth;
-                        mRect_FourCorner_coordinate[3][0] = mViewWidth;
-                        mRect_FourCorner_coordinate[0][0] = mViewWidth - w;
-                        mRect_FourCorner_coordinate[1][0] = mViewWidth - w;
-                    }
-                    if (mRect_FourCorner_coordinate[3][1] + 1 * mDensity / 2 >= mViewHeight) {//下
-                        mRect_FourCorner_coordinate[1][1] = mViewHeight - 1 * mDensity / 2;
-                        mRect_FourCorner_coordinate[3][1] = mViewHeight - 1 * mDensity / 2;
-                        mRect_FourCorner_coordinate[0][1] = mViewHeight - h - 1 * mDensity / 2;
-                        mRect_FourCorner_coordinate[2][1] = mViewHeight - h - 1 * mDensity / 2;
-                    }
+                    zoomContainerRect.offsetTo(touchX - zoomContainerRect.width() / 2, touchY - zoomContainerRect.width() / 2);
+                    autoFixRectByTransform(zoomContainerRect);
                     invalidate();
                 }
                 /*边角缩放*/
                 else if (mOperatingStatus == 2) {
-
-//                    mHeight = mRect_FourCorner_coordinate[1][1] - mRect_FourCorner_coordinate[0][1];
-//                    mWidth = mRect_FourCorner_coordinate[2][0] - mRect_FourCorner_coordinate[0][0];
-//                    Log.e("Logger", "mWidth / mHeight = " + (mWidth / mHeight));
-                    /*是否继续缩放*/
-                    initRect();
-                    if (toolCornerIsTouch(event.getX(), event.getY(), mLastPressX, mLastPressY)) {
-                        return true;
-                    }
-                    /*判断点击的是哪一个角*/
-                    /*点击了左上角*/
-                    if (mCornerStatus == 0) {
-
-//            /***/
-//            if (mRect_FourCorner_coordinate[0][0] + mCornerLength >= mRect_FourCorner_coordinate[2][0] - mCornerLength
-//                && mRect_FourCorner_coordinate[0][1] + mCornerLength >= mRect_FourCorner_coordinate[1][1] - mCornerLength) {
-//
-//
-//            }
-                        /*左上角坐标变化*/
-                        mRect_FourCorner_coordinate[0][0] += event.getX() - mLastPressX;
-                        mRect_FourCorner_coordinate[0][1] += event.getY() - mLastPressY;
-
-                        /*右上角坐标变化-不影响矩形位置-影响边角线位置*/
-                        mRect_FourCorner_coordinate[2][1] += event.getY() - mLastPressY;
-
-                        /*左下角-同上*/
-                        mRect_FourCorner_coordinate[1][0] += event.getX() - mLastPressX;
-                        if (mRect_FourCorner_coordinate[0][0] < 0) {
-                            mRect_FourCorner_coordinate[0][0] = 0;
-                            mRect_FourCorner_coordinate[1][0] = 0;
-                        }
-                        if (mRect_FourCorner_coordinate[0][1] < 0) {
-                            mRect_FourCorner_coordinate[0][1] = 0;
-                            mRect_FourCorner_coordinate[2][1] = 0;
-                        }
-                    }
-                    /*点击了左下角*/
-                    else if (mCornerStatus == 1) {
-                        /*左下角坐标变化*/
-                        mRect_FourCorner_coordinate[1][0] += event.getX() - mLastPressX;
-                        mRect_FourCorner_coordinate[1][1] += event.getY() - mLastPressY;
-                        /*左上角坐标变化-不影响矩形位置-影响边角线位置*/
-                        mRect_FourCorner_coordinate[0][0] += event.getX() - mLastPressX;
-                        /*右下角-同上*/
-                        mRect_FourCorner_coordinate[3][1] += event.getY() - mLastPressY;
-                        if (mRect_FourCorner_coordinate[1][0] < 0) {
-                            mRect_FourCorner_coordinate[0][0] = 0;
-                            mRect_FourCorner_coordinate[1][0] = 0;
-                        }
-                        if (mRect_FourCorner_coordinate[1][1] > mViewHeight) {
-                            mRect_FourCorner_coordinate[1][1] = mViewHeight;
-                            mRect_FourCorner_coordinate[3][1] = mViewHeight;
-                        }
-                    }
-                    /*点击了右上角*/
-                    else if (mCornerStatus == 2) {
-
-                        /*右上角坐标变化*/
-                        mRect_FourCorner_coordinate[2][0] += event.getX() - mLastPressX;
-                        mRect_FourCorner_coordinate[2][1] += event.getY() - mLastPressY;
-                        /*左上角坐标变化-不影响矩形位置-影响边角线位置*/
-                        mRect_FourCorner_coordinate[0][1] += event.getY() - mLastPressY;
-                        /*右下角-同上*/
-                        mRect_FourCorner_coordinate[3][0] += event.getX() - mLastPressX;
-                        if (mRect_FourCorner_coordinate[2][0] > mViewWidth) {
-                            mRect_FourCorner_coordinate[3][0] = mViewWidth;
-                            mRect_FourCorner_coordinate[2][0] = mViewWidth;
-                        }
-                        if (mRect_FourCorner_coordinate[2][1] < 0) {
-                            mRect_FourCorner_coordinate[2][1] = 0;
-                            mRect_FourCorner_coordinate[0][1] = 0;
-                        }
-                    }
-                    /*点击了右下角*/
-                    else if (mCornerStatus == 3) {
-                        /*右下角坐标变化*/
-                        mRect_FourCorner_coordinate[3][0] += event.getX() - mLastPressX;
-                        mRect_FourCorner_coordinate[3][1] += event.getY() - mLastPressY;
-                        /*右上角坐标变化-不影响矩形位置-影响边角线位置*/
-                        mRect_FourCorner_coordinate[2][0] += event.getX() - mLastPressX;
-                        /*左下角-同上*/
-                        mRect_FourCorner_coordinate[1][1] += event.getY() - mLastPressY;
-                        if (mRect_FourCorner_coordinate[3][1] > mViewHeight) {
-                            mRect_FourCorner_coordinate[1][1] = mViewHeight;
-                            mRect_FourCorner_coordinate[3][1] = mViewHeight;
-                        }
-                        if (mRect_FourCorner_coordinate[3][0] > mViewWidth) {
-                            mRect_FourCorner_coordinate[3][0] = mViewWidth;
-                            mRect_FourCorner_coordinate[2][0] = mViewWidth;
-                        }
-                    }
-                    /*重新绘制*/
-                    invalidate();
+                    onCornerDrag(touchX, touchY);
                 }
                 /*边框缩放*/
                 else if (mOperatingStatus == 3) {
-
-                    /*是否继续缩放*/
-                    if (toolCornerIsTouch(event.getX(), event.getY(), mLastPressX, mLastPressY)) {
-                        return true;
-                    }
-                    if (mBorderlineStatus == 0) {
-                        Log.e("自定义", "边框线-左");
-                        mRect_FourCorner_coordinate[0][0] += event.getX() - mLastPressX;
-                        mRect_FourCorner_coordinate[1][0] += event.getX() - mLastPressX;
-                        if (mRect_FourCorner_coordinate[0][0] < 0) {
-                            mRect_FourCorner_coordinate[0][0] = 0;
-                            mRect_FourCorner_coordinate[1][0] = 0;
-                        }
-                    } else if (mBorderlineStatus == 1) {
-                        Log.e("自定义", "边框线-上");
-                        mRect_FourCorner_coordinate[0][1] += event.getY() - mLastPressY;
-                        mRect_FourCorner_coordinate[2][1] += event.getY() - mLastPressY;
-                        if (mRect_FourCorner_coordinate[0][1] < 0) {
-                            mRect_FourCorner_coordinate[0][1] = 0;
-                            mRect_FourCorner_coordinate[2][1] = 0;
-                        }
-                    } else if (mBorderlineStatus == 2) {
-                        Log.e("自定义", "边框线-右");
-                        mRect_FourCorner_coordinate[2][0] += event.getX() - mLastPressX;
-                        mRect_FourCorner_coordinate[3][0] += event.getX() - mLastPressX;
-                        if (mRect_FourCorner_coordinate[2][0] > mViewWidth) {
-                            mRect_FourCorner_coordinate[2][0] = mViewWidth;
-                            mRect_FourCorner_coordinate[3][0] = mViewWidth;
-                        }
-                    } else if (mBorderlineStatus == 3) {
-                        Log.e("自定义", "边框线-下");
-                        mRect_FourCorner_coordinate[1][1] += event.getY() - mLastPressY;
-                        mRect_FourCorner_coordinate[3][1] += event.getY() - mLastPressY;
-                        if (mRect_FourCorner_coordinate[1][1] > mViewHeight) {
-                            mRect_FourCorner_coordinate[1][1] = mViewHeight;
-                            mRect_FourCorner_coordinate[3][1] = mViewHeight;
-                        }
-                    }
-
-                    /*重新绘制*/
-                    invalidate();
+                    onBorderDrag(touchX, touchY);
                 }
-                /**保存上一次按下的点X坐标*/mLastPressX = event.getX();
-                /**保存上一次按下的点Y坐标*/mLastPressY = event.getY();
-                w = mRect_FourCorner_coordinate[2][0] - mRect_FourCorner_coordinate[0][0];
-                h = mRect_FourCorner_coordinate[1][1] - mRect_FourCorner_coordinate[0][1];
+                /*保存上一次按下的点*/
+                lastPressPoint.set(touchX, touchY);
                 break;
             /*松开*/
             case MotionEvent.ACTION_UP:
-                /**恢复静止*/mOperatingStatus = 0;
+                /*恢复静止*/
+                mOperatingStatus = 0;
                 mBorderlineStatus = -1;
-                mCornerStatus = -1;
-                onTransformListener.onTransform(mRect_FourCorner_coordinate[0][0],
-                        mRect_FourCorner_coordinate[0][1],
-                        mRect_FourCorner_coordinate[2][0],
-                        mRect_FourCorner_coordinate[1][1]);
+                onTransformListener.onTransform(
+                        zoomContainerRect.left,
+                        zoomContainerRect.top,
+                        zoomContainerRect.right,
+                        zoomContainerRect.bottom
+                );
                 break;
             default:
 
@@ -456,205 +290,303 @@ public class MCustomZoomView extends View {
         return true;
     }
 
-    private void initRect() {
-        if (mRatioType == 2) {
-            /**
-             * 比例 1:1
-             * （右上-左上）=左下-左上
-             * */
-            float tempWidth = mRect_FourCorner_coordinate[1][1] - mRect_FourCorner_coordinate[0][1];
-            //右上X坐标
-            mRect_FourCorner_coordinate[2][0] = mRect_FourCorner_coordinate[0][0] + tempWidth;
-            //右下的X坐标
-            mRect_FourCorner_coordinate[3][0] = mRect_FourCorner_coordinate[1][0] + tempWidth;
-        } else if (mRatioType == 3) {
-            //4:3
-            float tempWidth = mRect_FourCorner_coordinate[1][1] - mRect_FourCorner_coordinate[0][1];
-            float tempHeight = mRect_FourCorner_coordinate[0][1] - mRect_FourCorner_coordinate[1][1];
-            float tempRatio = (float) (tempWidth * 0.75);
-            mRect_FourCorner_coordinate[2][0] = mRect_FourCorner_coordinate[0][0] + (tempRatio);
-            mRect_FourCorner_coordinate[3][0] = mRect_FourCorner_coordinate[1][0] + (tempRatio);
-        } else if (mRatioType == 4) {
-            //3:4
-            float tempWidth = mRect_FourCorner_coordinate[1][1] - mRect_FourCorner_coordinate[0][1];
-            float tempHeight = mRect_FourCorner_coordinate[0][1] - mRect_FourCorner_coordinate[1][1];
-            float tempRatio = (float) (tempWidth * 1.3333);
-            mRect_FourCorner_coordinate[2][0] = mRect_FourCorner_coordinate[0][0] + (tempRatio);
-            mRect_FourCorner_coordinate[3][0] = mRect_FourCorner_coordinate[1][0] + (tempRatio);
+    /**
+     * 边角拖动
+     */
+    private void onCornerDrag(float touchX, float touchY) {
+        boolean baseWithLeft = touchCorner == 2 || touchCorner == 3;
+        boolean baseWithTop = touchCorner == 1 || touchCorner == 3;
+        // fix触摸点的坐标，使其不超过边界
+        touchX = autoFixTouchX(touchX, baseWithLeft);
+        touchY = autoFixTouchY(touchY, baseWithTop);
+
+        cacheZoomContainerRect.set(zoomContainerRect);
+        float x = baseWithLeft ? cacheZoomContainerRect.left : cacheZoomContainerRect.right;
+        float y = baseWithTop ? cacheZoomContainerRect.top : cacheZoomContainerRect.bottom;
+        // 设置新的宽高
+        float newW = Math.abs(touchX - x);
+        float newH = Math.abs(touchY - y);
+        if (ratio != 0 && newW / newH != ratio) {
+            // 如果不是自由模式，需要重新计算另外一边
+            if (newW > newH) {
+                newW = newH * ratio;
+            } else {
+                newH = newW / ratio;
+            }
+        }
+        cacheZoomContainerRect.set(
+                baseWithLeft ? cacheZoomContainerRect.left : cacheZoomContainerRect.right - newW,
+                baseWithTop ? cacheZoomContainerRect.top : cacheZoomContainerRect.bottom - newH,
+                baseWithLeft ? cacheZoomContainerRect.left + newW : cacheZoomContainerRect.right,
+                baseWithTop ? cacheZoomContainerRect.top + newH : cacheZoomContainerRect.bottom
+        );
+
+        // fix框的宽高
+        autoFixRectByScale(cacheZoomContainerRect, baseWithLeft, baseWithTop);
+        zoomContainerRect.set(cacheZoomContainerRect);
+        invalidate();
+    }
+
+    /**
+     * 边框拖动
+     */
+    private void onBorderDrag(float touchX, float touchY) {
+        boolean isVertical = mBorderlineStatus == 1 || mBorderlineStatus == 3;
+        boolean baseWithLeft = mBorderlineStatus != 0;
+        boolean baseWithTop = mBorderlineStatus != 1;
+        // fix触摸点的坐标，使其不超过边界
+        touchX = autoFixTouchX(touchX, baseWithLeft);
+        touchY = autoFixTouchY(touchY, baseWithTop);
+
+        cacheZoomContainerRect.set(zoomContainerRect);
+        float x = baseWithLeft ? cacheZoomContainerRect.left : cacheZoomContainerRect.right;
+        float y = baseWithTop ? cacheZoomContainerRect.top : cacheZoomContainerRect.bottom;
+        if (mRatioType == 0) {
+            // 自由模式，单边缩放，前面限制过触摸点的坐标了，不用做额外的处理
+            if (isVertical) {
+                if (baseWithTop) {
+                    cacheZoomContainerRect.bottom = touchY;
+                } else {
+                    cacheZoomContainerRect.top = touchY;
+                }
+            } else {
+                if (baseWithLeft) {
+                    cacheZoomContainerRect.right = touchX;
+                } else {
+                    cacheZoomContainerRect.left = touchX;
+                }
+            }
+        } else {
+            // 设置新的宽高
+            float newW = Math.abs(touchX - x);
+            float newH = Math.abs(touchY - y);
+            if (isVertical) {
+                newW = newH * ratio;
+            } else {
+                newH = newW / ratio;
+            }
+            cacheZoomContainerRect.set(
+                    baseWithLeft ? cacheZoomContainerRect.left : cacheZoomContainerRect.right - newW,
+                    baseWithTop ? cacheZoomContainerRect.top : cacheZoomContainerRect.bottom - newH,
+                    baseWithLeft ? cacheZoomContainerRect.left + newW : cacheZoomContainerRect.right,
+                    baseWithTop ? cacheZoomContainerRect.top + newH : cacheZoomContainerRect.bottom
+            );
+            autoFixRectByScale(cacheZoomContainerRect, baseWithLeft, baseWithTop);
+        }
+
+        zoomContainerRect.set(cacheZoomContainerRect);
+        invalidate();
+    }
+
+    private void autoFixRectByTransform(RectF rect) {
+        float newLeft = rect.left;
+        float newTop = rect.top;
+        newLeft = Math.max(getPaddingLeft(), Math.min(newLeft, getWidth() - getPaddingRight() - rect.width()));
+        newTop = Math.max(getPaddingTop(), Math.min(newTop, getHeight() - getPaddingBottom() - rect.height()));
+        rect.offsetTo(newLeft, newTop);
+    }
+
+    private void autoFixRectByScale(RectF rect, boolean baseWithLeft, boolean baseWithTop) {
+        int minLeft = getPaddingLeft();
+        int minTop = getPaddingTop();
+        int maxRight = getWidth() - getPaddingRight();
+        int maxBottom = getHeight() - getPaddingBottom();
+
+        // 原来的宽高比
+        float originRatio = rect.width() / rect.height();
+
+        float offsetX;
+        float offsetY;
+        if (baseWithLeft) {
+            offsetX = maxRight - rect.right;
+        } else {
+            offsetX = rect.left - minLeft;
+        }
+        if (baseWithTop) {
+            offsetY = maxBottom - rect.bottom;
+        } else {
+            offsetY = rect.top - minTop;
+        }
+
+        if (offsetX >= 0 && offsetY >= 0) {
+            return;
+        }
+
+        /*
+            1.都未超出边界
+            2.宽超出边界，宽fix后高超出边界
+            3.宽超出边界，宽fix后正常
+            4.高超出边界，高fix后宽超出边界
+            5.高超出边界，高fix后正常
+         */
+        if (offsetX < 0) {
+            if (baseWithLeft) {
+                rect.right = maxRight;
+            } else {
+                rect.left = minLeft;
+            }
+            float newH = rect.width() / originRatio;
+            if (baseWithTop) {
+                rect.bottom = rect.top + newH;
+            } else {
+                rect.top = rect.bottom - newH;
+            }
+            if (baseWithTop) {
+                offsetY = maxBottom - rect.bottom;
+            } else {
+                offsetY = rect.top - minTop;
+            }
+        }
+
+        if (offsetX >= 0 && offsetY >= 0) {
+            return;
+        }
+
+        if (offsetY < 0) {
+            if (baseWithTop) {
+                rect.bottom = maxBottom;
+            } else {
+                rect.top = minTop;
+            }
+            float newW = rect.height() * originRatio;
+            if (baseWithLeft) {
+                rect.right = rect.left + newW;
+            } else {
+                rect.left = rect.bottom - newW;
+            }
+            if (baseWithLeft) {
+                offsetX = maxRight - rect.right;
+            } else {
+                offsetX = rect.left - minLeft;
+            }
+        }
+
+        if (offsetX >= 0 && offsetY >= 0) {
+            return;
+        }
+
+        // 前面两步后如果还不成立，在执行一次横向的缩放
+        if (offsetX < 0) {
+            if (baseWithLeft) {
+                rect.right = maxRight;
+            } else {
+                rect.left = minLeft;
+            }
+            float newH = rect.width() / originRatio;
+            if (baseWithTop) {
+                rect.bottom = rect.top + newH;
+            } else {
+                rect.top = rect.bottom - newH;
+            }
+        }
+    }
+
+    private float autoFixTouchX(float touchX, boolean baseWithLeft) {
+        if (baseWithLeft) {
+            touchX = Math.max(zoomContainerRect.left + mCornerLength * 2, touchX);
+            return Math.min(getWidth() - getPaddingRight(), touchX);
+        } else {
+            touchX = Math.min(zoomContainerRect.right - mCornerLength * 2, touchX);
+            return Math.max(getPaddingLeft(), touchX);
+        }
+    }
+
+    private float autoFixTouchY(float touchY, boolean baseWithTop) {
+        if (baseWithTop) {
+            touchY = Math.max(zoomContainerRect.top + mCornerLength * 2, touchY);
+            return Math.min(getHeight() - getPaddingBottom(), touchY);
+        } else {
+            touchY = Math.min(zoomContainerRect.bottom - mCornerLength * 2, touchY);
+            return Math.max(getPaddingTop(), touchY);
         }
     }
 
     public void setRatioType(int mRatioType) {
+        switch (mRatioType) {
+            case 2:
+                setRatio(1);
+                break;
+            case 3:
+                setRatio(3f / 4f);
+                break;
+            case 4:
+                setRatio(4f / 3f);
+                break;
+            default:
+                this.mRatioType = 0;
+                return;
+        }
         this.mRatioType = mRatioType;
-        initRect();
-        invalidate();
     }
 
     /**
      * 判断按下的点是否在矩形内
      */
     private boolean toolPointIsInRect(float x, float y) {
-        if (x > mRect_FourCorner_coordinate[0][0] + 2 * mDensity
-                && x < mRect_FourCorner_coordinate[2][0] - 2 * mDensity
-                && y > mRect_FourCorner_coordinate[0][1] + 2 * mDensity
-                && y < mRect_FourCorner_coordinate[1][1] - 2 * mDensity) {
-            return true;
-        }
-        return false;
+        return zoomContainerRect.contains(x, y);
     }
 
     /**
      * 绘制测绘线
      */
     private void toolDrawMapLine(Canvas canvas) {
-        /*绘制横线*/
-        /*绘制第一根线-位于矩形框的3分之一处*/
-        canvas.drawLine(mRect_FourCorner_coordinate[0][0]
-                , mRect_FourCorner_coordinate[0][1] + (mRect_FourCorner_coordinate[1][1] - mRect_FourCorner_coordinate[0][1]) / 3
-                , mRect_FourCorner_coordinate[2][0]
-                , mRect_FourCorner_coordinate[0][1] + (mRect_FourCorner_coordinate[1][1] - mRect_FourCorner_coordinate[0][1]) / 3
-                , mMappingLinePaint);
-        /*绘制第二根线-位于矩形框的3分之二处*/
-        canvas.drawLine(mRect_FourCorner_coordinate[0][0]
-                , mRect_FourCorner_coordinate[0][1] + (mRect_FourCorner_coordinate[1][1] - mRect_FourCorner_coordinate[0][1]) / 3 * 2
-                , mRect_FourCorner_coordinate[2][0]
-                , mRect_FourCorner_coordinate[0][1] + (mRect_FourCorner_coordinate[1][1] - mRect_FourCorner_coordinate[0][1]) / 3 * 2
-                , mMappingLinePaint);
-
-        /*绘制竖线*/
-        /*绘制第一根线-位于矩形框的3分之一处*/
-        canvas.drawLine(mRect_FourCorner_coordinate[0][0] + (mRect_FourCorner_coordinate[2][0] - mRect_FourCorner_coordinate[0][0]) / 3
-                , mRect_FourCorner_coordinate[0][1]
-                , mRect_FourCorner_coordinate[0][0] + (mRect_FourCorner_coordinate[2][0] - mRect_FourCorner_coordinate[0][0]) / 3
-                , mRect_FourCorner_coordinate[1][1]
-                , mMappingLinePaint);
-        /*绘制第二根线-位于矩形框的3分之二处*/
-        canvas.drawLine(mRect_FourCorner_coordinate[0][0] + (mRect_FourCorner_coordinate[2][0] - mRect_FourCorner_coordinate[0][0]) / 3 * 2
-                , mRect_FourCorner_coordinate[0][1]
-                , mRect_FourCorner_coordinate[0][0] + (mRect_FourCorner_coordinate[2][0] - mRect_FourCorner_coordinate[0][0]) / 3 * 2
-                , mRect_FourCorner_coordinate[1][1]
-                , mMappingLinePaint);
-    }
-
-    /**
-     * 绘制坐标点
-     */
-    private void toolDrawPoint(Canvas canvas) {
-
-        /*保存画布状态*/
-        canvas.save();
-
-        /*把画布逆时针旋转45度*/
-        canvas.rotate(-45, mRect_FourCorner_coordinate[0][0], mRect_FourCorner_coordinate[0][1]);
-
-        /*绘制左上角坐标*/
-        canvas.drawText("x:" + mRect_FourCorner_coordinate[0][0]
-                        + " y:" + mRect_FourCorner_coordinate[0][1], mRect_FourCorner_coordinate[0][0], mRect_FourCorner_coordinate[0][1] - 10 * mDensity
-                , mTextPaint);
-
-        /*使画布恢复到save之前的状态*/
-        canvas.restore();
-
-        canvas.save();
-
-        /*把画布顺时针旋转45度*/
-        canvas.rotate(45, mRect_FourCorner_coordinate[2][0], mRect_FourCorner_coordinate[2][1]);
-
-        /*绘制右上角坐标*/
-        canvas.drawText("x:" + mRect_FourCorner_coordinate[2][0]
-                        + " y:" + mRect_FourCorner_coordinate[2][1], mRect_FourCorner_coordinate[2][0], mRect_FourCorner_coordinate[2][1] - 10 * mDensity
-                , mTextPaint);
-
-        canvas.restore();
-
-        canvas.save();
-
-        /*把画布逆时针旋转45度*/
-        canvas.rotate(135, mRect_FourCorner_coordinate[3][0], mRect_FourCorner_coordinate[3][1]);
-
-        /*绘制右下角坐标*/
-        canvas.drawText("x:" + mRect_FourCorner_coordinate[3][0]
-                        + " y:" + mRect_FourCorner_coordinate[3][1], mRect_FourCorner_coordinate[3][0], mRect_FourCorner_coordinate[3][1] - 10 * mDensity
-                , mTextPaint);
-
-
-        canvas.restore();
-
-        canvas.save();
-        /*把画布逆时针旋转45度*/
-        canvas.rotate(225, mRect_FourCorner_coordinate[1][0], mRect_FourCorner_coordinate[1][1]);
-
-        /*绘制左下角坐标*/
-        canvas.drawText("x:" + mRect_FourCorner_coordinate[1][0]
-                        + " y:" + mRect_FourCorner_coordinate[1][1], mRect_FourCorner_coordinate[1][0], mRect_FourCorner_coordinate[1][1] - 10 * mDensity
-                , mTextPaint);
-
-        canvas.restore();
-    }
-
-    /*动画控制*/private ObjectAnimator objectAnimator;
-
-    /**
-     * 开启旋转动画
-     */
-    private void toolLoadRotateAnimation() {
-        objectAnimator = ObjectAnimator.ofFloat(this, "rotation", 0, 360)
-                .setDuration(700);
-        objectAnimator.setInterpolator(new LinearInterpolator());
-        objectAnimator.setRepeatCount(ValueAnimator.INFINITE);
-        objectAnimator.addListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                if (mIsOpenAnima) {
-                    objectAnimator.start();
-                }
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animation) {
-
-            }
-        });
+        float column1X = zoomContainerRect.left + zoomContainerRect.width() / 3f;
+        float column2X = zoomContainerRect.left + zoomContainerRect.width() * 2f / 3f;
+        float row1Y = zoomContainerRect.top + zoomContainerRect.height() / 3f;
+        float row2Y = zoomContainerRect.top + zoomContainerRect.height() * 2f / 3f;
+        canvas.drawLine(column1X, zoomContainerRect.top, column1X, zoomContainerRect.bottom, mMappingLinePaint);
+        canvas.drawLine(column2X, zoomContainerRect.top, column2X, zoomContainerRect.bottom, mMappingLinePaint);
+        canvas.drawLine(zoomContainerRect.left, row1Y, zoomContainerRect.right, row1Y, mMappingLinePaint);
+        canvas.drawLine(zoomContainerRect.left, row2Y, zoomContainerRect.right, row2Y, mMappingLinePaint);
     }
 
     /**
      * 判断按下的点是否在边角范围内
      */
     private boolean toolPointIsInCorner(float x, float y) {
-        if (x > mRect_FourCorner_coordinate[0][0]
-                && x < mRect_FourCorner_coordinate[0][0] + mCornerLength / 2
-                && y > mRect_FourCorner_coordinate[0][1]
-                && y < mRect_FourCorner_coordinate[0][1] + mCornerLength / 2) {
-            mCornerStatus = 0;
-            return true;
-        } else if (x > mRect_FourCorner_coordinate[0][0]
-                && x < mRect_FourCorner_coordinate[0][0] + mCornerLength / 2
-                && y > mRect_FourCorner_coordinate[1][1] - mCornerLength / 2
-                && y < mRect_FourCorner_coordinate[1][1]) {
-            mCornerStatus = 1;
-            return true;
-        } else if (x > mRect_FourCorner_coordinate[2][0] - mCornerLength / 2
-                && x < mRect_FourCorner_coordinate[2][0]
-                && y > mRect_FourCorner_coordinate[2][1]
-                && y < mRect_FourCorner_coordinate[2][1] + mCornerLength / 2) {
-            mCornerStatus = 2;
-            return true;
-        } else if (x > mRect_FourCorner_coordinate[3][0] - mCornerLength / 2
-                && x < mRect_FourCorner_coordinate[3][0]
-                && y > mRect_FourCorner_coordinate[3][1] - mCornerLength / 2
-                && y < mRect_FourCorner_coordinate[3][1]) {
-            mCornerStatus = 3;
+        float touchOffset = mCornerLength / 2;
+
+        // 左上
+        cacheRect.set(zoomContainerRect);
+        cacheRect.right = cacheRect.left + mCornerLength;
+        cacheRect.bottom = cacheRect.top + mCornerLength;
+        cacheRect.offset(-touchOffset, -touchOffset);
+        if (cacheRect.contains(x, y)) {
+            touchCorner = 0;
             return true;
         }
+
+        // 左下
+        cacheRect.set(zoomContainerRect);
+        cacheRect.right = cacheRect.left + mCornerLength;
+        cacheRect.top = cacheRect.bottom - mCornerLength;
+        cacheRect.offset(-touchOffset, touchOffset);
+        if (cacheRect.contains(x, y)) {
+            touchCorner = 1;
+            return true;
+        }
+
+        // 右上
+        cacheRect.set(zoomContainerRect);
+        cacheRect.left = cacheRect.right - mCornerLength;
+        cacheRect.bottom = cacheRect.top + mCornerLength;
+        cacheRect.offset(touchOffset, -touchOffset);
+        if (cacheRect.contains(x, y)) {
+            touchCorner = 2;
+            return true;
+        }
+
+        // 右下
+        cacheRect.set(zoomContainerRect);
+        cacheRect.left = cacheRect.right - mCornerLength;
+        cacheRect.top = cacheRect.bottom - mCornerLength;
+        cacheRect.offset(touchOffset, touchOffset);
+        //noinspection RedundantIfStatement
+        if (cacheRect.contains(x, y)) {
+            touchCorner = 3;
+            return true;
+        }
+
         return false;
     }
 
@@ -662,23 +594,22 @@ public class MCustomZoomView extends View {
      * 判断按下的点是否在边框线范围内
      */
     private boolean toolPointIsInBorderline(float x, float y) {
-        if (x > mRect_FourCorner_coordinate[0][0] && x < mRect_FourCorner_coordinate[0][0] + 10 * mDensity
-                && y > mRect_FourCorner_coordinate[0][1] + mCornerLength
-                && y < mRect_FourCorner_coordinate[1][1] - mCornerLength) {
+        if (x > zoomContainerRect.left && x < (zoomContainerRect.left + 10 * mDensity)) {
             mBorderlineStatus = 0;
             return true;
-        } else if (x > mRect_FourCorner_coordinate[0][0] + mCornerLength
-                && x < mRect_FourCorner_coordinate[2][0] - mCornerLength
-                && y > mRect_FourCorner_coordinate[0][1] && y < mRect_FourCorner_coordinate[0][1] + 10 * mDensity) {
+        }
+
+        if (y > zoomContainerRect.top && y < (zoomContainerRect.top + 10 * mDensity)) {
             mBorderlineStatus = 1;
             return true;
-        } else if (x > mRect_FourCorner_coordinate[2][0] && x < mRect_FourCorner_coordinate[2][0] + 10 * mDensity
-                && y > mRect_FourCorner_coordinate[2][1] + mCornerLength
-                && y < mRect_FourCorner_coordinate[3][1] - mCornerLength) {
+        }
+
+        if (x < zoomContainerRect.right && x > (zoomContainerRect.right - 10 * mDensity)) {
             mBorderlineStatus = 2;
             return true;
-        } else if (x > mRect_FourCorner_coordinate[1][0] + mCornerLength && x < mRect_FourCorner_coordinate[3][0] - mCornerLength
-                && y > mRect_FourCorner_coordinate[1][1] && y < mRect_FourCorner_coordinate[1][1] + 10 * mDensity) {
+        }
+
+        if (y < zoomContainerRect.bottom && y > (zoomContainerRect.bottom - 10 * mDensity)) {
             mBorderlineStatus = 3;
             return true;
         }
@@ -686,85 +617,9 @@ public class MCustomZoomView extends View {
         return false;
     }
 
-    /**
-     * 判断是否还能缩放-边角线触碰就不再缩放
-     * true:触碰
-     * false:没有触碰
-     * 0:点击边框线没有触碰 1:触碰
-     * 2:点击左上边角、
-     */
-    private boolean toolCornerIsTouch(float mNowx, float mNowY, float mLastPressX, float mLastPressY) {
-        /*如果左右边角触碰*/
-        if (mRect_FourCorner_coordinate[0][0] + mCornerLength >= mRect_FourCorner_coordinate[2][0] - mCornerLength) {
-            /*如果点击左侧边框*/
-            if (mBorderlineStatus == 0 || mCornerStatus == 0 || mCornerStatus == 1) {
-                /*如果继续向右滑-禁止滑动*/
-                if (mNowx > mLastPressX) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-            /*如果点击右侧边框*/
-            else if (mBorderlineStatus == 2 || mCornerStatus == 2 || mCornerStatus == 3) {
-                /*如果继续向左滑动-禁止滑动*/
-                if (mNowx < mLastPressX) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        } else if (mRect_FourCorner_coordinate[0][1] + mCornerLength >= mRect_FourCorner_coordinate[1][1] - mCornerLength) {
-            /*如果点击的是上侧边框*/
-            if (mBorderlineStatus == 1 || mCornerStatus == 0 || mCornerStatus == 2) {
-                /*如果继续向下滑-禁止滑动*/
-                if (mNowY > mLastPressY) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-            /*如果点击的是下侧边框*/
-            else if (mBorderlineStatus == 3 || mCornerStatus == 1 || mCornerStatus == 3) {
-                /*如果继续向上滑-禁止滑动*/
-                if (mNowY < mLastPressY) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     * 判断是横向滑动还是垂直滑动
-     * true:横向滑动
-     * false:垂直滑动
-     */
-    private boolean toolHorOrVer(float mNowx, float mNowY, float mLastPressX, float mLastPressY) {
-
-        return false;
-    }
-
-    public void setIsDrawPonit(boolean mIsDrawPonit) {
-        this.mIsDrawPonit = mIsDrawPonit;
-        invalidate();
-    }
-
     public void setISDrawMapLine(boolean mISDrawMapLine) {
         this.mISDrawMapLine = mISDrawMapLine;
         invalidate();
-    }
-
-    public void setOpenAnima(boolean mOpenStatus) {
-        if (!mIsOpenAnima) {
-            this.mIsOpenAnima = mOpenStatus;
-            objectAnimator.start();
-        } else {
-            this.mIsOpenAnima = mOpenStatus;
-            objectAnimator.cancel();
-        }
     }
 
     /**
