@@ -4,7 +4,6 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.RectF;
 import android.media.MediaPlayer;
@@ -12,7 +11,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.provider.MediaStore;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.CardView;
 import android.text.TextUtils;
@@ -20,21 +18,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.MediaController;
 
-import com.google.gson.Gson;
 import com.manyu.videoshare.R;
-import com.manyu.videoshare.base.BaseApplication;
 import com.manyu.videoshare.base.BaseVideoActivity;
-import com.manyu.videoshare.base.LoadingDialog;
-import com.manyu.videoshare.bean.AnalysisTimeBean;
 import com.manyu.videoshare.permission.PermissionUtils;
 import com.manyu.videoshare.permission.request.IRequestPermissions;
 import com.manyu.videoshare.permission.request.RequestPermissions;
-import com.manyu.videoshare.util.Constants;
-import com.manyu.videoshare.util.DialogIncomeTipUtil;
 import com.manyu.videoshare.util.FFmpegUtil;
-import com.manyu.videoshare.util.Globals;
-import com.manyu.videoshare.util.HttpUtils;
-import com.manyu.videoshare.util.RomUtils;
 import com.manyu.videoshare.util.ToastUtils;
 import com.manyu.videoshare.util.ToolUtils;
 import com.manyu.videoshare.util.UriToPathUtil;
@@ -42,13 +31,10 @@ import com.manyu.videoshare.util.VideoViewTool;
 import com.manyu.videoshare.view.ScreenShotZoomView;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import io.microshow.rxffmpeg.RxFFmpegInvoke;
 import io.microshow.rxffmpeg.RxFFmpegSubscriber;
-import okhttp3.Call;
 
 import static com.manyu.videoshare.util.SystemProgramUtils.REQUEST_CODE_MOVE_WATER_MARK;
 
@@ -64,8 +50,6 @@ public class RemoveWatermarkActivity extends BaseVideoActivity implements View.O
     private int videoViewW;
     private int videoViewH;
     private float scale;
-    private RectF rect = new RectF();
-    private List<RectF> list;
     private String newPath = Environment.getExternalStorageDirectory() + File.separator + Environment.DIRECTORY_DCIM + File.separator + "Camera" + File.separator;
     private VideoViewTool videoViewTool = new VideoViewTool();
     private IRequestPermissions requestPermissions = RequestPermissions.getInstance();//动态权限请求
@@ -97,20 +81,10 @@ public class RemoveWatermarkActivity extends BaseVideoActivity implements View.O
         MediaController mediaController = new MediaController(this);
         mediaController.setVisibility(View.GONE);
         zoomView = findViewById(R.id.sszv);
-        zoomView.setOnTransformListener(new ScreenShotZoomView.onTransformListener() {
-            @Override
-            public void onTransform(float left, float top, float right, float bottom) {
-                rect.left = left * scale;
-                rect.top = top * scale;
-                rect.right = right * scale;
-                rect.bottom = bottom * scale;
-            }
-        });
     }
 
     @Override
     public void initData() {
-        list = new ArrayList<>();
         newPath = getBaseContext().getCacheDir().getAbsolutePath() + File.separator;
     }
 
@@ -162,32 +136,40 @@ public class RemoveWatermarkActivity extends BaseVideoActivity implements View.O
     }
 
     private void removeWM(String path) {
-        if (rect.right <= 0 || rect.bottom <= 0 || (rect.left / scale >= videoViewW) || rect.top / scale > videoViewH) {
-            ToastUtils.showShort("请在视频范围内裁剪！");
+        List<RectF> areaRectFs = zoomView.getAreaRectF();
+        if (areaRectFs.size() == 0) {
             return;
         }
-        if (rect.top >= rect.bottom || rect.left >= rect.right) {
-            ToastUtils.showShort("请重新选择水印区域！");
-            return;
+
+        for (RectF rect : areaRectFs) {
+            if (rect.right <= 0 || rect.bottom <= 0 || (rect.left / scale >= videoViewW) || rect.top / scale > videoViewH) {
+                ToastUtils.showShort("请在视频范围内裁剪！");
+                return;
+            }
+            if (rect.top >= rect.bottom || rect.left >= rect.right) {
+                ToastUtils.showShort("请重新选择水印区域！");
+                return;
+            }
         }
+
+
         videoViewTool.videoPuase();
-        list.add(rect);
-        for (int i = 0; i < list.size(); i++) {
-            if (list.get(i).left < 0) {
-                list.get(i).left = 0;
+        for (int i = 0; i < areaRectFs.size(); i++) {
+            if (areaRectFs.get(i).left < 0) {
+                areaRectFs.get(i).left = 0;
             }
-            if (list.get(i).top < 0) {
-                list.get(i).top = 0;
+            if (areaRectFs.get(i).top < 0) {
+                areaRectFs.get(i).top = 0;
             }
-            if (list.get(i).right > videoW - 1) {
-                list.get(i).right = videoW - 1;
+            if (areaRectFs.get(i).right > videoW - 1) {
+                areaRectFs.get(i).right = videoW - 1;
             }
-            if (list.get(i).bottom > videoH) {
-                list.get(i).bottom = videoH;
+            if (areaRectFs.get(i).bottom > videoH) {
+                areaRectFs.get(i).bottom = videoH;
             }
         }
-        newPath = newPath + "jq_" + (int) rect.left + "_" + (int) rect.top + "_" + UriToPathUtil.getFileNameByPath(path);
-        String[] commands = FFmpegUtil.removeWaterMark(path, newPath, list);
+        newPath = newPath + "jq_" + System.currentTimeMillis() + "_" + UriToPathUtil.getFileNameByPath(path);
+        String[] commands = FFmpegUtil.removeWaterMark(path, newPath, areaRectFs);
 
         RxFFmpegInvoke.getInstance().runCommandRxJava(commands).subscribe(new RxFFmpegSubscriber() {
             @Override
@@ -195,7 +177,6 @@ public class RemoveWatermarkActivity extends BaseVideoActivity implements View.O
                 progressEnd();
                 Log.e("ffmpeg_result", "成功");
                 PreviewActivity.start(RemoveWatermarkActivity.this, newPath, REQUEST_CODE_MOVE_WATER_MARK);
-                list.clear();
                 newPath = getBaseContext().getCacheDir().getAbsolutePath() + File.separator;
             }
 
@@ -225,7 +206,6 @@ public class RemoveWatermarkActivity extends BaseVideoActivity implements View.O
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == 0 || resultCode == 100) {
             finish();
-            return;
         } else if (resultCode == RESULT_OK) {
             if (requestCode == 1) {
                 Uri uri = data.getData();
@@ -263,6 +243,9 @@ public class RemoveWatermarkActivity extends BaseVideoActivity implements View.O
                                         videoW = mp.getVideoWidth();
                                         videoH = mp.getVideoHeight();
                                         scale = (float) videoW / (float) videoViewW;
+
+                                        // 宽高初始化完成后，才允许拖动
+                                        zoomView.setEnabled(true);
                                     }
                                 });
                             }

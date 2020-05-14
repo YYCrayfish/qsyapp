@@ -16,10 +16,8 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.TextView;
 
 import com.gyf.immersionbar.ImmersionBar;
 import com.manyu.videoshare.R;
@@ -54,7 +52,6 @@ public class VideoClipActivity extends BaseVideoActivity implements View.OnClick
     private int videoViewW;//视频控件宽度
     private int videoViewH;//视频控件高度
     private float scale;
-    private float mLeft, mTop, mRight, mBottom;
     private RectF rect = new RectF();
     private String newPath = Environment.getExternalStorageDirectory()
             + File.separator + Environment.DIRECTORY_DCIM
@@ -92,7 +89,7 @@ public class VideoClipActivity extends BaseVideoActivity implements View.OnClick
         ratio1 = findViewById(R.id.ratio1);
         ratio43 = findViewById(R.id.ratio43);
         ratio34 = findViewById(R.id.ratio34);
-        zoomView.setISDrawMapLine(true);
+        zoomView.setIsDrawMapLine(true);
 
         mRatioTypeGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
@@ -114,16 +111,6 @@ public class VideoClipActivity extends BaseVideoActivity implements View.OnClick
                 }
             }
         });
-        zoomView.setOnTransformListener(new MCustomZoomView.onTransformListener() {
-            @Override
-            public void onTransform(float left, float top, float right, float bottom) {
-                mLeft = left;
-                mTop = top;
-                mRight = right;
-                mBottom = bottom;
-            }
-        });
-
     }
 
     @Override
@@ -177,10 +164,10 @@ public class VideoClipActivity extends BaseVideoActivity implements View.OnClick
     }
 
     private void cipVideo(String path) {
-        rect.left = mLeft * scale;
-        rect.top = mTop * scale;
-        rect.right = mRight * scale;
-        rect.bottom = mBottom * scale;
+        rect.left = zoomView.getAreaRectF().left * scale;
+        rect.top = zoomView.getAreaRectF().top * scale;
+        rect.right = zoomView.getAreaRectF().right * scale;
+        rect.bottom = zoomView.getAreaRectF().bottom * scale;
         if (rect.right <= 0 || rect.bottom <= 0 || (rect.left / scale >= videoViewW) || rect.top / scale > videoViewH) {
             ToastUtils.showShort("请在视频范围内裁剪！");
             return;
@@ -271,6 +258,9 @@ public class VideoClipActivity extends BaseVideoActivity implements View.OnClick
                                         videoW = mp.getVideoWidth();
                                         videoH = mp.getVideoHeight();
                                         scale = (float) videoW / (float) videoViewW;
+
+                                        // 宽高初始化完成后，才允许拖动
+                                        zoomView.setEnabled(true);
                                     }
                                 });
                             }
