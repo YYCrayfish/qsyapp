@@ -142,7 +142,7 @@ public class RemoveWatermarkActivity extends BaseVideoActivity implements View.O
         }
 
         for (RectF rect : areaRectFs) {
-            if (rect.right <= 0 || rect.bottom <= 0 || (rect.left / scale >= videoViewW) || rect.top / scale > videoViewH) {
+            if (rect.left < 0 || rect.top < 0 || (rect.right > videoViewW) || rect.bottom > videoViewH) {
                 ToastUtils.showShort("请在视频范围内裁剪！");
                 return;
             }
@@ -155,17 +155,22 @@ public class RemoveWatermarkActivity extends BaseVideoActivity implements View.O
 
         videoViewTool.videoPuase();
         for (int i = 0; i < areaRectFs.size(); i++) {
-            if (areaRectFs.get(i).left < 0) {
-                areaRectFs.get(i).left = 0;
+            RectF rectF = areaRectFs.get(i);
+            rectF.left *= scale;
+            rectF.top *= scale;
+            rectF.right *= scale;
+            rectF.bottom *= scale;
+            if (rectF.left < 0) {
+                rectF.left = 0;
             }
-            if (areaRectFs.get(i).top < 0) {
-                areaRectFs.get(i).top = 0;
+            if (rectF.top < 0) {
+                rectF.top = 0;
             }
-            if (areaRectFs.get(i).right > videoW - 1) {
-                areaRectFs.get(i).right = videoW - 1;
+            if (rectF.right > videoW - 1) {
+                rectF.right = videoW - 1;
             }
-            if (areaRectFs.get(i).bottom > videoH) {
-                areaRectFs.get(i).bottom = videoH;
+            if (rectF.bottom > videoH) {
+                rectF.bottom = videoH;
             }
         }
         newPath = newPath + "jq_" + System.currentTimeMillis() + "_" + UriToPathUtil.getFileNameByPath(path);

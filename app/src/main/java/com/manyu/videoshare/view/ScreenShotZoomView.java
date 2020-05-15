@@ -117,7 +117,7 @@ public class ScreenShotZoomView extends View {
     public List<RectF> getAreaRectF() {
         ArrayList<RectF> result = new ArrayList<>();
         for (AreaHolder area : areas) {
-            result.add(area.getContainerRect());
+            result.add(new RectF(area.getContainerRect()));
         }
         return result;
     }
